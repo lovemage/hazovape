@@ -2,19 +2,32 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
 
-// Railway Volume 數據持久化配置
-// 確保數據庫目錄存在
-const dbDir = process.env.NODE_ENV === 'production'
-  ? '/app/data'  // Railway Volume 路徑
-  : path.join(__dirname, '../data');  // 本地開發路徑
+// 動態數據庫路徑配置 - 與 railway-start.js 保持一致
+const isRailwayEnvironment = process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_PROJECT_ID;
+const dbDir = process.env.DATABASE_PATH
+  ? path.dirname(process.env.DATABASE_PATH)
+  : isRailwayEnvironment
+    ? '/app/data'  // Railway 環境
+    : path.join(__dirname, '../data');  // 本地環境
 
+// 確保數據庫目錄存在
 if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
+  try {
+    fs.mkdirSync(dbDir, { recursive: true });
+    console.log('✅ 創建數據庫目錄:', dbDir);
+  } catch (error) {
+    console.error('❌ 無法創建數據庫目錄:', error.message);
+    // 如果創建失敗，使用當前目錄下的 data 作為備用
+    const fallbackDir = path.join(__dirname, '../data');
+    if (!fs.existsSync(fallbackDir)) {
+      fs.mkdirSync(fallbackDir, { recursive: true });
+    }
+    console.log('🔄 使用備用目錄:', fallbackDir);
+  }
 }
 
-// 統一使用 mistmall.db，不分環境
-const dbFileName = 'mistmall.db';
-const dbPath = path.join(dbDir, dbFileName);
+// 數據庫文件路徑
+const dbPath = process.env.DATABASE_PATH || path.join(dbDir, 'mistmall.db');
 
 // Railway 首次部署：從部署包複製初始數據到 Volume
 if (process.env.NODE_ENV === 'production') {
@@ -37,7 +50,7 @@ if (process.env.NODE_ENV === 'production') {
 
 console.log('🗄️  數據庫路徑:', dbPath);
 console.log('🌍 環境:', process.env.NODE_ENV || 'development');
-console.log('📄 數據庫文件名:', dbFileName);
+console.log('📄 數據庫文件名:', path.basename(dbPath));
 console.log('📁 數據庫目錄存在:', fs.existsSync(dbDir));
 console.log('📄 數據庫文件存在:', fs.existsSync(dbPath));
 

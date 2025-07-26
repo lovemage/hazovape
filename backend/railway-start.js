@@ -133,9 +133,24 @@ async function initializeDatabase() {
   // 運行遷移（表結構應該已經存在）
   try {
     console.log('🔄 運行數據庫遷移...');
+    
+    // 添加 system_settings 表和 Telegram 設置
+    console.log('🔄 檢查系統設置功能...');
+    const addTelegramSettings = require('./scripts/add-telegram-settings');
+    await addTelegramSettings();
+    console.log('✅ 系統設置功能遷移完成');
+    
+    // 添加 tracking_number 字段
     const migrateTrackingNumber = require('./scripts/migrate-add-tracking-number');
     await migrateTrackingNumber();
     console.log('✅ tracking_number 遷移完成');
+    
+    // 添加 upsell_products 表和功能
+    console.log('🔄 檢查加購商品功能...');
+    const addUpsellProducts = require('./scripts/add-upsell-products');
+    await addUpsellProducts();
+    console.log('✅ 加購商品功能遷移完成');
+    
   } catch (error) {
     console.error('❌ 遷移失敗:', error.message);
     console.log('⚠️  遷移失敗，但繼續啟動服務器...');
