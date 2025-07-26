@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    font-family: 'Inter', 'Noto Sans TC', system-ui, sans-serif;
+  }
+  
+  body {
+    font-family: 'Inter', 'Noto Sans TC', system-ui, sans-serif;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+  
+  :root {
+    --radius: 0.5rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%
+  }
+
+  .dark {
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%
+  }
+}
+
+
+
+img {
+  object-position: top;
+}
+
+/* Pixel 3D Button Styles */
+.pixel-button {
+  position: relative;
+  border: none;
+  border-radius: 0;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  user-select: none;
+  
+  /* 3D Effect */
+  box-shadow: 
+    0 4px 0 rgba(0,0,0,0.2),
+    0 8px 0 rgba(0,0,0,0.1),
+    0 12px 20px rgba(0,0,0,0.15);
+  
+  /* Pixel borders */
+  background-image: 
+    linear-gradient(90deg, transparent 0%, transparent 1px, rgba(255,255,255,0.3) 1px, rgba(255,255,255,0.3) 2px, transparent 2px),
+    linear-gradient(0deg, transparent 0%, transparent 1px, rgba(0,0,0,0.2) 1px, rgba(0,0,0,0.2) 2px, transparent 2px);
+  
+  /* Animation */
+  transform: translateY(0);
+}
+
+.pixel-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 0 rgba(0,0,0,0.2),
+    0 10px 0 rgba(0,0,0,0.1),
+    0 15px 25px rgba(0,0,0,0.2);
+}
+
+.pixel-button:active {
+  transform: translateY(2px);
+  box-shadow: 
+    0 2px 0 rgba(0,0,0,0.2),
+    0 4px 0 rgba(0,0,0,0.1),
+    0 6px 10px rgba(0,0,0,0.1);
+}
+
+/* Green variant for LINE */
+.pixel-button-green {
+  background: linear-gradient(135deg, #06c755 0%, #05a346 100%);
+  color: white;
+}
+
+.pixel-button-green:hover {
+  background: linear-gradient(135deg, #07d965 0%, #06b450 100%);
+}
+
+.pixel-button-green:active {
+  background: linear-gradient(135deg, #05a346 0%, #04923c 100%);
+}
+
+/* Blue variant for Telegram */
+.pixel-button-blue {
+  background: linear-gradient(135deg, #0088cc 0%, #0066aa 100%);
+  color: white;
+}
+
+.pixel-button-blue:hover {
+  background: linear-gradient(135deg, #0099dd 0%, #0077bb 100%);
+}
+
+.pixel-button-blue:active {
+  background: linear-gradient(135deg, #0066aa 0%, #005588 100%);
+}

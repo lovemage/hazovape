@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>門市選擇完成</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+        }
+        .store-info {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🏪</div>
+        <div class="title">門市選擇完成</div>
+        <div class="subtitle">正在將門市信息傳送回結帳頁面...</div>
+        
+        <div class="store-info" id="storeInfo" style="display: none;">
+            <div><strong>門市名稱：</strong><span id="storeName"></span></div>
+            <div><strong>門市代號：</strong><span id="storeId"></span></div>
+            <div><strong>門市地址：</strong><span id="storeAddress"></span></div>
+        </div>
+        
+        <div class="loading"></div>
+        
+        <div style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.7;">
+            此視窗將在 3 秒後自動關閉
+        </div>
+    </div>
+
+    <script>
+        console.log('🏪 門市回調頁面載入');
+        
+        // 解析 URL 參數
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // 檢查各種可能的參數名稱
+        const storeName = urlParams.get('storeName') || urlParams.get('CVSStoreName');
+        const storeId = urlParams.get('storeId') || urlParams.get('CVSStoreID');
+        const storeAddress = urlParams.get('storeAddress') || urlParams.get('CVSAddress');
+        
+        console.log('🔍 解析到的門市參數:', {
+            storeName,
+            storeId,
+            storeAddress,
+            allParams: Object.fromEntries(urlParams.entries())
+        });
+        
+        if (storeName && storeId) {
+            // 顯示門市信息
+            document.getElementById('storeInfo').style.display = 'block';
+            document.getElementById('storeName').textContent = storeName;
+            document.getElementById('storeId').textContent = storeId;
+            document.getElementById('storeAddress').textContent = storeAddress || '地址信息未提供';
+            
+            // 向父視窗發送門市信息
+            if (window.opener) {
+                console.log('✅ 向父視窗發送門市數據');
+                window.opener.postMessage({
+                    type: 'STORE_SELECTED',
+                    storeName: storeName,
+                    storeId: storeId,
+                    storeAddress: storeAddress
+                }, '*');
+                
+                // 更新顯示
+                document.querySelector('.subtitle').textContent = '門市信息已成功傳送！';
+                document.querySelector('.loading').style.display = 'none';
+            } else {
+                console.error('❌ 找不到父視窗');
+                document.querySelector('.subtitle').textContent = '錯誤：找不到父視窗';
+                document.querySelector('.loading').style.display = 'none';
+            }
+        } else {
+            console.error('❌ 門市參數不完整');
+            document.querySelector('.subtitle').textContent = '錯誤：門市參數不完整';
+            document.querySelector('.loading').style.display = 'none';
+        }
+        
+        // 3秒後自動關閉視窗
+        setTimeout(() => {
+            console.log('🔄 自動關閉視窗');
+            window.close();
+        }, 3000);
+    </script>
+</body>
+</html>
