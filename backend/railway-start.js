@@ -2,8 +2,37 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 console.log('🚀 Railway 啟動腳本開始...');
+
+// 安裝後端依賴項
+console.log('📦 檢查後端依賴項...');
+try {
+  const backendDir = __dirname;
+  const packageJsonPath = path.join(backendDir, 'package.json');
+  const nodeModulesPath = path.join(backendDir, 'node_modules');
+  
+  // 檢查是否需要安裝依賴項
+  if (fs.existsSync(packageJsonPath) && !fs.existsSync(nodeModulesPath)) {
+    console.log('🔧 安裝後端依賴項...');
+    execSync('npm install --production', { cwd: backendDir, stdio: 'inherit' });
+    console.log('✅ 後端依賴項安裝完成');
+  } else {
+    console.log('✅ 後端依賴項已存在');
+  }
+} catch (error) {
+  console.error('❌ 後端依賴項安裝失敗:', error.message);
+  // 嘗試使用 npm ci 作為備選方案
+  try {
+    console.log('🔄 嘗試使用 npm ci...');
+    execSync('npm ci --production', { cwd: __dirname, stdio: 'inherit' });
+    console.log('✅ 使用 npm ci 安裝成功');
+  } catch (ciError) {
+    console.error('❌ npm ci 也失敗了:', ciError.message);
+    console.log('⚠️  繼續啟動，但後端可能缺少依賴項...');
+  }
+}
 
 // 確保必要的目錄存在
 const dirs = ['data', 'uploads', 'exports'];
@@ -16,14 +45,27 @@ dirs.forEach(dir => {
 });
 
 // 設置數據庫路徑
-const dbPath = process.env.DATABASE_PATH || '/app/data/mistmall.db';
+const isRailwayEnvironment = process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_PROJECT_ID;
+const dbPath = process.env.DATABASE_PATH || (isRailwayEnvironment ? '/app/data/mistmall.db' : path.join(__dirname, 'data', 'mistmall.db'));
 console.log('🗄️ 數據庫路徑:', dbPath);
+console.log('🌍 環境類型:', isRailwayEnvironment ? 'Railway' : 'Local');
 
 // 確保數據庫目錄存在
 const dbDir = path.dirname(dbPath);
 if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
-  console.log('✅ 創建數據庫目錄:', dbDir);
+  try {
+    fs.mkdirSync(dbDir, { recursive: true });
+    console.log('✅ 創建數據庫目錄:', dbDir);
+  } catch (error) {
+    console.error('❌ 無法創建數據庫目錄:', error.message);
+    // 如果創建失敗，嘗試使用當前目錄下的 data 目錄
+    const fallbackDbPath = path.join(__dirname, 'data', 'mistmall.db');
+    const fallbackDbDir = path.dirname(fallbackDbPath);
+    fs.mkdirSync(fallbackDbDir, { recursive: true });
+    process.env.DATABASE_PATH = fallbackDbPath;
+    console.log('🔄 使用備用路徑:', fallbackDbPath);
+    return;
+  }
 }
 
 // 設置環境變量

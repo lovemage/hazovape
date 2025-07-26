@@ -1,0 +1,15 @@
+[build]
+builder = "nixpacks"
+buildCommand = "pnpm install && pnpm build"
+
+[deploy]
+startCommand = "node backend/railway-start.js"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
+
+[env]
+NODE_ENV = "production"
+DATABASE_PATH = "/app/data/mistmall.db"
+PORT = "3001"
+JWT_SECRET = "mist-mall-production-secret-key-change-this" 
