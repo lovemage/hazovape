@@ -489,21 +489,22 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   if (process.env.NODE_ENV === 'production') {
     console.log('✅ Railway 生產環境啟動成功');
 
-    // 運行數據庫修復和遷移（異步，不阻塞服務器）
+    // 運行數據庫維護操作（異步，不阻塞服務器）
     setTimeout(async () => {
       try {
-        console.log('🔧 開始數據庫修復...');
-        const fixDatabase = require('../railway-database-fix.cjs');
-        await fixDatabase();
-        console.log('✅ 數據庫修復完成');
-
-        // 遷移已完成，跳過以避免數據庫連接衝突
-        console.log('✅ 數據庫遷移已完成，跳過重複執行');
+        console.log('🔧 開始數據庫維護檢查...');
+        
+        // 確保靜態文件目錄存在
+        const ensureStaticFiles = require('./scripts/ensure-static-files');
+        await ensureStaticFiles();
+        console.log('✅ 靜態文件檢查完成');
+        
+        console.log('✅ 數據庫維護完成');
       } catch (error) {
-        console.error('⚠️ 數據庫操作失敗:', error.message);
+        console.error('⚠️ 數據庫維護失敗:', error.message);
         // 不要讓錯誤影響服務器運行
       }
-    }, 10000); // 10秒後運行，確保服務器已完全啟動
+    }, 5000); // 5秒後運行，確保服務器已完全啟動
   }
 });
 

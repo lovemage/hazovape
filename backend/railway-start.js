@@ -75,18 +75,69 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 console.log('🌍 環境:', process.env.NODE_ENV);
 console.log('📄 數據庫文件存在:', fs.existsSync(dbPath));
 
-// 運行數據庫遷移
-async function runMigrations() {
-  console.log('🔧 開始運行數據庫遷移...');
+// 數據庫初始化和遷移
+async function initializeDatabase() {
+  console.log('🔧 開始數據庫初始化和遷移...');
   
+  const dbExists = fs.existsSync(dbPath);
+  
+  if (!dbExists) {
+    console.log('📋 首次部署，需要初始化數據庫...');
+    
+    try {
+      // 運行完整的數據庫初始化
+      console.log('🚀 運行完整數據庫初始化...');
+      const completeInit = require('./scripts/complete-init');
+      await completeInit();
+      console.log('✅ 數據庫初始化完成');
+    } catch (error) {
+      console.error('❌ 數據庫初始化失敗:', error);
+      console.log('⚠️  嘗試基本初始化...');
+      
+      try {
+        // 嘗試基本的 SQL 初始化
+        const Database = require('./config/database');
+        const fs = require('fs');
+        const path = require('path');
+        
+        const sqlPath = path.join(__dirname, 'database.sql');
+        if (fs.existsSync(sqlPath)) {
+          const sqlScript = fs.readFileSync(sqlPath, 'utf8');
+          const statements = sqlScript
+            .split(';')
+            .map(stmt => stmt.trim())
+            .filter(stmt => stmt.length > 0);
+          
+          for (const statement of statements) {
+            if (statement.trim()) {
+              try {
+                await Database.run(statement);
+                console.log('✅ 執行 SQL:', statement.substring(0, 50) + '...');
+              } catch (error) {
+                if (!error.message.includes('already exists')) {
+                  console.error('❌ SQL 執行失敗:', error.message);
+                }
+              }
+            }
+          }
+          console.log('✅ 基本 SQL 初始化完成');
+        }
+      } catch (sqlError) {
+        console.error('❌ 基本初始化也失敗:', sqlError);
+      }
+    }
+  } else {
+    console.log('📋 數據庫文件已存在，跳過初始化');
+  }
+  
+  // 運行遷移（表結構應該已經存在）
   try {
-    // 運行tracking_number遷移
+    console.log('🔄 運行數據庫遷移...');
     const migrateTrackingNumber = require('./scripts/migrate-add-tracking-number');
     await migrateTrackingNumber();
     console.log('✅ tracking_number 遷移完成');
   } catch (error) {
-    console.error('❌ 遷移失敗:', error);
-    // 不要退出，因為可能是字段已存在
+    console.error('❌ 遷移失敗:', error.message);
     console.log('⚠️  遷移失敗，但繼續啟動服務器...');
   }
 }
@@ -94,8 +145,8 @@ async function runMigrations() {
 // 異步啟動函數
 async function start() {
   try {
-    // 先運行遷移
-    await runMigrations();
+    // 先初始化數據庫，再運行遷移
+    await initializeDatabase();
     
     // 然後啟動服務器
     console.log('🚀 啟動服務器...');

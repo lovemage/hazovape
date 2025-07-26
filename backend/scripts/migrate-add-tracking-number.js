@@ -6,6 +6,17 @@ async function migrateAddTrackingNumber() {
   console.log('🚀 開始添加運輸單號字段...');
   
   try {
+    // 首先檢查 orders 表是否存在
+    const tableExists = await Database.get(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='orders'"
+    );
+    
+    if (!tableExists) {
+      console.log('⚠️  orders 表不存在，跳過 tracking_number 遷移');
+      console.log('💡 請確保數據庫已正確初始化');
+      return;
+    }
+    
     // 檢查字段是否已存在
     const tableInfo = await Database.all("PRAGMA table_info(orders)");
     const hasTrackingNumber = tableInfo.some(column => column.name === 'tracking_number');
