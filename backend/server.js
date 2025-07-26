@@ -89,8 +89,14 @@ app.use((req, res, next) => {
 
 // 靜態文件服務 - 支持 Railway Volume
 const getUploadsPath = () => {
+  // 優先使用環境變數 UPLOADS_PATH（用於 Railway Volume）
+  if (process.env.UPLOADS_PATH) {
+    return process.env.UPLOADS_PATH;
+  }
+  
+  // 根據環境判斷
   if (process.env.NODE_ENV === 'production') {
-    // Railway 生產環境：使用 Volume 路徑
+    // Railway 生產環境：使用 Volume 路徑（備用方案）
     return '/app/data/uploads';
   } else {
     // 本地開發環境：使用相對路徑

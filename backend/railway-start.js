@@ -140,6 +140,12 @@ async function initializeDatabase() {
     await addTelegramSettings();
     console.log('✅ 系統設置功能遷移完成');
     
+    // 添加 products 表的 description 字段
+    console.log('🔄 檢查商品描述功能...');
+    const addProductDescription = require('./scripts/migrate-add-product-description');
+    await addProductDescription();
+    console.log('✅ 商品描述功能遷移完成');
+    
     // 添加 tracking_number 字段
     const migrateTrackingNumber = require('./scripts/migrate-add-tracking-number');
     await migrateTrackingNumber();

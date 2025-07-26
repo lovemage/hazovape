@@ -8,8 +8,23 @@ healthcheckPath = "/api/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 
+# Volume 配置說明
+# 需要在 Railway Dashboard 中手動創建 Volume：
+# Mount Path: /app/data
+# Size: 1GB+
+
 [env]
 NODE_ENV = "production"
 DATABASE_PATH = "/app/data/mistmall.db"
+UPLOADS_PATH = "/app/data/uploads"
 PORT = "3001"
-JWT_SECRET = "mist-mall-production-secret-key-change-this" 
+JWT_SECRET = "mist-mall-production-secret-key-change-this"
+
+# 數據庫配置
+SQLITE_JOURNAL_MODE = "WAL"
+SQLITE_SYNCHRONOUS = "NORMAL"
+
+# 開發者注意：
+# 1. 必須在 Railway Dashboard 中設置 Volume 後才能使用永久存儲
+# 2. Volume Mount Path 必須設置為 /app/data
+# 3. 首次部署會自動初始化數據庫和目錄結構 
