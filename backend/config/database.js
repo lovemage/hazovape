@@ -29,9 +29,11 @@ if (!fs.existsSync(dbDir)) {
 // 數據庫文件路徑
 const dbPath = process.env.DATABASE_PATH || path.join(dbDir, 'mistmall.db');
 
+// 統一的數據庫文件名定義
+const dbFileName = 'mistmall.db';
+
 // Railway 首次部署：從部署包複製初始數據到 Volume
 if (process.env.NODE_ENV === 'production') {
-  const dbFileName = 'mistmall.db';  // 統一使用固定的數據庫文件名
   const volumeDbPath = path.join('/app/data', dbFileName);
   const sourceDbPath = path.join(__dirname, '../data', dbFileName);
 
