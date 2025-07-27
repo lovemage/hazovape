@@ -152,6 +152,12 @@ async function initializeDatabase() {
     await addProductCategory();
     console.log('✅ 產品分類功能遷移完成');
 
+    // 添加產品分類管理表
+    console.log('🔄 檢查產品分類管理表...');
+    const addProductCategoriesTable = require('./scripts/migrate-add-product-categories-table');
+    await addProductCategoriesTable();
+    console.log('✅ 產品分類管理表遷移完成');
+
     // 添加 tracking_number 字段
     const migrateTrackingNumber = require('./scripts/migrate-add-tracking-number');
     await migrateTrackingNumber();

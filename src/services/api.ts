@@ -296,11 +296,25 @@ export const adminAPI = {
 
 // 網站設置 API
 export const settingsAPI = {
-  getAll: () => api.get('/settings'),
-  get: (key: string) => api.get(`/settings/${key}`),
-  update: (key: string, value: any) => api.put(`/settings/${key}`, { value }),
-  updateBatch: (settings: Record<string, any>) => api.put('/settings', { settings }),
-  getCategories: () => api.get('/settings/categories/list')
+  getAll: () => api.get('/api/settings'),
+  update: (data: any) => api.put('/api/settings', data),
+};
+
+// 產品分類API
+export const productCategoryAPI = {
+  getAll: () => api.get('/api/product-categories'),
+  getAllAdmin: () => api.get('/api/product-categories/admin', {
+    headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+  }),
+  create: (data: any) => api.post('/api/product-categories/admin', data, {
+    headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+  }),
+  update: (id: number, data: any) => api.put(`/api/product-categories/admin/${id}`, data, {
+    headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+  }),
+  delete: (id: number) => api.delete(`/api/product-categories/admin/${id}`, {
+    headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+  }),
 };
 
 export default api;

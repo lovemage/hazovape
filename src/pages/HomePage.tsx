@@ -4,9 +4,16 @@ import { ShoppingBag, Settings, Search, X, MessageCircle, Star, Gift, Truck, Coi
 import { Button } from '../components/ui/button';
 import { useCart } from '../contexts/CartContext';
 import { AnnouncementCarousel } from '../components/TypewriterText';
-import { announcementAPI, productAPI, settingsAPI } from '../services/api';
+import { announcementAPI, productAPI, settingsAPI, productCategoryAPI } from '../services/api';
 import { getProductImageUrl } from '../utils/imageUtils';
 import { Announcement, Product } from '../types';
+
+interface ProductCategory {
+  id: number;
+  name: string;
+  description?: string;
+  sort_order: number;
+}
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,15 +36,28 @@ export const HomePage: React.FC = () => {
   const [lineUrl, setLineUrl] = useState<string>('https://line.me/ti/p/@590shgcm');
   const [telegramUrl, setTelegramUrl] = useState<string>('https://t.me/whalesale');
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
 
-  // 商品分類選項
-  const categories = [
-    '一次性拋棄式電子煙',
-    '注油式主機與耗材',
-    '拋棄式通用煙蛋系列',
-    '小煙油系列',
-    '其他產品'
-  ];
+  // 載入產品分類
+  const loadCategories = useCallback(async () => {
+    try {
+      console.log('🏠 loadCategories 被調用');
+      const response = await productCategoryAPI.getAll();
+      if (response.data.success) {
+        setCategories(response.data.data || []);
+      }
+    } catch (error) {
+      console.error('載入分類失敗:', error);
+      // 使用預設分類作為後備
+      setCategories([
+        { id: 1, name: '一次性拋棄式電子煙', description: '', sort_order: 1 },
+        { id: 2, name: '注油式主機與耗材', description: '', sort_order: 2 },
+        { id: 3, name: '拋棄式通用煙蛋系列', description: '', sort_order: 3 },
+        { id: 4, name: '小煙油系列', description: '', sort_order: 4 },
+        { id: 5, name: '其他產品', description: '', sort_order: 5 }
+      ]);
+    }
+  }, []);
 
   const loadAnnouncements = useCallback(async () => {
     try {
@@ -142,7 +162,8 @@ export const HomePage: React.FC = () => {
     loadAnnouncements();
     loadProducts();
     loadSettings();
-  }, [loadAnnouncements, loadProducts, loadSettings]);
+    loadCategories();
+  }, [loadAnnouncements, loadProducts, loadSettings, loadCategories]);
 
   useEffect(() => {
     // 顯示廣告彈窗，延遲1.5秒以確保設置載入完成
@@ -238,11 +259,11 @@ export const HomePage: React.FC = () => {
                   <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                     {categories.map((category) => (
                       <button
-                        key={category}
-                        onClick={() => handleCategoryClick(category)}
+                        key={category.id}
+                        onClick={() => handleCategoryClick(category.name)}
                         className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 hover:text-vintage-green transition-colors"
                       >
-                        {category}
+                        {category.name}
                       </button>
                     ))}
                   </div>

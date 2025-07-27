@@ -14,13 +14,17 @@ import {
   Lock,
   Globe,
   ExternalLink,
-  Plus
+  Plus,
+  Home,
+  Tag,
+  Palette
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { adminAPI } from '../services/api';
 import { AdminUser } from '../types';
 import { toast } from 'sonner';
+import { Link } from 'react-router-dom';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -71,6 +75,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       label: '商品管理',
       icon: <Package className="w-5 h-5" />,
       path: '/admin/products',
+    },
+    {
+      id: 'product-categories',
+      label: '產品分類',
+      icon: <Tag className="w-5 h-5" />,
+      path: '/admin/product-categories',
     },
     {
       id: 'flavors',
@@ -181,14 +191,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             <ul className="space-y-2">
               {menuItems.map((item) => (
                 <li key={item.id}>
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      navigate(item.path);
-                      setSidebarOpen(false);
-                    }}
+                  <Link
+                    to={item.path}
                     className={`
-                      w-full justify-start px-3 py-2 text-left
+                      flex items-center w-full justify-start px-3 py-2 rounded-md text-sm font-medium transition-colors
                       ${isCurrentPath(item.path) 
                         ? 'bg-vape-purple/10 text-vape-purple border-r-2 border-vape-purple' 
                         : 'text-gray-700 hover:bg-gray-100'
@@ -202,7 +208,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                         {item.badge}
                       </Badge>
                     )}
-                  </Button>
+                  </Link>
                 </li>
               ))}
             </ul>

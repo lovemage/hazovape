@@ -5,9 +5,16 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
 import { useCart } from '../contexts/CartContext';
-import { productAPI } from '../services/api';
+import { productAPI, productCategoryAPI } from '../services/api';
 import { getProductImageUrl } from '../utils/imageUtils';
 import { Product } from '../types';
+
+interface ProductCategory {
+  id: number;
+  name: string;
+  description?: string;
+  sort_order: number;
+}
 
 export const ProductsPage: React.FC = () => {
   const location = useLocation();
@@ -21,15 +28,33 @@ export const ProductsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedVariants, setSelectedVariants] = useState<{[key: number]: {id: number, name: string}[]}>({});
   const [quantities, setQuantities] = useState<{[key: number]: number}>({});
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
 
-  // 商品分類選項
-  const categories = [
-    '一次性拋棄式電子煙',
-    '注油式主機與耗材',
-    '拋棄式通用煙蛋系列',
-    '小煙油系列',
-    '其他產品'
-  ];
+  const totalItems = getTotalItems();
+
+  // 載入產品分類
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      const response = await productCategoryAPI.getAll();
+      if (response.data.success) {
+        setCategories(response.data.data || []);
+      }
+    } catch (error) {
+      console.error('載入分類失敗:', error);
+      // 使用預設分類作為後備
+      setCategories([
+        { id: 1, name: '一次性拋棄式電子煙', description: '', sort_order: 1 },
+        { id: 2, name: '注油式主機與耗材', description: '', sort_order: 2 },
+        { id: 3, name: '拋棄式通用煙蛋系列', description: '', sort_order: 3 },
+        { id: 4, name: '小煙油系列', description: '', sort_order: 4 },
+        { id: 5, name: '其他產品', description: '', sort_order: 5 }
+      ]);
+    }
+  };
 
   useEffect(() => {
     // 從 location.state 獲取傳遞的數據
@@ -173,8 +198,6 @@ export const ProductsPage: React.FC = () => {
     );
   };
 
-  const totalItems = getTotalItems();
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -270,17 +293,17 @@ export const ProductsPage: React.FC = () => {
             <div className="flex flex-wrap gap-2">
               {categories.map((category) => (
                 <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
+                  key={category.id}
+                  variant={selectedCategory === category.name ? "default" : "outline"}
                   size="sm"
-                  onClick={() => handleCategoryChange(category)}
+                  onClick={() => handleCategoryChange(category.name)}
                   className={`${
-                    selectedCategory === category 
+                    selectedCategory === category.name 
                       ? 'bg-vintage-green text-white hover:bg-vintage-green/90' 
                       : 'border-vintage-green text-vintage-green hover:bg-vintage-green hover:text-white'
                   }`}
                 >
-                  {category}
+                  {category.name}
                 </Button>
               ))}
             </div>

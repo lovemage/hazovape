@@ -138,14 +138,16 @@ if (process.env.NODE_ENV === 'production') {
 
 // API 路由
 app.use('/api/auth', require('./routes/auth').router);
-app.use('/api/products', require('./routes/products'));
 app.use('/api/flavors', require('./routes/flavors'));
 app.use('/api/flavor-categories', require('./routes/flavor-categories'));
+app.use('/api/products', require('./routes/products'));
+app.use('/api/product-categories', require('./routes/product-categories'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/announcements', require('./routes/announcements'));
 app.use('/api/settings', require('./routes/settings'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/upsell-products', require('./routes/upsell-products'));
+app.use('/api/store-callback', require('./routes/store-callback'));
 
 // 7-11 門市選擇回調處理
 app.use('/store-callback.html', require('./routes/store-callback'));

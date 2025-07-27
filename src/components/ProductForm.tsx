@@ -6,7 +6,7 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Switch } from './ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { productAPI } from '../services/api';
+import { productAPI, productCategoryAPI } from '../services/api';
 import { getImageUrl } from '../utils/imageUtils';
 import { toast } from 'sonner';
 import { Product } from '../types';
@@ -16,6 +16,13 @@ interface ProductFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+}
+
+interface ProductCategory {
+  id: number;
+  name: string;
+  description?: string;
+  sort_order: number;
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -38,15 +45,35 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
-  // 商品分類選項
-  const categories = [
-    '一次性拋棄式電子煙',
-    '注油式主機與耗材',
-    '拋棄式通用煙蛋系列',
-    '小煙油系列',
-    '其他產品'
-  ];
+  // 載入產品分類
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      setCategoriesLoading(true);
+      const response = await productCategoryAPI.getAll();
+      if (response.data.success) {
+        setCategories(response.data.data || []);
+      }
+    } catch (error) {
+      console.error('載入分類失敗:', error);
+      // 使用預設分類作為後備
+      setCategories([
+        { id: 1, name: '一次性拋棄式電子煙', description: '', sort_order: 1 },
+        { id: 2, name: '注油式主機與耗材', description: '', sort_order: 2 },
+        { id: 3, name: '拋棄式通用煙蛋系列', description: '', sort_order: 3 },
+        { id: 4, name: '小煙油系列', description: '', sort_order: 4 },
+        { id: 5, name: '其他產品', description: '', sort_order: 5 }
+      ]);
+    } finally {
+      setCategoriesLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (product) {
@@ -361,19 +388,30 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
               <div>
                 <Label htmlFor="category">商品分類 *</Label>
-                <select
-                  id="category"
-                  value={formData.category}
-                  onChange={(e) => handleInputChange('category', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                >
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
+                {categoriesLoading ? (
+                  <div className="flex items-center justify-center py-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                    <span className="ml-2 text-sm text-gray-600">載入分類中...</span>
+                  </div>
+                ) : (
+                  <select
+                    id="category"
+                    value={formData.category}
+                    onChange={(e) => handleInputChange('category', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    {categories.length === 0 ? (
+                      <option value="其他產品">其他產品</option>
+                    ) : (
+                      categories.map((category) => (
+                        <option key={category.id} value={category.name}>
+                          {category.name}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                )}
               </div>
 
               <div className="flex items-center space-x-2">

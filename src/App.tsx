@@ -19,7 +19,9 @@ import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminWebsiteSettings } from './pages/admin/AdminWebsiteSettings';
 import { AdminProducts } from './pages/admin/AdminProducts';
+import { AdminProductCategories } from './pages/admin/AdminProductCategories';
 import { AdminFlavors } from './pages/admin/AdminFlavors';
+import { AdminFlavorCategories } from './pages/admin/AdminFlavorCategories';
 import { AdminOrders } from './pages/admin/AdminOrders';
 import { AdminAnnouncements } from './pages/admin/AdminAnnouncements';
 import { AdminChangePassword } from './pages/admin/AdminChangePassword';
@@ -83,6 +85,14 @@ function App() {
                 }
               />
               <Route
+                path="/admin/product-categories"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminProductCategories />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
                 path="/admin/flavors"
                 element={
                   <ProtectedAdminRoute>
@@ -91,14 +101,14 @@ function App() {
                 }
               />
               {/* 隱藏規格類別管理路由 */}
-              {/* <Route
+              <Route
                 path="/admin/flavor-categories"
                 element={
                   <ProtectedAdminRoute>
                     <AdminFlavorCategories />
                   </ProtectedAdminRoute>
                 }
-              /> */}
+              />
               <Route
                 path="/admin/orders"
                 element={
