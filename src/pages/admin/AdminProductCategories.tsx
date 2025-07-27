@@ -7,6 +7,7 @@ import { Textarea } from '../../components/ui/textarea';
 import { Switch } from '../../components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
+import { AdminLayout } from '../../components/AdminLayout';
 import { toast } from 'sonner';
 
 interface ProductCategory {
@@ -172,185 +173,187 @@ export const AdminProductCategories: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">產品分類管理</h1>
-          <p className="text-gray-600">管理商品分類，設定分類顯示順序</p>
+    <AdminLayout>
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">產品分類管理</h1>
+            <p className="text-gray-600">管理商品分類，設定分類顯示順序</p>
+          </div>
+          <Button
+            onClick={() => {
+              setFormData({
+                name: '',
+                description: '',
+                sort_order: categories.length + 1,
+                is_active: true
+              });
+              setEditingCategory(null);
+              setShowForm(true);
+            }}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            新增分類
+          </Button>
         </div>
-        <Button
-          onClick={() => {
-            setFormData({
-              name: '',
-              description: '',
-              sort_order: categories.length + 1,
-              is_active: true
-            });
-            setEditingCategory(null);
-            setShowForm(true);
-          }}
-          className="bg-green-600 hover:bg-green-700"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          新增分類
-        </Button>
-      </div>
 
-      {/* 分類表單 */}
-      {showForm && (
-        <Card className="mb-6">
+        {/* 分類表單 */}
+        {showForm && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>
+                {editingCategory ? '編輯分類' : '新增分類'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name">分類名稱 *</Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="請輸入分類名稱"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="sort_order">排序順序</Label>
+                    <Input
+                      id="sort_order"
+                      type="number"
+                      value={formData.sort_order}
+                      onChange={(e) => setFormData(prev => ({ ...prev, sort_order: parseInt(e.target.value) || 0 }))}
+                      placeholder="排序順序（數字越小越前面）"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="description">分類描述</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="請輸入分類描述"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="is_active"
+                    checked={formData.is_active}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
+                  />
+                  <Label htmlFor="is_active">啟用分類</Label>
+                </div>
+
+                <div className="flex justify-end space-x-3">
+                  <Button type="button" variant="outline" onClick={resetForm}>
+                    取消
+                  </Button>
+                  <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                    {editingCategory ? '更新分類' : '創建分類'}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 分類列表 */}
+        <Card>
           <CardHeader>
-            <CardTitle>
-              {editingCategory ? '編輯分類' : '新增分類'}
-            </CardTitle>
+            <CardTitle>分類列表</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">分類名稱 *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="請輸入分類名稱"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="sort_order">排序順序</Label>
-                  <Input
-                    id="sort_order"
-                    type="number"
-                    value={formData.sort_order}
-                    onChange={(e) => setFormData(prev => ({ ...prev, sort_order: parseInt(e.target.value) || 0 }))}
-                    placeholder="排序順序（數字越小越前面）"
-                  />
-                </div>
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                <span className="ml-3 text-gray-600">載入中...</span>
               </div>
+            ) : categories.length === 0 ? (
+              <div className="text-center py-12">
+                <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500">暫無分類數據</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {categories.map((category, index) => (
+                  <div
+                    key={category.id}
+                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="flex flex-col space-y-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => updateSortOrder(category.id, category.sort_order - 1)}
+                          disabled={index === 0}
+                        >
+                          <ArrowUp className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => updateSortOrder(category.id, category.sort_order + 1)}
+                          disabled={index === categories.length - 1}
+                        >
+                          <ArrowDown className="h-3 w-3" />
+                        </Button>
+                      </div>
 
-              <div>
-                <Label htmlFor="description">分類描述</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="請輸入分類描述"
-                  rows={3}
-                />
-              </div>
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <h3 className="font-medium text-gray-900">{category.name}</h3>
+                          <Badge variant={category.is_active ? "default" : "secondary"}>
+                            {category.is_active ? '啟用' : '停用'}
+                          </Badge>
+                          <Badge variant="outline">
+                            排序: {category.sort_order}
+                          </Badge>
+                        </div>
+                        {category.description && (
+                          <p className="text-gray-600 text-sm mt-1">{category.description}</p>
+                        )}
+                        <p className="text-gray-400 text-xs mt-1">
+                          創建時間: {new Date(category.created_at).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
 
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="is_active"
-                  checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
-                />
-                <Label htmlFor="is_active">啟用分類</Label>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEdit(category)}
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        編輯
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDelete(category)}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4 mr-1" />
+                        刪除
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              <div className="flex justify-end space-x-3">
-                <Button type="button" variant="outline" onClick={resetForm}>
-                  取消
-                </Button>
-                <Button type="submit" className="bg-green-600 hover:bg-green-700">
-                  {editingCategory ? '更新分類' : '創建分類'}
-                </Button>
-              </div>
-            </form>
+            )}
           </CardContent>
         </Card>
-      )}
-
-      {/* 分類列表 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>分類列表</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-              <span className="ml-3 text-gray-600">載入中...</span>
-            </div>
-          ) : categories.length === 0 ? (
-            <div className="text-center py-12">
-              <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">暫無分類數據</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {categories.map((category, index) => (
-                <div
-                  key={category.id}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="flex flex-col space-y-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0"
-                        onClick={() => updateSortOrder(category.id, category.sort_order - 1)}
-                        disabled={index === 0}
-                      >
-                        <ArrowUp className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0"
-                        onClick={() => updateSortOrder(category.id, category.sort_order + 1)}
-                        disabled={index === categories.length - 1}
-                      >
-                        <ArrowDown className="h-3 w-3" />
-                      </Button>
-                    </div>
-
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <h3 className="font-medium text-gray-900">{category.name}</h3>
-                        <Badge variant={category.is_active ? "default" : "secondary"}>
-                          {category.is_active ? '啟用' : '停用'}
-                        </Badge>
-                        <Badge variant="outline">
-                          排序: {category.sort_order}
-                        </Badge>
-                      </div>
-                      {category.description && (
-                        <p className="text-gray-600 text-sm mt-1">{category.description}</p>
-                      )}
-                      <p className="text-gray-400 text-xs mt-1">
-                        創建時間: {new Date(category.created_at).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(category)}
-                    >
-                      <Edit className="w-4 h-4 mr-1" />
-                      編輯
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(category)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      刪除
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }; 
