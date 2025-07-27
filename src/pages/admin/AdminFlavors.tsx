@@ -277,6 +277,22 @@ export const AdminFlavors: React.FC = () => {
           </div>
           <div className="flex space-x-3">
             <Button
+              onClick={downloadTemplate}
+              variant="outline"
+              className="flex items-center space-x-2"
+            >
+              <Download className="w-4 h-4" />
+              <span>下載模板</span>
+            </Button>
+            <Button
+              onClick={() => setShowBatchImport(true)}
+              variant="outline"
+              className="flex items-center space-x-2"
+            >
+              <Upload className="w-4 h-4" />
+              <span>批量導入</span>
+            </Button>
+            <Button
               onClick={() => setShowBatchForm(true)}
               className="flex items-center space-x-2"
               variant="outline"
