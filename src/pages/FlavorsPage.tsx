@@ -20,6 +20,18 @@ export const FlavorsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // 從 location.state 獲取傳遞的產品數據
+  useEffect(() => {
+    console.log('🔍 檢查 location.state:', location.state);
+    if (location.state?.selectedProduct) {
+      console.log('✅ 找到傳遞的產品:', location.state.selectedProduct);
+      setSelectedProduct(location.state.selectedProduct);
+    } else {
+      console.log('❌ 沒有找到產品數據，返回產品列表');
+      navigate('/products');
+    }
+  }, [location.state, navigate]);
+
   const getProductImage = (product: Product) => {
     console.log('🖼️  處理商品圖片:', product.name, '圖片數據:', product.images);
     let images: string[] = [];
@@ -45,12 +57,11 @@ export const FlavorsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!selectedProduct) {
-      navigate('/products');
-      return;
+    if (selectedProduct) {
+      console.log('🔄 開始載入規格，產品:', selectedProduct.name);
+      loadFlavors();
     }
-    loadFlavors();
-  }, [selectedProduct, navigate]);
+  }, [selectedProduct]);
 
   const loadFlavors = async () => {
     try {
