@@ -1,21 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import { Plus, Edit, Trash2, Eye, EyeOff, FileText, Upload, Download, AlertCircle, CheckCircle } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
-import { AdminLayout } from '../../components/AdminLayout';
 import { ProductForm } from '../../components/ProductForm';
-import { productAPI } from '../../services/api';
-import { getImageUrl } from '../../utils/imageUtils';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { Product } from '../../types';
+import { productAPI } from '../../services/api';
+import { getProductImageUrl } from '../../utils/imageUtils';
+
+interface Product {
+  id: number;
+  name: string;
+  description?: string;
+  category?: string;
+  price: number;
+  stock?: number;
+  multi_discount?: string;
+  images?: string[];
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+interface BatchImportResult {
+  totalParsed: number;
+  successful: number;
+  failed: number;
+  errors: string[];
+}
 
 export const AdminProducts: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | undefined>(undefined);
+  const [showBatchImport, setShowBatchImport] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // 批量導入相關狀態
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<BatchImportResult | null>(null);
 
   useEffect(() => {
     loadProducts();
@@ -27,266 +55,438 @@ export const AdminProducts: React.FC = () => {
       const response = await productAPI.getAllAdmin();
       if (response.data.success) {
         setProducts(response.data.data || []);
-      } else {
-        setError('載入產品失敗');
       }
     } catch (error) {
       console.error('載入產品失敗:', error);
-      setError('載入產品失敗');
+      toast.error('載入產品失敗');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product);
+    setShowForm(true);
+  };
+
+  const handleDelete = async () => {
+    if (!deletingProduct) return;
+
     try {
-      if (currentStatus) {
-        await productAPI.delete(id);
-        toast.success('產品已停用');
+      const response = await productAPI.delete(deletingProduct.id);
+      if (response.data.success) {
+        toast.success('產品已刪除');
+        loadProducts();
       } else {
-        await productAPI.restore(id);
-        toast.success('產品已啟用');
+        toast.error(response.data.message || '刪除失敗');
       }
-      await loadProducts();
+    } catch (error) {
+      console.error('刪除產品失敗:', error);
+      toast.error('刪除產品失敗');
+    } finally {
+      setDeletingProduct(null);
+    }
+  };
+
+  const handleToggleActive = async (product: Product) => {
+    try {
+      const response = await productAPI.update(product.id, {
+        ...product,
+        is_active: !product.is_active
+      });
+      
+      if (response.data.success) {
+        toast.success(`產品已${!product.is_active ? '啟用' : '停用'}`);
+        loadProducts();
+      } else {
+        toast.error('更新失敗');
+      }
     } catch (error) {
       console.error('更新產品狀態失敗:', error);
       toast.error('更新產品狀態失敗');
     }
   };
 
-  const handleDeleteProduct = async (id: number, name: string) => {
-    if (!confirm(`確定要永久刪除產品「${name}」嗎？此操作會同時刪除所有相關規格，無法撤銷。`)) {
+  const handleFormSuccess = () => {
+    setShowForm(false);
+    setEditingProduct(null);
+    loadProducts();
+  };
+
+  // 批量導入處理
+  const handleBatchImport = async () => {
+    if (!importFile) {
+      toast.error('請選擇要上傳的txt文件');
       return;
     }
 
     try {
-      await productAPI.permanentDelete(id);
-      toast.success('產品及相關規格已永久刪除');
-      await loadProducts();
-    } catch (error) {
-      console.error('刪除產品失敗:', error);
-      toast.error('刪除產品失敗');
-    }
-  };
+      setImporting(true);
+      const formData = new FormData();
+      formData.append('txtFile', importFile);
 
-  const handleAddProduct = () => {
-    setEditingProduct(undefined);
-    setShowForm(true);
-  };
-
-  const handleEditProduct = (product: Product) => {
-    setEditingProduct(product);
-    setShowForm(true);
-  };
-
-  const handleFormClose = () => {
-    setShowForm(false);
-    setEditingProduct(undefined);
-  };
-
-  const handleFormSuccess = () => {
-    loadProducts();
-  };
-
-  const getDiscountText = (multiDiscount: any) => {
-    if (!multiDiscount) return '無';
-    try {
-      const discounts = typeof multiDiscount === 'string' 
-        ? JSON.parse(multiDiscount) 
-        : multiDiscount;
+      const response = await productAPI.batchImport(formData);
       
-      return Object.entries(discounts)
-        .map(([qty, discount]: [string, any]) => `${qty}件${((1 - discount) * 100).toFixed(0)}%折`)
-        .join(', ');
-    } catch {
-      return '無';
+      if (response.data.success) {
+        setImportResult(response.data.data);
+        toast.success(`批量導入完成！成功: ${response.data.data.successful}, 失敗: ${response.data.data.failed}`);
+        loadProducts(); // 重新載入產品列表
+      } else {
+        toast.error(response.data.message || '批量導入失敗');
+        setImportResult({
+          totalParsed: 0,
+          successful: 0,
+          failed: 1,
+          errors: [response.data.message || '批量導入失敗']
+        });
+      }
+    } catch (error) {
+      console.error('批量導入失敗:', error);
+      toast.error('批量導入失敗');
+      setImportResult({
+        totalParsed: 0,
+        successful: 0,
+        failed: 1,
+        errors: ['網路錯誤或服務器問題']
+      });
+    } finally {
+      setImporting(false);
     }
   };
 
-  if (loading) {
-    return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-vape-purple"></div>
-        </div>
-      </AdminLayout>
-    );
-  }
+  const downloadTemplate = async () => {
+    try {
+      const response = await fetch('/api/products/admin/batch-import/template');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'product_import_template.txt';
+      a.click();
+      window.URL.revokeObjectURL(url);
+      toast.success('模板文件已下載');
+    } catch (error) {
+      console.error('下載模板失敗:', error);
+      toast.error('下載模板失敗');
+    }
+  };
 
-  if (error) {
-    return (
-      <AdminLayout>
-        <div className="text-center py-8">
-          <p className="text-red-600 mb-4">{error}</p>
-          <Button onClick={loadProducts}>重試</Button>
-        </div>
-      </AdminLayout>
-    );
-  }
+  const resetBatchImport = () => {
+    setImportFile(null);
+    setImportResult(null);
+    setShowBatchImport(false);
+  };
+
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        {/* 頁面標題 */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <Package className="h-8 w-8" />
-              商品管理
-            </h1>
-            <p className="text-gray-600 mt-2">管理商品信息、價格和庫存</p>
-          </div>
-          <Button onClick={handleAddProduct}>
-            <Plus className="h-4 w-4 mr-2" />
-            新增商品
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-900">產品管理</h1>
+        <div className="flex gap-3">
+          <Button
+            onClick={downloadTemplate}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            下載模板
+          </Button>
+          <Button
+            onClick={() => setShowBatchImport(true)}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Upload className="w-4 h-4" />
+            批量導入
+          </Button>
+          <Button
+            onClick={() => setShowForm(true)}
+            className="flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            新增產品
           </Button>
         </div>
+      </div>
 
-        {/* 統計卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">總商品數</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{products.length}</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">啟用商品</CardTitle>
-              <Eye className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {products.filter(p => p.is_active).length}
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">停用商品</CardTitle>
-              <EyeOff className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {products.filter(p => !p.is_active).length}
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">總庫存</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {products.reduce((sum, p) => sum + p.stock, 0)}
-              </div>
-            </CardContent>
-          </Card>
+      {/* 搜索框 */}
+      <div className="flex gap-4">
+        <div className="flex-1">
+          <input
+            type="text"
+            placeholder="搜索產品名稱或描述..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
         </div>
+      </div>
 
-        {/* 商品列表 */}
-        <Card>
-          <CardHeader>
-            <CardTitle>商品列表</CardTitle>
-            <CardDescription>管理所有商品的基本信息</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {products.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                暫無商品數據
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {products.map((product) => (
-                  <div key={product.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                        {(() => {
-                          const images = Array.isArray(product.images)
-                            ? product.images
-                            : (product.images ? JSON.parse(product.images) : []);
-
-                          return images && images.length > 0 ? (
-                            <img
-                              src={getImageUrl(images[0])}
-                              alt={product.name}
-                              className="w-full h-full object-cover rounded-lg"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
-                              }}
-                            />
-                          ) : (
-                            <Package className="h-6 w-6 text-gray-400" />
-                          );
-                        })()}
+      {/* 產品列表 */}
+      <Card>
+        <CardHeader>
+          <CardTitle>產品列表 ({filteredProducts.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="text-center py-8">載入中...</div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              {searchTerm ? '沒有找到符合條件的產品' : '暫無產品'}
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredProducts.map((product) => (
+                <Card key={product.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 line-clamp-2">
+                          {product.name}
+                        </h3>
+                        {product.category && (
+                          <Badge variant="outline" className="mt-1 text-xs">
+                            {product.category}
+                          </Badge>
+                        )}
                       </div>
-                      
-                      <div>
-                        <h3 className="font-medium text-gray-900">{product.name}</h3>
-                        <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
-                          <span>價格: NT$ {Math.round(product.price).toLocaleString()}</span>
-                          <span>庫存: {product.stock}</span>
-                          <span>優惠: {getDiscountText(product.multi_discount)}</span>
+                      <Button
+                        onClick={() => handleToggleActive(product)}
+                        variant="ghost"
+                        size="sm"
+                        className={`p-1 ${product.is_active ? 'text-green-600 hover:text-green-700' : 'text-gray-400 hover:text-gray-500'}`}
+                      >
+                        {product.is_active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                      </Button>
+                    </div>
+
+                    {/* 產品圖片 */}
+                    <div className="aspect-square bg-gray-100 rounded-lg mb-3 overflow-hidden">
+                      <img
+                        src={getProductImageUrl(product)}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
+                        }}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-bold text-blue-600">
+                          NT$ {Math.round(product.price).toLocaleString()}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          庫存: {product.stock || 0}
+                        </span>
+                      </div>
+
+                      {product.description && (
+                        <p className="text-sm text-gray-600 line-clamp-2">
+                          {product.description}
+                        </p>
+                      )}
+
+                      <div className="flex justify-between items-center pt-2">
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => handleEdit(product)}
+                            variant="outline"
+                            size="sm"
+                          >
+                            <Edit className="w-3 h-3 mr-1" />
+                            編輯
+                          </Button>
+                          <Button
+                            onClick={() => setDeletingProduct(product)}
+                            variant="outline"
+                            size="sm"
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-3 h-3 mr-1" />
+                            刪除
+                          </Button>
                         </div>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <Badge variant={product.is_active ? "default" : "secondary"}>
-                        {product.is_active ? '啟用' : '停用'}
-                      </Badge>
-                      
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditProduct(product)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleToggleStatus(product.id, product.is_active)}
-                        >
-                          {product.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </Button>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-red-600 hover:text-red-700"
-                          onClick={() => handleDeleteProduct(product.id, product.name)}
-                          title="永久刪除產品"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* 批量導入對話框 */}
+      <Dialog open={showBatchImport} onOpenChange={setShowBatchImport}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              批量導入產品
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* 格式說明 */}
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h4 className="font-medium text-blue-900 mb-2">文件格式說明：</h4>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• 使用 txt 文件，UTF-8 編碼</li>
+                <li>• 每個產品之間用 "---" 分隔</li>
+                <li>• 每行格式：字段名: 值</li>
+                <li>• 必填字段：名稱、價格</li>
+                <li>• 可選字段：庫存、分類、描述、多件優惠、是否啟用</li>
+              </ul>
+            </div>
+
+            {/* 文件上傳 */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  選擇 txt 文件：
+                </label>
+                <input
+                  type="file"
+                  accept=".txt"
+                  onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                  className="block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-lg file:border-0
+                    file:text-sm file:font-medium
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100"
+                />
+              </div>
+
+              {importFile && (
+                <div className="text-sm text-gray-600">
+                  已選擇文件: {importFile.name} ({(importFile.size / 1024).toFixed(1)} KB)
+                </div>
+              )}
+            </div>
+
+            {/* 導入結果 */}
+            {importResult && (
+              <div className="space-y-3">
+                <h4 className="font-medium text-gray-900">導入結果：</h4>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <div className="text-lg font-bold text-gray-700">{importResult.totalParsed}</div>
+                    <div className="text-sm text-gray-600">解析總數</div>
+                  </div>
+                  <div className="bg-green-50 p-3 rounded-lg">
+                    <div className="text-lg font-bold text-green-700 flex items-center justify-center gap-1">
+                      <CheckCircle className="w-4 h-4" />
+                      {importResult.successful}
+                    </div>
+                    <div className="text-sm text-green-600">成功</div>
+                  </div>
+                  <div className="bg-red-50 p-3 rounded-lg">
+                    <div className="text-lg font-bold text-red-700 flex items-center justify-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {importResult.failed}
+                    </div>
+                    <div className="text-sm text-red-600">失敗</div>
+                  </div>
+                </div>
+
+                {importResult.errors.length > 0 && (
+                  <div className="bg-red-50 p-3 rounded-lg">
+                    <h5 className="font-medium text-red-900 mb-2">錯誤詳情：</h5>
+                    <div className="text-sm text-red-800 space-y-1 max-h-32 overflow-y-auto">
+                      {importResult.errors.map((error, index) => (
+                        <div key={index}>• {error}</div>
+                      ))}
                     </div>
                   </div>
-                ))}
+                )}
               </div>
             )}
-          </CardContent>
-        </Card>
-      </div>
 
-      {/* 產品表單 */}
-      <ProductForm
-        product={editingProduct}
-        isOpen={showForm}
-        onClose={handleFormClose}
-        onSuccess={handleFormSuccess}
-      />
-    </AdminLayout>
+            {/* 操作按鈕 */}
+            <div className="flex justify-between">
+              <Button
+                onClick={downloadTemplate}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                下載模板
+              </Button>
+              
+              <div className="flex gap-3">
+                <Button
+                  onClick={resetBatchImport}
+                  variant="outline"
+                >
+                  取消
+                </Button>
+                <Button
+                  onClick={handleBatchImport}
+                  disabled={!importFile || importing}
+                  className="flex items-center gap-2"
+                >
+                  {importing ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      導入中...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4" />
+                      開始導入
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 產品表單對話框 */}
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingProduct ? '編輯產品' : '新增產品'}
+            </DialogTitle>
+          </DialogHeader>
+          <ProductForm
+            product={editingProduct}
+            onSuccess={handleFormSuccess}
+            onCancel={() => {
+              setShowForm(false);
+              setEditingProduct(null);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* 刪除確認對話框 */}
+      <AlertDialog open={!!deletingProduct} onOpenChange={() => setDeletingProduct(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>確認刪除</AlertDialogTitle>
+            <AlertDialogDescription>
+              確定要刪除產品「{deletingProduct?.name}」嗎？此操作無法撤銷。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+              刪除
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 };

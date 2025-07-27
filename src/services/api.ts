@@ -157,43 +157,19 @@ const createMockResponse = (data: any) => ({
 
 // 產品相關 API
 export const productAPI = {
-  getAll: async () => {
-    try {
-      console.log('嘗試從後端獲取產品數據...');
-      const response = await api.get('/products');
-      console.log('成功獲取產品數據:', response.data);
-      return response;
-    } catch (error) {
-      console.error('後端API調用失敗:', error);
-      console.warn('使用模擬產品數據，因為無法連接到後端');
-      return createMockResponse(MOCK_DATA.products);
-    }
-  },
-  getById: async (id: number) => {
-    try {
-      return await api.get(`/products/${id}`);
-    } catch (error) {
-      console.warn('使用模擬產品數據');
-      const product = MOCK_DATA.products.find(p => p.id === id);
-      return createMockResponse(product);
-    }
-  },
-  // 管理員API
-  getAllAdmin: () => api.get('/products/admin/all'),
-  create: (data: any) => {
+  getAll: () => api.get('/products'),
+  getAllAdmin: () => api.get('/products/admin'),
+  getById: (id: number) => api.get(`/products/${id}`),
+  create: (data: FormData | any) => {
     console.log('📤 productAPI.create 調用，數據類型:', data instanceof FormData ? 'FormData' : typeof data);
     return api.post('/products/admin', data);
   },
-  update: (id: number, data: any) => {
-    console.log('📤 productAPI.update 調用，數據類型:', data instanceof FormData ? 'FormData' : typeof data);
-    return api.put(`/products/admin/${id}`, data);
+  update: (id: number, data: FormData | any) => api.put(`/products/admin/${id}`, data),
+  delete: (id: number) => api.delete(`/products/admin/${id}`),
+  batchImport: (formData: FormData) => {
+    console.log('📤 productAPI.batchImport 調用');
+    return api.post('/products/admin/batch-import', formData);
   },
-  delete: (id: number) => api.delete(`/products/admin/${id}`), // 軟刪除（停用）
-  permanentDelete: (id: number) => api.delete(`/products/admin/${id}/permanent`), // 永久刪除
-  restore: (id: number) => api.put(`/products/admin/${id}/restore`),
-  uploadImage: (formData: FormData) => api.post('/products/admin/upload', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  }),
 };
 
 // 口味相關 API
