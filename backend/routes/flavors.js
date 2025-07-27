@@ -6,6 +6,17 @@ const fs = require('fs').promises;
 
 const router = express.Router();
 
+// 檢查flavors表是否有price欄位的通用函數
+async function checkFlavorPriceColumn() {
+  try {
+    const tableInfo = await Database.all("PRAGMA table_info(flavors)");
+    return tableInfo.some(column => column.name === 'price');
+  } catch (error) {
+    console.warn('檢查價格欄位失敗:', error);
+    return false;
+  }
+}
+
 // 設置文件上傳（用於批量導入）
 const upload = multer({
   dest: 'uploads/temp/',
@@ -304,21 +315,39 @@ router.get('/admin/batch-import/template', (req, res) => {
 // 獲取所有活躍口味（前端用戶）- 按商品分組
 router.get('/', async (req, res) => {
   try {
-    const flavors = await Database.all(`
-      SELECT f.id, f.name, f.sort_order, f.stock, f.product_id, f.category_id, f.price,
-             p.name as product_name, p.price as product_base_price,
-             fc.name as category_name
-      FROM flavors f
-      LEFT JOIN products p ON f.product_id = p.id
-      LEFT JOIN flavor_categories fc ON f.category_id = fc.id
-      WHERE f.is_active = 1 AND p.is_active = 1
-      ORDER BY p.name, fc.sort_order, f.sort_order, f.id
-    `);
+    const hasPriceField = await checkFlavorPriceColumn();
+    
+    let query;
+    if (hasPriceField) {
+      query = `
+        SELECT f.id, f.name, f.sort_order, f.stock, f.product_id, f.category_id, f.price,
+               p.name as product_name, p.price as product_base_price,
+               fc.name as category_name
+        FROM flavors f
+        LEFT JOIN products p ON f.product_id = p.id
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        WHERE f.is_active = 1 AND p.is_active = 1
+        ORDER BY p.name, fc.sort_order, f.sort_order, f.id
+      `;
+    } else {
+      query = `
+        SELECT f.id, f.name, f.sort_order, f.stock, f.product_id, f.category_id,
+               p.name as product_name, p.price as product_base_price,
+               fc.name as category_name
+        FROM flavors f
+        LEFT JOIN products p ON f.product_id = p.id
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        WHERE f.is_active = 1 AND p.is_active = 1
+        ORDER BY p.name, fc.sort_order, f.sort_order, f.id
+      `;
+    }
+
+    const flavors = await Database.all(query);
 
     // 計算最終價格（規格價格優先，否則使用產品基礎價格）
     const flavorsWithPrice = flavors.map(flavor => ({
       ...flavor,
-      final_price: flavor.price !== null ? flavor.price : flavor.product_base_price
+      final_price: (hasPriceField && flavor.price !== null) ? flavor.price : flavor.product_base_price
     }));
 
     res.json({
@@ -338,23 +367,39 @@ router.get('/', async (req, res) => {
 router.get('/product/:productId', async (req, res) => {
   try {
     const { productId } = req.params;
+    const hasPriceField = await checkFlavorPriceColumn();
 
-    // 統一使用 flavors 表，包含價格信息
-    const flavors = await Database.all(`
-      SELECT f.id, f.name, f.sort_order, f.stock, f.category_id, f.price,
-             fc.name as category_name,
-             p.price as product_base_price
-      FROM flavors f
-      LEFT JOIN flavor_categories fc ON f.category_id = fc.id
-      LEFT JOIN products p ON f.product_id = p.id
-      WHERE f.product_id = ? AND f.is_active = 1
-      ORDER BY fc.sort_order, f.sort_order, f.id
-    `, [productId]);
+    let query;
+    if (hasPriceField) {
+      query = `
+        SELECT f.id, f.name, f.sort_order, f.stock, f.category_id, f.price,
+               fc.name as category_name,
+               p.price as product_base_price
+        FROM flavors f
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        LEFT JOIN products p ON f.product_id = p.id
+        WHERE f.product_id = ? AND f.is_active = 1
+        ORDER BY fc.sort_order, f.sort_order, f.id
+      `;
+    } else {
+      query = `
+        SELECT f.id, f.name, f.sort_order, f.stock, f.category_id,
+               fc.name as category_name,
+               p.price as product_base_price
+        FROM flavors f
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        LEFT JOIN products p ON f.product_id = p.id
+        WHERE f.product_id = ? AND f.is_active = 1
+        ORDER BY fc.sort_order, f.sort_order, f.id
+      `;
+    }
+
+    const flavors = await Database.all(query, [productId]);
 
     // 計算最終價格（規格價格優先，否則使用產品基礎價格）
     const flavorsWithPrice = flavors.map(flavor => ({
       ...flavor,
-      final_price: flavor.price !== null ? flavor.price : flavor.product_base_price
+      final_price: (hasPriceField && flavor.price !== null) ? flavor.price : flavor.product_base_price
     }));
 
     res.json({
@@ -373,17 +418,38 @@ router.get('/product/:productId', async (req, res) => {
 // 獲取所有規格（管理員）
 router.get('/admin/all', authenticateAdmin, async (req, res) => {
   try {
-    const flavors = await Database.all(`
-      SELECT f.id, f.name, f.product_id, f.category_id, f.stock, f.sort_order, 
-             f.is_active, f.created_at, f.price,
-             p.name as product_name, p.price as product_base_price,
-             fc.name as category_name,
-             CASE WHEN f.price IS NOT NULL THEN f.price ELSE p.price END as final_price
-      FROM flavors f
-      LEFT JOIN products p ON f.product_id = p.id
-      LEFT JOIN flavor_categories fc ON f.category_id = fc.id
-      ORDER BY p.name, fc.sort_order, f.sort_order, f.id
-    `);
+    const hasPriceField = await checkFlavorPriceColumn();
+    
+    let query;
+    if (hasPriceField) {
+      // 有price欄位的完整查詢
+      query = `
+        SELECT f.id, f.name, f.product_id, f.category_id, f.stock, f.sort_order, 
+               f.is_active, f.created_at, f.price,
+               p.name as product_name, p.price as product_base_price,
+               fc.name as category_name,
+               CASE WHEN f.price IS NOT NULL THEN f.price ELSE p.price END as final_price
+        FROM flavors f
+        LEFT JOIN products p ON f.product_id = p.id
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        ORDER BY p.name, fc.sort_order, f.sort_order, f.id
+      `;
+    } else {
+      // 沒有price欄位的兼容查詢
+      query = `
+        SELECT f.id, f.name, f.product_id, f.category_id, f.stock, f.sort_order, 
+               f.is_active, f.created_at,
+               p.name as product_name, p.price as product_base_price,
+               fc.name as category_name,
+               p.price as final_price
+        FROM flavors f
+        LEFT JOIN products p ON f.product_id = p.id
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        ORDER BY p.name, fc.sort_order, f.sort_order, f.id
+      `;
+    }
+
+    const flavors = await Database.all(query);
 
     res.json({
       success: true,
