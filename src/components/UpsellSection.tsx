@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { useCart } from '../contexts/CartContext';
+import { toast } from 'react-toastify';
 
 interface UpsellProduct {
   id: number;
@@ -55,19 +56,23 @@ export const UpsellSection: React.FC<UpsellSectionProps> = ({ className = '' }) 
     return cartItem?.quantity || 0;
   };
 
-  const handleAddToCart = (product: UpsellProduct) => {
+  const handleAddToCart = (product: UpsellProduct, selectedFlavors: any[] = []) => {
     const quantity = quantities[product.id] || 1;
-    addItem({
-      productId: product.id,
-      productName: `[加購] ${product.name}`,
-      productPrice: product.price,
-      quantity,
-      variants: [], // 加購商品通常沒有規格
-      subtotal: product.price * quantity
-    });
     
-    // 重置數量選擇
-    setQuantities(prev => ({ ...prev, [product.id]: 1 }));
+    // 如果產品有規格，使用第一個規格的價格作為基礎價格
+    const basePrice = selectedFlavors.length > 0 ? selectedFlavors[0].final_price || product.price : product.price;
+    
+    addItem({
+      id: `${product.id}-${Date.now()}`,
+      productId: product.id,
+      productName: product.name,
+      productPrice: basePrice,
+      quantity,
+      variants: [],
+      subtotal: basePrice * quantity
+    });
+
+    toast.success(`已添加 ${product.name} 到購物車`);
   };
 
   const updateCartQuantity = (productId: number, productName: string, newQuantity: number) => {

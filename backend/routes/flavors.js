@@ -305,8 +305,8 @@ router.get('/admin/batch-import/template', (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const flavors = await Database.all(`
-      SELECT f.id, f.name, f.sort_order, f.stock, f.product_id, f.category_id,
-             p.name as product_name,
+      SELECT f.id, f.name, f.sort_order, f.stock, f.product_id, f.category_id, f.price,
+             p.name as product_name, p.price as product_base_price,
              fc.name as category_name
       FROM flavors f
       LEFT JOIN products p ON f.product_id = p.id
@@ -315,9 +315,15 @@ router.get('/', async (req, res) => {
       ORDER BY p.name, fc.sort_order, f.sort_order, f.id
     `);
 
+    // 計算最終價格（規格價格優先，否則使用產品基礎價格）
+    const flavorsWithPrice = flavors.map(flavor => ({
+      ...flavor,
+      final_price: flavor.price !== null ? flavor.price : flavor.product_base_price
+    }));
+
     res.json({
       success: true,
-      data: flavors
+      data: flavorsWithPrice
     });
   } catch (error) {
     console.error('獲取口味列表錯誤:', error);
@@ -333,19 +339,27 @@ router.get('/product/:productId', async (req, res) => {
   try {
     const { productId } = req.params;
 
-    // 統一使用 flavors 表
+    // 統一使用 flavors 表，包含價格信息
     const flavors = await Database.all(`
-      SELECT f.id, f.name, f.sort_order, f.stock, f.category_id,
-             fc.name as category_name
+      SELECT f.id, f.name, f.sort_order, f.stock, f.category_id, f.price,
+             fc.name as category_name,
+             p.price as product_base_price
       FROM flavors f
       LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+      LEFT JOIN products p ON f.product_id = p.id
       WHERE f.product_id = ? AND f.is_active = 1
       ORDER BY fc.sort_order, f.sort_order, f.id
     `, [productId]);
 
+    // 計算最終價格（規格價格優先，否則使用產品基礎價格）
+    const flavorsWithPrice = flavors.map(flavor => ({
+      ...flavor,
+      final_price: flavor.price !== null ? flavor.price : flavor.product_base_price
+    }));
+
     res.json({
       success: true,
-      data: flavors
+      data: flavorsWithPrice
     });
   } catch (error) {
     console.error('獲取商品口味錯誤:', error);
@@ -356,15 +370,19 @@ router.get('/product/:productId', async (req, res) => {
   }
 });
 
-// 管理員：獲取所有口味（包括停用的）
+// 獲取所有規格（管理員）
 router.get('/admin/all', authenticateAdmin, async (req, res) => {
   try {
     const flavors = await Database.all(`
-      SELECT f.*, p.name as product_name, fc.name as category_name
+      SELECT f.id, f.name, f.product_id, f.category_id, f.stock, f.sort_order, 
+             f.is_active, f.created_at, f.price,
+             p.name as product_name, p.price as product_base_price,
+             fc.name as category_name,
+             CASE WHEN f.price IS NOT NULL THEN f.price ELSE p.price END as final_price
       FROM flavors f
       LEFT JOIN products p ON f.product_id = p.id
       LEFT JOIN flavor_categories fc ON f.category_id = fc.id
-      ORDER BY p.name, fc.sort_order, f.sort_order, f.created_at DESC
+      ORDER BY p.name, fc.sort_order, f.sort_order, f.id
     `);
 
     res.json({
@@ -372,272 +390,172 @@ router.get('/admin/all', authenticateAdmin, async (req, res) => {
       data: flavors
     });
   } catch (error) {
-    console.error('獲取口味列表錯誤:', error);
+    console.error('獲取規格列表錯誤:', error);
     res.status(500).json({
       success: false,
-      message: '獲取口味列表失敗'
+      message: '獲取規格列表失敗'
     });
   }
 });
 
-// 管理員：創建口味
+// 創建新規格（管理員）
 router.post('/admin', authenticateAdmin, async (req, res) => {
   try {
-    console.log('🔄 創建規格請求:', req.body);
-    const { name, product_id, category_id, sort_order, stock } = req.body;
+    const { name, product_id, category_id, stock, sort_order, price } = req.body;
 
-    if (!name) {
-      console.log('❌ 規格名稱為空');
+    console.log('📝 創建規格請求:', { name, product_id, category_id, stock, sort_order, price });
+
+    // 驗證必要字段
+    if (!name || !product_id) {
       return res.status(400).json({
         success: false,
-        message: '口味名稱不能為空'
+        message: '規格名稱和商品ID為必填項'
       });
     }
 
-    if (!product_id) {
-      console.log('❌ 商品ID為空');
-      return res.status(400).json({
-        success: false,
-        message: '請選擇商品'
-      });
-    }
-
-    // 確保有默認類別，如果沒有就創建一個
-    let finalCategoryId = category_id;
-    if (!finalCategoryId) {
-      console.log('🔍 檢查默認類別是否存在...');
-      const defaultCategory = await Database.get(
-        'SELECT id FROM flavor_categories WHERE id = 12'
-      );
-
-      if (!defaultCategory) {
-        console.log('⚠️  默認類別不存在，創建默認類別...');
-        try {
-          await Database.run(
-            'INSERT INTO flavor_categories (id, name, description, sort_order, is_active) VALUES (?, ?, ?, ?, ?)',
-            [12, '其他系列', '其他特殊口味', 12, 1]
-          );
-          console.log('✅ 創建默認類別成功');
-        } catch (error) {
-          console.error('❌ 創建默認類別失敗:', error);
-        }
-      }
-      finalCategoryId = 12;
-    }
-
-    // 檢查商品是否存在
-    console.log('🔍 檢查商品是否存在:', product_id);
-    const product = await Database.get(
-      'SELECT id, name FROM products WHERE id = ?',
-      [product_id]
-    );
-
+    // 驗證產品是否存在
+    const product = await Database.get('SELECT id, name, price FROM products WHERE id = ?', [product_id]);
     if (!product) {
-      console.log('❌ 商品不存在:', product_id);
-      // 列出所有可用商品
-      const allProducts = await Database.all('SELECT id, name FROM products');
-      console.log('📋 可用商品列表:', allProducts);
       return res.status(400).json({
         success: false,
-        message: `選擇的商品不存在 (ID: ${product_id})`
+        message: '指定的商品不存在'
       });
     }
-    console.log('✅ 商品存在:', product);
 
-    // 檢查類別是否存在
-    console.log('🔍 檢查類別是否存在:', finalCategoryId);
-    const category = await Database.get(
-      'SELECT id, name FROM flavor_categories WHERE id = ?',
-      [finalCategoryId]
+    // 檢查同一商品下是否已有相同名稱的規格
+    const existing = await Database.get(
+      'SELECT id FROM flavors WHERE product_id = ? AND name = ?',
+      [product_id, name]
     );
 
-    if (!category) {
-      console.log('❌ 類別不存在:', finalCategoryId);
-      // 列出所有可用類別
-      const allCategories = await Database.all('SELECT id, name FROM flavor_categories');
-      console.log('📋 可用類別列表:', allCategories);
-
-      // 如果沒有任何類別，創建一個默認類別
-      if (allCategories.length === 0) {
-        console.log('⚠️  沒有任何類別，創建默認類別...');
-        try {
-          await Database.run(
-            'INSERT INTO flavor_categories (id, name, description, sort_order, is_active) VALUES (?, ?, ?, ?, ?)',
-            [1, '默認類別', '默認規格類別', 1, 1]
-          );
-          finalCategoryId = 1;
-          console.log('✅ 創建默認類別成功');
-        } catch (error) {
-          console.error('❌ 創建默認類別失敗:', error);
-          return res.status(500).json({
-            success: false,
-            message: '無法創建默認類別'
-          });
-        }
-      } else {
-        // 使用第一個可用類別
-        finalCategoryId = allCategories[0].id;
-        console.log('🔄 使用第一個可用類別:', allCategories[0]);
-      }
-    } else {
-      console.log('✅ 類別存在:', category);
-    }
-
-    // 檢查同一商品下口味名稱是否已存在
-    console.log('🔍 檢查規格名稱是否重複:', { name, product_id });
-    const existingFlavor = await Database.get(
-      'SELECT id FROM flavors WHERE name = ? AND product_id = ?',
-      [name, product_id]
-    );
-
-    if (existingFlavor) {
-      console.log('❌ 規格名稱已存在:', existingFlavor);
+    if (existing) {
       return res.status(400).json({
         success: false,
-        message: '該商品下已存在相同名稱的口味'
+        message: '該商品已存在相同名稱的規格'
       });
     }
 
-    // 最終驗證外鍵
-    console.log('🔍 最終驗證外鍵...');
-    const finalProduct = await Database.get('SELECT id FROM products WHERE id = ?', [parseInt(product_id)]);
-    const finalCategory = await Database.get('SELECT id FROM flavor_categories WHERE id = ?', [parseInt(finalCategoryId)]);
+    // 處理價格：如果沒有設定規格價格，則為NULL（使用產品基礎價格）
+    const flavorPrice = price && price > 0 ? parseFloat(price) : null;
 
-    if (!finalProduct) {
-      console.log('❌ 最終驗證：商品不存在');
-      return res.status(400).json({
-        success: false,
-        message: '商品驗證失敗'
-      });
-    }
-
-    if (!finalCategory) {
-      console.log('❌ 最終驗證：類別不存在');
-      return res.status(400).json({
-        success: false,
-        message: '類別驗證失敗'
-      });
-    }
-
-    const insertData = {
+    // 插入新規格
+    const result = await Database.run(`
+      INSERT INTO flavors (name, product_id, category_id, stock, sort_order, price, is_active, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, 1, datetime('now'))
+    `, [
       name,
-      product_id: parseInt(product_id),
-      category_id: parseInt(finalCategoryId),
-      sort_order: parseInt(sort_order) || 0,
-      stock: parseInt(stock) || 0,
-      is_active: 1
-    };
-
-    console.log('🔄 創建規格:', insertData);
-
-    const result = await Database.run(
-      'INSERT INTO flavors (name, product_id, category_id, sort_order, stock, is_active) VALUES (?, ?, ?, ?, ?, ?)',
-      [insertData.name, insertData.product_id, insertData.category_id, insertData.sort_order, insertData.stock, insertData.is_active]
-    );
+      product_id,
+      category_id || 1,
+      parseInt(stock) || 0,
+      parseInt(sort_order) || 0,
+      flavorPrice
+    ]);
 
     console.log('✅ 規格創建成功:', result.lastID);
+
+    // 返回創建的規格信息
+    const newFlavor = await Database.get(`
+      SELECT f.*, fc.name as category_name, p.price as product_base_price,
+             CASE WHEN f.price IS NOT NULL THEN f.price ELSE p.price END as final_price
+      FROM flavors f
+      LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+      LEFT JOIN products p ON f.product_id = p.id
+      WHERE f.id = ?
+    `, [result.lastID]);
+
     res.json({
       success: true,
-      message: '口味創建成功',
-      data: { id: result.lastID }
+      message: '規格創建成功',
+      data: newFlavor
     });
+
   } catch (error) {
-    console.error('❌ 創建口味錯誤:', error);
-    console.error('錯誤堆棧:', error.stack);
+    console.error('創建規格錯誤:', error);
     res.status(500).json({
       success: false,
-      message: '創建口味失敗: ' + error.message
+      message: '創建規格失敗: ' + error.message
     });
   }
 });
 
-// 管理員：更新口味
+// 更新規格（管理員）
 router.put('/admin/:id', authenticateAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, product_id, category_id, sort_order, is_active, stock } = req.body;
+    const { name, category_id, stock, sort_order, is_active, price } = req.body;
 
-    // 檢查口味是否存在
+    console.log('📝 更新規格請求:', { id, name, category_id, stock, sort_order, is_active, price });
+
+    // 檢查規格是否存在
     const flavor = await Database.get('SELECT * FROM flavors WHERE id = ?', [id]);
     if (!flavor) {
       return res.status(404).json({
         success: false,
-        message: '口味不存在'
+        message: '規格不存在'
       });
     }
 
-    // 如果更新商品，檢查商品是否存在
-    if (product_id && product_id !== flavor.product_id) {
-      const product = await Database.get(
-        'SELECT id FROM products WHERE id = ? AND is_active = 1',
-        [product_id]
+    // 如果要更新名稱，檢查同一商品下是否已有相同名稱的其他規格
+    if (name && name !== flavor.name) {
+      const existing = await Database.get(
+        'SELECT id FROM flavors WHERE product_id = ? AND name = ? AND id != ?',
+        [flavor.product_id, name, id]
       );
 
-      if (!product) {
+      if (existing) {
         return res.status(400).json({
           success: false,
-          message: '選擇的商品不存在或已停用'
+          message: '該商品已存在相同名稱的規格'
         });
       }
     }
 
-    // 如果更新類別，檢查類別是否存在
-    if (category_id && category_id !== flavor.category_id) {
-      const category = await Database.get(
-        'SELECT id FROM flavor_categories WHERE id = ? AND is_active = 1',
-        [category_id]
-      );
+    // 處理價格：如果設為0或空，則設為NULL（使用產品基礎價格）
+    const flavorPrice = price && price > 0 ? parseFloat(price) : null;
 
-      if (!category) {
-        return res.status(400).json({
-          success: false,
-          message: '選擇的類別不存在或已停用'
-        });
-      }
-    }
+    // 更新規格
+    await Database.run(`
+      UPDATE flavors 
+      SET name = COALESCE(?, name),
+          category_id = COALESCE(?, category_id),
+          stock = COALESCE(?, stock),
+          sort_order = COALESCE(?, sort_order),
+          is_active = COALESCE(?, is_active),
+          price = ?
+      WHERE id = ?
+    `, [
+      name,
+      category_id,
+      stock !== undefined ? parseInt(stock) : undefined,
+      sort_order !== undefined ? parseInt(sort_order) : undefined,
+      is_active !== undefined ? (is_active ? 1 : 0) : undefined,
+      flavorPrice,
+      id
+    ]);
 
-    // 如果更新名稱或商品，檢查同一商品下是否重複
-    if ((name && name !== flavor.name) || (product_id && product_id !== flavor.product_id)) {
-      const checkProductId = product_id || flavor.product_id;
-      const checkName = name || flavor.name;
+    console.log('✅ 規格更新成功:', id);
 
-      const existingFlavor = await Database.get(
-        'SELECT id FROM flavors WHERE name = ? AND product_id = ? AND id != ?',
-        [checkName, checkProductId, id]
-      );
-
-      if (existingFlavor) {
-        return res.status(400).json({
-          success: false,
-          message: '該商品下已存在相同名稱的口味'
-        });
-      }
-    }
-
-    await Database.run(
-      `UPDATE flavors
-       SET name = ?, product_id = ?, category_id = ?, sort_order = ?, is_active = ?, stock = ?
-       WHERE id = ?`,
-      [
-        name || flavor.name,
-        product_id !== undefined ? parseInt(product_id) : flavor.product_id,
-        category_id !== undefined ? parseInt(category_id) : flavor.category_id,
-        sort_order !== undefined ? parseInt(sort_order) : flavor.sort_order,
-        is_active !== undefined ? is_active : flavor.is_active,
-        stock !== undefined ? parseInt(stock) : flavor.stock,
-        id
-      ]
-    );
+    // 返回更新後的規格信息
+    const updatedFlavor = await Database.get(`
+      SELECT f.*, fc.name as category_name, p.price as product_base_price,
+             CASE WHEN f.price IS NOT NULL THEN f.price ELSE p.price END as final_price
+      FROM flavors f
+      LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+      LEFT JOIN products p ON f.product_id = p.id
+      WHERE f.id = ?
+    `, [id]);
 
     res.json({
       success: true,
-      message: '口味更新成功'
+      message: '規格更新成功',
+      data: updatedFlavor
     });
+
   } catch (error) {
-    console.error('更新口味錯誤:', error);
+    console.error('更新規格錯誤:', error);
     res.status(500).json({
       success: false,
-      message: '更新口味失敗'
+      message: '更新規格失敗: ' + error.message
     });
   }
 });

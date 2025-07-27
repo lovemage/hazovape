@@ -2,13 +2,8 @@
 export interface ProductVariant {
   id: number;
   name: string;
-  product_id?: number;
-  category_id?: number;
-  category_name?: string;
-  stock: number;
-  sort_order?: number;
-  is_active?: boolean;
-  created_at?: string;
+  quantity: number;
+  price: number; // 規格價格
 }
 
 export interface Product {
@@ -32,13 +27,15 @@ export interface Flavor {
   name: string;
   product_id: number;
   category_id: number;
-  is_active: boolean;
-  sort_order: number;
   stock: number;
-  product_name?: string;
-  category_name?: string;
+  sort_order: number;
+  is_active: boolean;
   created_at: string;
-  updated_at: string;
+  price?: number | null; // 規格獨立價格，null時使用產品基礎價格
+  category_name?: string;
+  product_name?: string;
+  product_base_price?: number; // 產品基礎價格
+  final_price?: number; // 最終價格（規格價格優先，否則使用產品基礎價格）
 }
 
 // 口味類別類型

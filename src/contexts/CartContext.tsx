@@ -19,7 +19,7 @@ interface CartState {
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product, variants: ProductVariant[], quantity: number) => void;
+  addToCart: (product: Product, quantity: number, selectedFlavors: ProductVariant[]) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -101,16 +101,26 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     isOpen: false
   });
 
-  const addToCart = (product: Product, variants: ProductVariant[], quantity: number) => {
-    const subtotal = product.price * quantity;
+  const addToCart = (product: Product, quantity: number = 1, selectedFlavors: ProductVariant[] = []) => {
+    // 計算總價格：如果有規格，使用規格價格總和；否則使用產品價格
+    let totalPrice = 0;
+    if (selectedFlavors.length > 0) {
+      totalPrice = selectedFlavors.reduce((sum, flavor) => sum + (flavor.price * flavor.quantity), 0);
+    } else {
+      totalPrice = product.price * quantity;
+    }
+
+    const subtotal = totalPrice;
+
     dispatch({
       type: 'ADD_ITEM',
       payload: {
+        id: `${product.id}-${Date.now()}`,
         productId: product.id,
         productName: product.name,
-        productPrice: product.price,
+        productPrice: totalPrice / quantity, // 平均單價用於顯示
         quantity,
-        variants,
+        variants: selectedFlavors,
         subtotal
       }
     });

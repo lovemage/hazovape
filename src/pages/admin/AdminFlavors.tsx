@@ -417,12 +417,23 @@ export const AdminFlavors: React.FC = () => {
                             <div>
                               <div className="flex items-center space-x-2">
                                 <span className="font-medium">{flavor.name}</span>
-                                <Badge variant={flavor.is_active ? "default" : "secondary"}>
-                                  {flavor.is_active ? '啟用' : '停用'}
-                                </Badge>
+                                {!flavor.is_active && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    已停用
+                                  </Badge>
+                                )}
                               </div>
-                              <div className="text-sm text-gray-600 mt-1">
-                                排序: {flavor.sort_order} | 庫存: {flavor.stock || 0}
+                              <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                <span>庫存: {flavor.stock}</span>
+                                <span>分類: {flavor.category_name || '未分類'}</span>
+                                {/* 顯示價格信息 */}
+                                <span className="font-medium text-blue-600">
+                                  {flavor.price !== null && flavor.price !== undefined ? (
+                                    <>規格價格: NT$ {Math.round(flavor.price).toLocaleString()}</>
+                                  ) : (
+                                    <>使用基礎價格: NT$ {Math.round(flavor.product_base_price || 0).toLocaleString()}</>
+                                  )}
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -430,8 +441,14 @@ export const AdminFlavors: React.FC = () => {
                             <Button
                               size="sm"
                               variant="ghost"
+                              onClick={() => handleEditFlavor(flavor)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
                               onClick={() => handleToggleStatus(flavor.id, flavor.is_active)}
-                              title={flavor.is_active ? '停用規格' : '啟用規格'}
                             >
                               {flavor.is_active ? (
                                 <EyeOff className="w-4 h-4" />
@@ -442,17 +459,7 @@ export const AdminFlavors: React.FC = () => {
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => handleEditFlavor(flavor)}
-                              title="編輯規格"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
                               onClick={() => handleDeleteFlavor(flavor)}
-                              title="刪除規格"
-                              className="text-red-600 hover:text-red-700"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>

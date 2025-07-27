@@ -118,8 +118,25 @@ export const FlavorsPage: React.FC = () => {
 
   const getCurrentPrice = () => {
     if (!selectedProduct) return 0;
-    const totalQuantity = getTotalQuantity();
-    return selectedProduct.price * totalQuantity;
+    
+    // 計算所選規格的總價格（使用每個規格的final_price）
+    let totalPrice = 0;
+    const validFlavors = flavors.filter(flavor => {
+      const qty = flavorQuantities[flavor.id] || 0;
+      return qty > 0;
+    });
+
+    if (validFlavors.length === 0) {
+      return selectedProduct.price;
+    }
+
+    validFlavors.forEach(flavor => {
+      const quantity = flavorQuantities[flavor.id] || 0;
+      const flavorPrice = flavor.final_price || selectedProduct.price; // 使用規格最終價格
+      totalPrice += flavorPrice * quantity;
+    });
+    
+    return totalPrice;
   };
 
   const getAppliedDiscount = () => {
