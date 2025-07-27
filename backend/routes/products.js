@@ -352,7 +352,7 @@ router.put('/admin/:id', authenticateAdmin, upload.array('images', 5), async (re
 
     const result = await Database.run(
       `UPDATE products 
-       SET name = ?, description = ?, price = ?, category = ?, multi_discount = ?, images = ?, updated_at = CURRENT_TIMESTAMP
+       SET name = ?, description = ?, price = ?, category = ?, multi_discount = ?, images = ?
        WHERE id = ?`,
       [
         name,
