@@ -1,8 +1,305 @@
 const express = require('express');
 const Database = require('../config/database');
 const { authenticateAdmin } = require('./auth');
+const multer = require('multer');
+const fs = require('fs').promises;
 
 const router = express.Router();
+
+// 設置文件上傳（用於批量導入）
+const upload = multer({
+  dest: 'uploads/temp/',
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'text/plain' || file.originalname.endsWith('.txt')) {
+      cb(null, true);
+    } else {
+      cb(new Error('只允許上傳 txt 文件'), false);
+    }
+  }
+});
+
+// 批量導入規格 - txt文件
+router.post('/admin/batch-import', authenticateAdmin, upload.single('txtFile'), async (req, res) => {
+  let tempFilePath = null;
+  
+  try {
+    console.log('📤 批量導入規格請求:', {
+      hasFile: !!req.file,
+      fileName: req.file?.originalname,
+      fileSize: req.file?.size
+    });
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: '請選擇要上傳的txt文件'
+      });
+    }
+
+    tempFilePath = req.file.path;
+
+    // 讀取文件內容
+    const fileContent = await fs.readFile(tempFilePath, 'utf-8');
+    console.log('📄 文件內容長度:', fileContent.length);
+
+    // 解析文件內容
+    const parseResult = await parseFlavorsTxt(fileContent);
+    console.log('📊 解析結果:', {
+      總數量: parseResult.groups.length,
+      錯誤數量: parseResult.errors.length
+    });
+
+    if (parseResult.groups.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: '文件中沒有找到有效的規格數據',
+        errors: parseResult.errors
+      });
+    }
+
+    // 批量插入規格
+    const insertResults = await batchInsertFlavors(parseResult.groups);
+    
+    // 清理臨時文件
+    if (tempFilePath) {
+      await fs.unlink(tempFilePath).catch(console.error);
+    }
+
+    res.json({
+      success: true,
+      message: '批量導入規格完成',
+      data: {
+        totalGroups: parseResult.groups.length,
+        successful: insertResults.successful,
+        failed: insertResults.failed,
+        totalFlavors: insertResults.totalFlavors,
+        errors: [...parseResult.errors, ...insertResults.errors]
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ 批量導入規格失敗:', error);
+    
+    // 清理臨時文件
+    if (tempFilePath) {
+      await fs.unlink(tempFilePath).catch(console.error);
+    }
+
+    res.status(500).json({
+      success: false,
+      message: '批量導入規格失敗',
+      error: error.message
+    });
+  }
+});
+
+// 解析txt文件內容
+async function parseFlavorsTxt(content) {
+  const groups = [];
+  const errors = [];
+  
+  try {
+    // 按 "---" 或空行分割產品組
+    const productBlocks = content.split(/---+|(?:\r?\n){2,}/).map(block => block.trim()).filter(block => block);
+    
+    console.log(`📦 找到 ${productBlocks.length} 個產品規格組`);
+
+    for (let i = 0; i < productBlocks.length; i++) {
+      const block = productBlocks[i];
+      const lineNumber = i + 1;
+      
+      try {
+        const group = parseFlavorGroup(block, lineNumber);
+        if (group.flavors.length > 0) {
+          groups.push(group);
+        }
+      } catch (error) {
+        errors.push(`產品組 ${lineNumber}: ${error.message}`);
+      }
+    }
+
+    return { groups, errors };
+  } catch (error) {
+    console.error('❌ 解析txt文件失敗:', error);
+    return { 
+      groups: [], 
+      errors: [`文件解析錯誤: ${error.message}`] 
+    };
+  }
+}
+
+// 解析單個產品規格組
+function parseFlavorGroup(block, lineNumber) {
+  const group = {
+    valid: false,
+    lineNumber,
+    productName: '',
+    productId: null,
+    category: '規格',
+    flavors: []
+  };
+
+  const lines = block.split('\n').map(line => line.trim()).filter(line => line);
+  
+  let inFlavorList = false;
+  
+  for (const line of lines) {
+    // 檢查是否是產品名稱行
+    if (line.includes('產品名稱：') || line.includes('產品名稱:') || line.includes('商品名稱：') || line.includes('商品名稱:')) {
+      const colonIndex = line.indexOf('：') !== -1 ? line.indexOf('：') : line.indexOf(':');
+      group.productName = line.substring(colonIndex + 1).trim();
+      continue;
+    }
+    
+    // 檢查是否是規格開始行
+    if (line.includes('規格：') || line.includes('規格:') || line.includes('口味：') || line.includes('口味:')) {
+      inFlavorList = true;
+      // 如果這行還有規格名稱，也要處理
+      const colonIndex = line.indexOf('：') !== -1 ? line.indexOf('：') : line.indexOf(':');
+      const afterColon = line.substring(colonIndex + 1).trim();
+      if (afterColon) {
+        group.flavors.push(afterColon);
+      }
+      continue;
+    }
+    
+    // 檢查是否是分類行
+    if (line.includes('分類：') || line.includes('分類:')) {
+      const colonIndex = line.indexOf('：') !== -1 ? line.indexOf('：') : line.indexOf(':');
+      group.category = line.substring(colonIndex + 1).trim() || '規格';
+      continue;
+    }
+    
+    // 如果在規格列表中，每行都是一個規格
+    if (inFlavorList && line && !line.includes('：') && !line.includes(':')) {
+      group.flavors.push(line);
+    }
+  }
+
+  // 驗證必要字段
+  if (!group.productName) {
+    throw new Error('產品名稱不能為空');
+  }
+  if (group.flavors.length === 0) {
+    throw new Error('至少需要一個規格');
+  }
+
+  group.valid = true;
+  return group;
+}
+
+// 批量插入規格
+async function batchInsertFlavors(groups) {
+  const results = {
+    successful: 0,
+    failed: 0,
+    totalFlavors: 0,
+    errors: []
+  };
+
+  // 獲取預設規格分類ID
+  const defaultCategory = await Database.get('SELECT id FROM flavor_categories WHERE name = ? OR name = ?', ['規格', '默認']);
+  const defaultCategoryId = defaultCategory?.id || 1;
+
+  for (const group of groups) {
+    try {
+      // 查找產品
+      const product = await Database.get('SELECT id FROM products WHERE name = ?', [group.productName]);
+      if (!product) {
+        throw new Error(`產品 "${group.productName}" 不存在`);
+      }
+
+      let insertedCount = 0;
+      for (let i = 0; i < group.flavors.length; i++) {
+        const flavorName = group.flavors[i];
+        
+        // 檢查是否已存在同名規格
+        const existing = await Database.get(
+          'SELECT id FROM flavors WHERE product_id = ? AND name = ?', 
+          [product.id, flavorName]
+        );
+        
+        if (existing) {
+          console.log(`⚠️ 跳過重複規格: ${group.productName} - ${flavorName}`);
+          continue;
+        }
+
+        // 插入規格
+        await Database.run(`
+          INSERT INTO flavors (name, product_id, category_id, stock, is_active, sort_order, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+        `, [
+          flavorName,
+          product.id,
+          defaultCategoryId,
+          999, // 預設庫存
+          1,   // 啟用
+          i + 1 // 排序
+        ]);
+
+        insertedCount++;
+        results.totalFlavors++;
+      }
+
+      console.log(`✅ 成功為產品 ${group.productName} 添加 ${insertedCount} 個規格`);
+      results.successful++;
+
+    } catch (error) {
+      console.error(`❌ 處理產品 ${group.productName} 失敗:`, error.message);
+      results.failed++;
+      results.errors.push(`${group.productName}: ${error.message}`);
+    }
+  }
+
+  return results;
+}
+
+// 獲取批量導入模板
+router.get('/admin/batch-import/template', (req, res) => {
+  const template = `# 規格批量導入模板
+# 
+# 格式說明:
+# 1. 每個產品組用 "---" 分隔或空行分隔
+# 2. 產品名稱: 必須是系統中已存在的產品名稱
+# 3. 規格: 每行一個規格名稱
+# 4. 分類: 可選，預設為"規格"
+#
+# ==================== 範例開始 ====================
+
+產品名稱: OXVA NEXLIM 大蠻牛
+規格:
+西瓜
+蘋果
+葡萄
+榴蓮
+芒果
+藍莓
+薄荷
+---
+
+產品名稱: OXVA XLIM PRO 2  
+分類: 煙油口味
+規格:
+香草
+巧克力
+咖啡
+抹茶
+草莓
+橙子
+---
+
+產品名稱: 小煙油系列 - 蘋果味
+規格:
+10ml
+30ml
+50ml
+100ml
+---`;
+
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="flavor_import_template.txt"');
+  res.send(template);
+});
 
 // 獲取所有活躍口味（前端用戶）- 按商品分組
 router.get('/', async (req, res) => {

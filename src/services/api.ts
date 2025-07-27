@@ -172,11 +172,14 @@ export const productAPI = {
   },
 };
 
-// 口味相關 API
+// 規格相關 API
 export const flavorAPI = {
   getAll: async () => {
     try {
-      return await api.get('/flavors');
+      console.log('嘗試從後端獲取規格數據...');
+      const response = await api.get('/flavors');
+      console.log('成功獲取規格數據:', response.data);
+      return response;
     } catch (error) {
       console.warn('使用模擬口味數據，因為無法連接到後端');
       return createMockResponse(MOCK_DATA.flavors);
@@ -191,7 +194,11 @@ export const flavorAPI = {
   restore: (id: number) => api.put(`/flavors/admin/${id}/restore`),
   updateOrder: (orders: { id: number; sort_order: number }[]) =>
     api.put('/flavors/admin/batch-sort', { flavors: orders }),
-  getByProduct: (productId: number) => api.get(`/flavors/product/${productId}`)
+  getByProduct: (productId: number) => api.get(`/flavors/product/${productId}`),
+  batchImport: (formData: FormData) => {
+    console.log('📤 flavorAPI.batchImport 調用');
+    return api.post('/flavors/admin/batch-import', formData);
+  },
 };
 
 // 口味類別相關 API

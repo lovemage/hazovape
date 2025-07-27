@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
   Coffee, Plus, Edit, Trash2, Eye, EyeOff, ArrowUp, ArrowDown,
-  Search, ChevronDown, ChevronRight, Package, Grid3X3, Layers, PlusCircle
+  Search, ChevronDown, ChevronRight, Package, Grid3X3, Layers, PlusCircle,
+  FileText, Upload, Download, AlertCircle, CheckCircle
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { Input } from '../../components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 import { AdminLayout } from '../../components/AdminLayout';
 import { FlavorForm } from '../../components/FlavorForm';
 import { BatchFlavorForm } from '../../components/BatchFlavorForm';
@@ -18,6 +20,14 @@ interface ProductWithFlavors extends Product {
   flavors: Flavor[];
 }
 
+interface BatchImportResult {
+  totalGroups: number;
+  successful: number;
+  failed: number;
+  totalFlavors: number;
+  errors: string[];
+}
+
 export const AdminFlavors: React.FC = () => {
   const [products, setProducts] = useState<ProductWithFlavors[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,8 +36,14 @@ export const AdminFlavors: React.FC = () => {
   const [expandedProducts, setExpandedProducts] = useState<Set<number>>(new Set());
   const [showForm, setShowForm] = useState(false);
   const [showBatchForm, setShowBatchForm] = useState(false);
+  const [showBatchImport, setShowBatchImport] = useState(false);
   const [editingFlavor, setEditingFlavor] = useState<Flavor | undefined>(undefined);
   const [selectedProductId, setSelectedProductId] = useState<number | undefined>(undefined);
+  
+  // 批量導入相關狀態
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<BatchImportResult | null>(null);
 
   useEffect(() => {
     loadProductsWithFlavors();
@@ -143,6 +159,72 @@ export const AdminFlavors: React.FC = () => {
 
   const handleFormSuccess = () => {
     loadProductsWithFlavors();
+  };
+
+  // 批量導入處理
+  const handleBatchImport = async () => {
+    if (!importFile) {
+      toast.error('請選擇要上傳的txt文件');
+      return;
+    }
+
+    try {
+      setImporting(true);
+      const formData = new FormData();
+      formData.append('txtFile', importFile);
+
+      const response = await flavorAPI.batchImport(formData);
+      
+      if (response.data.success) {
+        setImportResult(response.data.data);
+        toast.success(`批量導入完成！成功: ${response.data.data.successful}, 失敗: ${response.data.data.failed}, 總規格數: ${response.data.data.totalFlavors}`);
+        loadProductsWithFlavors(); // 重新載入數據
+      } else {
+        toast.error(response.data.message || '批量導入失敗');
+        setImportResult({
+          totalGroups: 0,
+          successful: 0,
+          failed: 1,
+          totalFlavors: 0,
+          errors: [response.data.message || '批量導入失敗']
+        });
+      }
+    } catch (error) {
+      console.error('批量導入失敗:', error);
+      toast.error('批量導入失敗');
+      setImportResult({
+        totalGroups: 0,
+        successful: 0,
+        failed: 1,
+        totalFlavors: 0,
+        errors: ['網路錯誤或服務器問題']
+      });
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const downloadTemplate = async () => {
+    try {
+      const response = await fetch('/api/flavors/admin/batch-import/template');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'flavor_import_template.txt';
+      a.click();
+      window.URL.revokeObjectURL(url);
+      toast.success('模板文件已下載');
+    } catch (error) {
+      console.error('下載模板失敗:', error);
+      toast.error('下載模板失敗');
+    }
+  };
+
+  const resetBatchImport = () => {
+    setImportFile(null);
+    setImportResult(null);
+    setShowBatchImport(false);
   };
 
   if (loading) {
@@ -393,10 +475,172 @@ export const AdminFlavors: React.FC = () => {
       {/* 批量新增表單 */}
       {showBatchForm && (
         <BatchFlavorForm
-          onSubmit={handleFormSuccess}
-          onCancel={() => setShowBatchForm(false)}
+          isOpen={showBatchForm}
+          onClose={() => setShowBatchForm(false)}
+          onSuccess={loadProductsWithFlavors}
         />
       )}
+
+      {/* 批量導入對話框 */}
+      <Dialog open={showBatchImport} onOpenChange={setShowBatchImport}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              批量導入規格
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* 格式說明 */}
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h4 className="font-medium text-blue-900 mb-3">📄 文件格式說明：</h4>
+              <div className="text-sm text-blue-800 space-y-2">
+                <div>
+                  <h5 className="font-medium mb-1">基本要求：</h5>
+                  <ul className="space-y-1 ml-4">
+                    <li>• 使用 .txt 文件，UTF-8 編碼</li>
+                    <li>• 每個產品組用 "---" 分隔或空行分隔</li>
+                    <li>• 產品名稱必須是系統中已存在的產品</li>
+                    <li>• 每行一個規格名稱</li>
+                  </ul>
+                </div>
+                
+                <div className="mt-3 pt-3 border-t border-blue-200">
+                  <details className="text-sm">
+                    <summary className="font-medium text-blue-900 cursor-pointer hover:text-blue-700">
+                      📝 範例格式 (點擊展開)
+                    </summary>
+                    <pre className="mt-2 p-3 bg-blue-100 rounded text-xs overflow-x-auto">
+{`產品名稱: OXVA NEXLIM 大蠻牛
+規格:
+西瓜
+蘋果
+葡萄
+榴蓮
+芒果
+---
+產品名稱: OXVA XLIM PRO 2
+分類: 煙油口味
+規格:
+香草
+巧克力
+咖啡
+抹茶`}
+                    </pre>
+                  </details>
+                </div>
+              </div>
+            </div>
+
+            {/* 文件上傳 */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  選擇 txt 文件：
+                </label>
+                <input
+                  type="file"
+                  accept=".txt"
+                  onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                  className="block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-lg file:border-0
+                    file:text-sm file:font-medium
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100"
+                />
+              </div>
+
+              {importFile && (
+                <div className="text-sm text-gray-600">
+                  已選擇文件: {importFile.name} ({(importFile.size / 1024).toFixed(1)} KB)
+                </div>
+              )}
+            </div>
+
+            {/* 導入結果 */}
+            {importResult && (
+              <div className="space-y-3">
+                <h4 className="font-medium text-gray-900">導入結果：</h4>
+                <div className="grid grid-cols-4 gap-3 text-center text-sm">
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <div className="text-lg font-bold text-gray-700">{importResult.totalGroups}</div>
+                    <div className="text-gray-600">產品組</div>
+                  </div>
+                  <div className="bg-green-50 p-3 rounded-lg">
+                    <div className="text-lg font-bold text-green-700 flex items-center justify-center gap-1">
+                      <CheckCircle className="w-4 h-4" />
+                      {importResult.successful}
+                    </div>
+                    <div className="text-green-600">成功</div>
+                  </div>
+                  <div className="bg-red-50 p-3 rounded-lg">
+                    <div className="text-lg font-bold text-red-700 flex items-center justify-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {importResult.failed}
+                    </div>
+                    <div className="text-red-600">失敗</div>
+                  </div>
+                  <div className="bg-purple-50 p-3 rounded-lg">
+                    <div className="text-lg font-bold text-purple-700">{importResult.totalFlavors}</div>
+                    <div className="text-purple-600">總規格</div>
+                  </div>
+                </div>
+
+                {importResult.errors.length > 0 && (
+                  <div className="bg-red-50 p-3 rounded-lg">
+                    <h5 className="font-medium text-red-900 mb-2">錯誤詳情：</h5>
+                    <div className="text-sm text-red-800 space-y-1 max-h-32 overflow-y-auto">
+                      {importResult.errors.map((error, index) => (
+                        <div key={index}>• {error}</div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 操作按鈕 */}
+            <div className="flex justify-between">
+              <Button
+                onClick={downloadTemplate}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                下載模板
+              </Button>
+              
+              <div className="flex gap-3">
+                <Button
+                  onClick={resetBatchImport}
+                  variant="outline"
+                >
+                  取消
+                </Button>
+                <Button
+                  onClick={handleBatchImport}
+                  disabled={!importFile || importing}
+                  className="flex items-center gap-2"
+                >
+                  {importing ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      導入中...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4" />
+                      開始導入
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };

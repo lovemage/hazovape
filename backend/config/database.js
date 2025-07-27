@@ -13,7 +13,7 @@ const dbDir = process.env.DATABASE_PATH
 // 確保數據庫目錄存在
 if (!fs.existsSync(dbDir)) {
   try {
-    fs.mkdirSync(dbDir, { recursive: true });
+  fs.mkdirSync(dbDir, { recursive: true });
     console.log('✅ 創建數據庫目錄:', dbDir);
   } catch (error) {
     console.error('❌ 無法創建數據庫目錄:', error.message);
