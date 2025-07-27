@@ -286,9 +286,10 @@ export const adminAPI = {
 };
 
 // 系統設置相關 API
-export const systemSettingsAPI = {
+export const settingsAPI = {
   getAll: () => api.get('/settings'),
-  update: (key: string, value: string) => api.put('/settings', { key, value }),
+  update: (data: any) => api.put('/settings', data),
+  updateBatch: (settings: Record<string, any>) => api.put('/settings', { settings }),
 };
 
 // 產品分類API
