@@ -298,6 +298,7 @@ export const adminAPI = {
 export const settingsAPI = {
   getAll: () => api.get('/api/settings'),
   update: (data: any) => api.put('/api/settings', data),
+  updateBatch: (settings: Record<string, any>) => api.put('/api/settings', { settings }),
 };
 
 // 產品分類API

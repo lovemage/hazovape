@@ -1,13 +1,27 @@
 // 產品相關類型
-export interface Product {
-  id?: number;
+export interface ProductVariant {
+  id: number;
   name: string;
-  price: number;
+  product_id?: number;
+  category_id?: number;
+  category_name?: string;
+  stock: number;
+  sort_order?: number;
+  is_active?: boolean;
+  created_at?: string;
+}
+
+export interface Product {
+  id: number;
+  name: string;
   description?: string;
+  category?: string;
+  price: number;
   stock?: number;
-  multi_discount?: string | Record<number, number> | any;
-  images?: string[] | string;
-  is_active: boolean;
+  multi_discount?: string | Record<string, number>;
+  images?: string | string[];
+  is_active?: boolean;
+  variants?: ProductVariant[];
   created_at?: string;
   updated_at?: string;
 }

@@ -202,29 +202,24 @@ export const FlavorsPage: React.FC = () => {
       }
     });
 
-    // 計算優惠價格
-    const originalUnitPrice = selectedProduct.price;
-    const appliedDiscount = getAppliedDiscount();
-    const totalPrice = getCurrentPrice();
-    const unitPrice = totalPrice / totalQuantity;
+    const quantity = totalQuantity;
 
-    // 創建單一購物車項目，包含所有規格
+    if (!selectedProduct || selectedFlavors.length === 0) {
+      toast.error('請選擇至少一個口味');
+      return;
+    }
+
     addItem({
       productId: selectedProduct.id,
-      name: selectedProduct.name,
-      price: unitPrice,
-      originalPrice: originalUnitPrice !== unitPrice ? originalUnitPrice : undefined,
-      quantity: totalQuantity,
-      flavors: selectedFlavors,
-      multiDiscount: selectedProduct.multi_discount, // 傳遞多件優惠規則
-      discountInfo: appliedDiscount ? {
-        type: appliedDiscount.type as 'quantity_discount' | 'item_discount',
-        display: appliedDiscount.display
-      } : undefined
+      productName: selectedProduct.name,
+      productPrice: selectedProduct.price,
+      quantity,
+      variants: selectedFlavors,
+      subtotal: selectedProduct.price * quantity
     });
 
-    toast.success(`已加入購物車！(${totalQuantity}件)`);
-    navigate('/products');
+    toast.success(`已將 ${quantity} 個 ${selectedProduct.name} 加入購物車`);
+    toggleCart();
   };
 
   if (!selectedProduct) {
