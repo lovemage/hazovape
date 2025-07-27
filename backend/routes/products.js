@@ -57,6 +57,34 @@ const upload = multer({
   }
 });
 
+// 配置專門用於TXT文件的multer
+const txtUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueName = `${uuidv4()}-${Date.now()}${path.extname(file.originalname)}`;
+      cb(null, uniqueName);
+    }
+  }),
+  limits: {
+    fileSize: 2 * 1024 * 1024, // 2MB for text files
+    files: 1 // 只允許一個文件
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /txt|text/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = file.mimetype === 'text/plain' || file.mimetype === 'application/octet-stream';
+
+    if (extname || mimetype) {
+      cb(null, true);
+    } else {
+      cb(new Error('只允許上傳 TXT 格式的文本文件'));
+    }
+  }
+});
+
 // 獲取所有產品（前端用戶）
 router.get('/', async (req, res) => {
   try {
@@ -469,7 +497,7 @@ router.delete('/admin/:id/permanent', authenticateAdmin, async (req, res) => {
 });
 
 // 批量導入產品 - txt文件
-router.post('/admin/batch-import', authenticateAdmin, upload.single('txtFile'), async (req, res) => {
+router.post('/admin/batch-import', authenticateAdmin, txtUpload.single('txtFile'), async (req, res) => {
   let tempFilePath = null;
   
   try {
