@@ -40,24 +40,7 @@ export const CheckoutPage: React.FC = () => {
       discountDisplay: string;
     }> = [];
 
-    items.forEach(item => {
-      const originalPrice = item.originalPrice || item.price;
-      const actualPrice = item.price;
-      const savings = (originalPrice - actualPrice) * item.quantity;
-
-      if (savings > 0) {
-        // 這裡需要從商品數據中獲取折扣規則來判斷折扣類型
-        discountInfo.push({
-          productName: item.name,
-          quantity: item.quantity,
-          originalPrice: originalPrice * item.quantity,
-          discountedPrice: actualPrice * item.quantity,
-          savings,
-          discountType: 'unknown', // 需要從商品數據獲取
-          discountDisplay: `已享優惠`
-        });
-      }
-    });
+    // 移除舊的折扣計算邏輯
 
     return discountInfo;
   };
