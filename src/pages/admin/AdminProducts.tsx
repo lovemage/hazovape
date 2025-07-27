@@ -336,14 +336,62 @@ export const AdminProducts: React.FC = () => {
           <div className="space-y-6">
             {/* 格式說明 */}
             <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-900 mb-2">文件格式說明：</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• 使用 txt 文件，UTF-8 編碼</li>
-                <li>• 每個產品之間用 "---" 分隔</li>
-                <li>• 每行格式：字段名: 值</li>
-                <li>• 必填字段：名稱、價格</li>
-                <li>• 可選字段：庫存、分類、描述、多件優惠、是否啟用</li>
-              </ul>
+              <h4 className="font-medium text-blue-900 mb-3">📄 文件格式說明：</h4>
+              <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-800">
+                <div>
+                  <h5 className="font-medium mb-2">基本要求：</h5>
+                  <ul className="space-y-1">
+                    <li>• 使用 .txt 文件，UTF-8 編碼</li>
+                    <li>• 每個產品用 "---" 分隔</li>
+                    <li>• 格式：字段名: 值（冒號後要空格）</li>
+                    <li>• 檔案大小建議不超過 10MB</li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 className="font-medium mb-2">字段說明：</h5>
+                  <ul className="space-y-1">
+                    <li>• <span className="font-medium text-red-700">必填</span>：名稱、價格</li>
+                    <li>• <span className="font-medium text-green-700">可選</span>：庫存、分類、描述</li>
+                    <li>• <span className="font-medium text-purple-700">進階</span>：多件優惠、是否啟用</li>
+                    <li>• 多件優惠格式：{"2": 0.9, "5": 0.8}</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="mt-3 pt-3 border-t border-blue-200">
+                <h5 className="font-medium text-blue-900 mb-2">🏷️ 可用分類：</h5>
+                <div className="flex flex-wrap gap-2">
+                  {['一次性拋棄式電子煙', '注油式主機與耗材', '拋棄式通用煙蛋系列', '小煙油系列', '其他產品'].map(category => (
+                    <span key={category} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                      {category}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-3 pt-3 border-t border-blue-200">
+                <details className="text-sm">
+                  <summary className="font-medium text-blue-900 cursor-pointer hover:text-blue-700">
+                    📝 範例格式 (點擊展開)
+                  </summary>
+                  <pre className="mt-2 p-3 bg-blue-100 rounded text-xs overflow-x-auto">
+{`名稱: OXVA NEXLIM 大蠻牛
+價格: 300
+庫存: 100
+分類: 一次性拋棄式電子煙
+描述: 高品質電子煙設備...
+多件優惠: {"2": 0.9, "5": 0.8}
+是否啟用: true
+---
+名稱: 另一個產品
+價格: 250
+庫存: 50
+分類: 注油式主機與耗材
+描述: 產品描述...
+是否啟用: true`}
+                  </pre>
+                </details>
+              </div>
             </div>
 
             {/* 文件上傳 */}
