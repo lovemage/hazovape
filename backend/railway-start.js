@@ -175,6 +175,12 @@ async function initializeDatabase() {
     await addFlavorPriceColumn();
     console.log('✅ 規格價格功能遷移完成');
     
+    // 更新電子煙規格分類
+    console.log('🔄 檢查電子煙規格分類...');
+    const { updateVapeFlavorCategories } = require('./scripts/migrate-update-vape-flavor-categories');
+    await updateVapeFlavorCategories();
+    console.log('✅ 電子煙規格分類更新完成');
+    
   } catch (error) {
     console.error('❌ 遷移失敗:', error.message);
     console.log('⚠️  遷移失敗，但繼續啟動服務器...');
