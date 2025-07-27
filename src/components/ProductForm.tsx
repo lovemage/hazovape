@@ -606,7 +606,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             </Button>
           </div>
         </form>
-      </div>
     </div>
   );
 };
