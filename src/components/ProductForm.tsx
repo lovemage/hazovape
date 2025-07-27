@@ -29,6 +29,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     price: 0,
     stock: 0,
     description: '',
+    category: '其他產品',
     is_active: true,
     multi_discount: {} as Record<number, number>
   });
@@ -38,6 +39,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const [newImageUrl, setNewImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // 商品分類選項
+  const categories = [
+    '一次性拋棄式電子煙',
+    '注油式主機與耗材',
+    '拋棄式通用煙蛋系列',
+    '小煙油系列',
+    '其他產品'
+  ];
+
   useEffect(() => {
     if (product) {
       setFormData({
@@ -45,6 +55,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         price: product.price || 0,
         stock: product.stock || 0,
         description: product.description || '',
+        category: product.category || '其他產品',
         is_active: product.is_active ?? true,
         multi_discount: typeof product.multi_discount === 'string' 
           ? JSON.parse(product.multi_discount || '{}')
@@ -63,6 +74,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         price: 0,
         stock: 0,
         description: '',
+        category: '其他產品',
         is_active: true,
         multi_discount: {}
       });
@@ -203,6 +215,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       submitData.append('price', formData.price.toString());
       submitData.append('stock', formData.stock.toString());
       submitData.append('description', formData.description);
+      submitData.append('category', formData.category);
       submitData.append('is_active', formData.is_active.toString());
       submitData.append('multi_discount', JSON.stringify(formData.multi_discount));
       
@@ -344,6 +357,23 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   placeholder="請輸入商品描述"
                   rows={3}
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="category">商品分類 *</Label>
+                <select
+                  id="category"
+                  value={formData.category}
+                  onChange={(e) => handleInputChange('category', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="flex items-center space-x-2">

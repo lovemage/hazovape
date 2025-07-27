@@ -61,7 +61,7 @@ const upload = multer({
 router.get('/', async (req, res) => {
   try {
     const products = await Database.all(
-      'SELECT id, name, description, price, multi_discount, images, is_active FROM products WHERE is_active = 1 ORDER BY id'
+      'SELECT id, name, description, price, category, multi_discount, images, is_active FROM products WHERE is_active = 1 ORDER BY id'
     );
 
     // 解析 JSON 字段並獲取規格數據
@@ -151,7 +151,7 @@ router.get('/:id', async (req, res) => {
 router.get('/admin/all', authenticateAdmin, async (req, res) => {
   try {
     const products = await Database.all(
-      'SELECT * FROM products ORDER BY created_at DESC'
+      'SELECT id, name, description, price, category, multi_discount, images, is_active, created_at FROM products ORDER BY created_at DESC'
     );
 
     // 解析 JSON 字段
@@ -177,10 +177,10 @@ router.get('/admin/all', authenticateAdmin, async (req, res) => {
 // 管理員：創建產品
 router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, res) => {
   try {
-    const { name, description, price, multi_discount, existing_images } = req.body;
+    const { name, description, price, category, multi_discount, existing_images } = req.body;
 
     console.log('🆕 創建產品請求');
-    console.log('📝 請求數據:', { name, price, existing_images });
+    console.log('📝 請求數據:', { name, price, category, existing_images });
     console.log('📁 上傳文件數量:', req.files?.length || 0);
     if (req.files && req.files.length > 0) {
       console.log('📁 上傳文件詳情:', req.files.map(f => ({ name: f.originalname, size: f.size, mimetype: f.mimetype })));
@@ -234,15 +234,17 @@ router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, 
       }
     }
 
+    // 插入產品數據
     const result = await Database.run(
-      `INSERT INTO products (name, description, price, multi_discount, images)
-       VALUES (?, ?, ?, ?, ?)`,
+      'INSERT INTO products (name, description, price, category, multi_discount, images, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)',
       [
         name,
         description || '',
-        parseFloat(price),
+        price,
+        category || '其他產品',
         JSON.stringify(parsedMultiDiscount),
-        JSON.stringify(allImages)
+        JSON.stringify(allImages),
+        1
       ]
     );
 
@@ -267,11 +269,11 @@ router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, 
 router.put('/admin/:id', authenticateAdmin, upload.array('images', 5), async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, price, multi_discount, existing_images } = req.body;
+    const { name, description, price, category, multi_discount, existing_images } = req.body;
 
-    console.log('🔄 更新產品請求，ID:', id);
-    console.log('📝 請求數據:', { name, price, existing_images });
-    console.log('📁 上傳文件:', req.files?.length || 0);
+    console.log('🔄 更新產品請求, ID:', id);
+    console.log('📝 請求數據:', { name, price, category, existing_images });
+    console.log('📁 上傳文件數量:', req.files?.length || 0);
 
     // 檢查產品是否存在
     const product = await Database.get('SELECT * FROM products WHERE id = ?', [id]);
@@ -320,14 +322,15 @@ router.put('/admin/:id', authenticateAdmin, upload.array('images', 5), async (re
       }
     }
 
-    await Database.run(
-      `UPDATE products
-       SET name = ?, description = ?, price = ?, multi_discount = ?, images = ?
+    const result = await Database.run(
+      `UPDATE products 
+       SET name = ?, description = ?, price = ?, category = ?, multi_discount = ?, images = ?, updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`,
       [
-        name || product.name,
-        description !== undefined ? description : product.description,
-        price ? parseFloat(price) : product.price,
+        name,
+        description || '',
+        price,
+        category || '其他產品',
         JSON.stringify(parsedMultiDiscount),
         JSON.stringify(currentImages),
         id
@@ -461,6 +464,87 @@ router.delete('/admin/:id/permanent', authenticateAdmin, async (req, res) => {
     res.status(500).json({
       success: false,
       message: '永久刪除產品失敗: ' + error.message
+    });
+  }
+});
+
+// 根據分類獲取產品
+router.get('/category/:category', async (req, res) => {
+  try {
+    const { category } = req.params;
+    
+    console.log('🏷️ 根據分類獲取產品:', category);
+    
+    const products = await Database.all(
+      'SELECT id, name, description, price, category, multi_discount, images, is_active FROM products WHERE is_active = 1 AND category = ? ORDER BY id',
+      [category]
+    );
+
+    // 解析 JSON 字段並獲取規格數據
+    const formattedProducts = await Promise.all(
+      products.map(async (product) => {
+        // 從 flavors 表獲取規格數據
+        const flavors = await Database.all(`
+          SELECT f.id, f.name, f.sort_order, f.stock, f.category_id,
+                 fc.name as category_name
+          FROM flavors f
+          LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+          WHERE f.product_id = ? AND f.is_active = 1
+          ORDER BY fc.sort_order, f.sort_order, f.id
+        `, [product.id]);
+
+        return {
+          ...product,
+          multi_discount: product.multi_discount ? JSON.parse(product.multi_discount) : {},
+          images: product.images ? JSON.parse(product.images) : [],
+          variants: flavors
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      data: formattedProducts,
+      count: formattedProducts.length
+    });
+  } catch (error) {
+    console.error('根據分類獲取產品錯誤:', error);
+    res.status(500).json({
+      success: false,
+      message: '獲取產品列表失敗'
+    });
+  }
+});
+
+// 獲取所有產品分類
+router.get('/categories/list', async (req, res) => {
+  try {
+    const categories = await Database.all(
+      'SELECT DISTINCT category FROM products WHERE is_active = 1 AND category IS NOT NULL ORDER BY category'
+    );
+
+    const categoryList = categories.map(row => row.category);
+    
+    // 確保所有標準分類都包含在內
+    const standardCategories = [
+      '一次性拋棄式電子煙',
+      '注油式主機與耗材',
+      '拋棄式通用煙蛋系列',
+      '小煙油系列',
+      '其他產品'
+    ];
+    
+    const allCategories = [...new Set([...standardCategories, ...categoryList])];
+
+    res.json({
+      success: true,
+      data: allCategories
+    });
+  } catch (error) {
+    console.error('獲取產品分類錯誤:', error);
+    res.status(500).json({
+      success: false,
+      message: '獲取產品分類失敗'
     });
   }
 });

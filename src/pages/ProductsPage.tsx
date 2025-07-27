@@ -1,63 +1,82 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShoppingBag, Package, Tag, RefreshCw, Search, X } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ShoppingBag, Filter, Search, X, ArrowLeft, Plus, Minus } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
+import { Badge } from '../components/ui/badge';
 import { useCart } from '../contexts/CartContext';
 import { productAPI } from '../services/api';
-import { Product } from '../types';
 import { getProductImageUrl } from '../utils/imageUtils';
+import { Product } from '../types';
 
 export const ProductsPage: React.FC = () => {
+  const location = useLocation();
   const navigate = useNavigate();
-  const { getTotalItems, toggleCart } = useCart();
+  const { addToCart, getTotalItems, toggleCart } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedVariants, setSelectedVariants] = useState<{[key: number]: {id: number, name: string}[]}>({});
+  const [quantities, setQuantities] = useState<{[key: number]: number}>({});
+
+  // 商品分類選項
+  const categories = [
+    '一次性拋棄式電子煙',
+    '注油式主機與耗材',
+    '拋棄式通用煙蛋系列',
+    '小煙油系列',
+    '其他產品'
+  ];
 
   useEffect(() => {
+    // 從 location.state 獲取傳遞的數據
+    if (location.state?.selectedProduct) {
+      setSelectedProduct(location.state.selectedProduct);
+    }
+    if (location.state?.selectedCategory) {
+      setSelectedCategory(location.state.selectedCategory);
+    }
+  }, [location.state]);
+
+  // 加載產品數據
+  useEffect(() => {
     loadProducts();
-
-    // 當頁面獲得焦點時重新載入數據（從管理後台切換回來時）
-    const handleFocus = () => {
-      console.log('🔄 頁面獲得焦點，重新載入商品數據');
-      loadProducts();
-    };
-
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-    };
   }, []);
 
-  const loadProducts = async (showLoading = true) => {
+  // 產品篩選邏輯
+  useEffect(() => {
+    let filtered = products;
+
+    // 分類篩選
+    if (selectedCategory) {
+      filtered = filtered.filter(product => product.category === selectedCategory);
+    }
+
+    // 搜索篩選
+    if (searchTerm) {
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    setFilteredProducts(filtered);
+  }, [products, selectedCategory, searchTerm]);
+
+  const loadProducts = async () => {
     try {
-      if (showLoading) setLoading(true);
-      console.log('🔄 載入商品數據...');
+      setLoading(true);
       const response = await productAPI.getAll();
       if (response.data.success) {
-        const newProducts = response.data.data || [];
-        setProducts(newProducts);
-        console.log('✅ 商品數據載入成功，共', newProducts.length, '個商品');
-
-        // 檢查圖片數據
-        newProducts.forEach(product => {
-          if (product.images && product.images.length > 0) {
-            console.log(`📸 商品 ${product.name} 的圖片:`, product.images);
-          }
-        });
-      } else {
-        setError('載入產品失敗');
+        setProducts(response.data.data || []);
       }
     } catch (error) {
       console.error('載入產品失敗:', error);
-      setError('載入產品失敗');
     } finally {
-      if (showLoading) setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -130,8 +149,12 @@ export const ProductsPage: React.FC = () => {
 
   // 清除所有過濾器
   const clearFilters = () => {
+    setSelectedCategory('');
     setSearchTerm('');
-    setSelectedTags([]);
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category === selectedCategory ? '' : category);
   };
 
   // 高亮搜索詞
@@ -228,198 +251,160 @@ export const ProductsPage: React.FC = () => {
           <p className="text-gray-600">請選擇您喜歡的商品，然後選擇口味</p>
         </div>
 
-        {/* 搜索和過濾區域 */}
-        <div className="mb-8 bg-white rounded-lg shadow-sm border p-6">
-          {/* 搜索欄 */}
-          <div className="mb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+        {/* 篩選區域 */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+            {/* 搜索框 */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
                 type="text"
-                placeholder="搜索商品名稱..."
+                placeholder="搜索商品..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-10"
+                className="pl-10"
               />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
             </div>
-          </div>
 
-          {/* 商品標籤 */}
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Tag className="w-4 h-4 text-blue-500" />
-              <span className="text-sm font-medium text-gray-700">快速選擇商品：</span>
-              {(searchTerm || selectedTags.length > 0) && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={clearFilters}
-                  className="ml-auto text-xs"
-                >
-                  <X className="w-3 h-3 mr-1" />
-                  清除過濾
-                </Button>
-              )}
-            </div>
+            {/* 分類篩選 */}
             <div className="flex flex-wrap gap-2">
-              {availableTags.map((tagName) => (
-                <Badge
-                  key={tagName}
-                  variant={selectedTags.includes(tagName) ? "default" : "secondary"}
-                  className={`cursor-pointer transition-colors hover:opacity-80 ${
-                    selectedTags.includes(tagName) 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant={selectedCategory === category ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleCategoryChange(category)}
+                  className={`${
+                    selectedCategory === category 
+                      ? 'bg-vintage-green text-white hover:bg-vintage-green/90' 
+                      : 'border-vintage-green text-vintage-green hover:bg-vintage-green hover:text-white'
                   }`}
-                  onClick={() => toggleTag(tagName)}
                 >
-                  {tagName}
-                  {selectedTags.includes(tagName) && (
-                    <X className="w-3 h-3 ml-1" />
-                  )}
-                </Badge>
+                  {category}
+                </Button>
               ))}
             </div>
+
+            {/* 清除篩選 */}
+            {(selectedCategory || searchTerm) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-4 h-4 mr-1" />
+                清除篩選
+              </Button>
+            )}
           </div>
 
-          {/* 過濾結果統計 */}
-          <div className="text-sm text-gray-500">
-            {searchTerm || selectedTags.length > 0 ? (
-              <span>
-                顯示 {filteredProducts.length} / {products.length} 個商品
-                {searchTerm && <span> • 搜索: "{searchTerm}"</span>}
-                {selectedTags.length > 0 && <span> • 已選標籤: {selectedTags.length}</span>}
-              </span>
-            ) : (
-              <span>共 {products.length} 個商品</span>
+          {/* 篩選結果摘要 */}
+          <div className="mt-4 flex items-center gap-2 text-sm text-gray-600">
+            <span>共找到 {filteredProducts.length} 個商品</span>
+            {selectedCategory && (
+              <Badge variant="secondary" className="bg-vintage-green/10 text-vintage-green">
+                分類: {selectedCategory}
+              </Badge>
+            )}
+            {searchTerm && (
+              <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                搜索: {searchTerm}
+              </Badge>
             )}
           </div>
         </div>
 
-        {products.length === 0 ? (
-          <div className="text-center py-12">
-            <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">目前沒有可用的商品</p>
+        {/* 產品列表 */}
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-vintage-green"></div>
+            <span className="ml-3 text-gray-600">載入商品中...</span>
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="text-center py-12">
-            <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 mb-2">沒有找到符合條件的商品</p>
-            <p className="text-sm text-gray-400 mb-4">
-              {searchTerm && `搜索詞: "${searchTerm}"`}
-              {selectedTags.length > 0 && ` • 已選標籤: ${selectedTags.join(', ')}`}
-            </p>
-            <Button onClick={clearFilters} variant="outline" size="sm">
-              清除過濾條件
-            </Button>
+            <div className="text-gray-500 mb-4">
+              <ShoppingBag className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p className="text-lg">
+                {selectedCategory || searchTerm ? '沒有找到符合條件的商品' : '暫無商品展示'}
+              </p>
+              <p className="text-sm">
+                {selectedCategory || searchTerm ? '請嘗試調整篩選條件' : '請稍後再來查看'}
+              </p>
+            </div>
+            {(selectedCategory || searchTerm) && (
+              <Button onClick={clearFilters} variant="outline">
+                清除篩選條件
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProducts.map((product) => {
-                const discounts = getDiscountInfo(product);
-                
-                return (
-                  <div
-                    key={product.id}
-                    className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group ${
-                      selectedTags.includes(product.name) ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
-                    }`}
-                    onClick={() => handleProductSelect(product)}
-                  >
-                    {/* 商品圖片 */}
-                    <div className="h-48 bg-gray-200 overflow-hidden">
-                      <img
-                        src={getProductImage(product)}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
-                        }}
-                      />
-                    </div>
+              const discounts = getDiscountInfo(product);
+              
+              return (
+                <div
+                  key={product.id}
+                  className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
+                  onClick={() => handleProductSelect(product)}
+                >
+                  {/* 商品圖片 */}
+                  <div className="aspect-square bg-gray-50 rounded-t-lg overflow-hidden">
+                    <img
+                      src={getProductImage(product)}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
+                      }}
+                    />
+                  </div>
 
-                    {/* 商品信息 */}
-                    <div className="p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                        {highlightSearchTerm(product.name, searchTerm)}
-                        {selectedTags.includes(product.name) && (
-                          <Badge className="ml-2 text-xs bg-blue-100 text-blue-700">
-                            已選
-                          </Badge>
-                        )}
-                      </h3>
+                  {/* 商品信息 */}
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
+                      {product.name}
+                    </h3>
+                    
+                    {/* 商品分類 */}
+                    {product.category && (
+                      <Badge variant="secondary" className="mb-2 bg-vintage-green/10 text-vintage-green">
+                        {product.category}
+                      </Badge>
+                    )}
 
-                      {/* 商品描述 */}
-                      {product.description && (
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                          {product.description}
-                        </p>
-                      )}
+                    {/* 商品描述 */}
+                    {product.description && (
+                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                        {product.description}
+                      </p>
+                    )}
 
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <span className="text-2xl font-bold text-blue-600">
-                            NT$ {Math.round(product.price).toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm text-gray-500">
-                            點擊查看口味選項
+                    {/* 價格和優惠 */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-xl font-bold text-vintage-green">
+                          NT$ {Math.round(product.price).toLocaleString()}
+                        </span>
+                        {discounts && discounts.length > 0 && (
+                          <p className="text-xs text-green-600 mt-1">
+                            {discounts[0].display}
                           </p>
-                        </div>
+                        )}
                       </div>
-
-                      {/* 多件優惠 */}
-                      {discounts && discounts.length > 0 && (
-                        <div className="mb-4">
-                          <div className="flex items-center gap-1 mb-2">
-                            <Tag className="w-4 h-4 text-orange-500" />
-                            <span className="text-sm font-medium text-orange-600">多件優惠</span>
-                          </div>
-                          <div className="flex flex-wrap gap-1">
-                            {discounts.map((discount, index) => (
-                              <Badge
-                                key={index}
-                                variant="secondary"
-                                className={`text-xs ${discount.type === 'item_discount' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}
-                              >
-                                {discount.type === 'item_discount'
-                                  ? `第${discount.quantity}件起-${discount.amount}元`
-                                  : `${discount.quantity}件-${discount.discount.toFixed(0)}%`
-                                }
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* 商品狀態 */}
-                      <div className="flex items-center justify-between">
-                        <Badge variant="outline" className="text-green-600 border-green-600">
-                          可選購
-                        </Badge>
-
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="group-hover:bg-blue-50 group-hover:border-blue-300"
-                        >
-                          選擇此商品
-                        </Button>
-                      </div>
+                      <Button
+                        size="sm"
+                        className="bg-vintage-green hover:bg-vintage-green/90 text-white"
+                      >
+                        選購
+                      </Button>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              );
+            })}
           </div>
         )}
 

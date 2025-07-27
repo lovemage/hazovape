@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingBag, Settings, Search, X, MessageCircle, Star, Gift, Truck, Coins } from 'lucide-react';
+import { ShoppingBag, Settings, Search, X, MessageCircle, Star, Gift, Truck, Coins, ChevronDown } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useCart } from '../contexts/CartContext';
 import { AnnouncementCarousel } from '../components/TypewriterText';
@@ -28,6 +28,16 @@ export const HomePage: React.FC = () => {
   const [popupEnabled, setPopupEnabled] = useState<boolean>(true);
   const [lineUrl, setLineUrl] = useState<string>('https://line.me/ti/p/@590shgcm');
   const [telegramUrl, setTelegramUrl] = useState<string>('https://t.me/whalesale');
+  const [showCategoryMenu, setShowCategoryMenu] = useState(false);
+
+  // 商品分類選項
+  const categories = [
+    '一次性拋棄式電子煙',
+    '注油式主機與耗材',
+    '拋棄式通用煙蛋系列',
+    '小煙油系列',
+    '其他產品'
+  ];
 
   const loadAnnouncements = useCallback(async () => {
     try {
@@ -181,6 +191,11 @@ export const HomePage: React.FC = () => {
     navigate('/products', { state: { selectedProduct: product } });
   };
 
+  const handleCategoryClick = (category: string) => {
+    setShowCategoryMenu(false);
+    navigate('/products', { state: { selectedCategory: category } });
+  };
+
   const totalItems = getTotalItems();
 
   return (
@@ -202,6 +217,37 @@ export const HomePage: React.FC = () => {
               <h1 className="text-xl font-bold text-vintage-green">
                 VJ Vape
               </h1>
+            </div>
+
+            {/* 導航選單 */}
+            <div className="hidden md:flex items-center space-x-6">
+              {/* 選購商品下拉選單 */}
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-2 text-vintage-green hover:text-vintage-green hover:bg-vintage-pink/50"
+                  onClick={() => setShowCategoryMenu(!showCategoryMenu)}
+                  onBlur={() => setTimeout(() => setShowCategoryMenu(false), 200)}
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  選購商品
+                  <ChevronDown className={`w-4 h-4 transition-transform ${showCategoryMenu ? 'rotate-180' : ''}`} />
+                </Button>
+                
+                {showCategoryMenu && (
+                  <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    {categories.map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => handleCategoryClick(category)}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-700 hover:text-vintage-green transition-colors"
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* 購物車按鈕 */}

@@ -145,7 +145,13 @@ async function initializeDatabase() {
     const addProductDescription = require('./scripts/migrate-add-product-description');
     await addProductDescription();
     console.log('✅ 商品描述功能遷移完成');
-    
+
+    // 添加產品分類字段
+    console.log('🔄 檢查產品分類功能...');
+    const addProductCategory = require('./scripts/migrate-add-product-category');
+    await addProductCategory();
+    console.log('✅ 產品分類功能遷移完成');
+
     // 添加 tracking_number 字段
     const migrateTrackingNumber = require('./scripts/migrate-add-tracking-number');
     await migrateTrackingNumber();
