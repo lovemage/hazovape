@@ -468,6 +468,216 @@ router.delete('/admin/:id/permanent', authenticateAdmin, async (req, res) => {
   }
 });
 
+// 批量導入產品 - txt文件
+router.post('/admin/batch-import', authenticateAdmin, upload.single('txtFile'), async (req, res) => {
+  let tempFilePath = null;
+  
+  try {
+    console.log('📤 批量導入產品請求:', {
+      hasFile: !!req.file,
+      fileName: req.file?.originalname,
+      fileSize: req.file?.size
+    });
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: '請選擇要上傳的txt文件'
+      });
+    }
+
+    tempFilePath = req.file.path;
+
+    // 讀取文件內容
+    const fileContent = await fs.promises.readFile(tempFilePath, 'utf-8');
+    console.log('📄 文件內容長度:', fileContent.length);
+
+    // 解析文件內容
+    const parseResult = await parseProductsTxt(fileContent);
+    console.log('📊 解析結果:', {
+      總數量: parseResult.products.length,
+      錯誤數量: parseResult.errors.length
+    });
+
+    if (parseResult.products.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: '文件中沒有找到有效的產品數據',
+        errors: parseResult.errors
+      });
+    }
+
+    // 批量插入產品
+    const insertResults = await batchInsertProducts(parseResult.products);
+    
+    // 清理臨時文件
+    if (tempFilePath) {
+      await fs.promises.unlink(tempFilePath).catch(console.error);
+    }
+
+    res.json({
+      success: true,
+      message: '批量導入產品完成',
+      data: {
+        totalProducts: parseResult.products.length,
+        successful: insertResults.successful,
+        failed: insertResults.failed,
+        errors: [...parseResult.errors, ...insertResults.errors]
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ 批量導入產品失敗:', error);
+    
+    // 清理臨時文件
+    if (tempFilePath) {
+      await fs.promises.unlink(tempFilePath).catch(console.error);
+    }
+
+    res.status(500).json({
+      success: false,
+      message: '批量導入產品失敗',
+      error: error.message
+    });
+  }
+});
+
+// 解析txt文件內容
+async function parseProductsTxt(content) {
+  const products = [];
+  const errors = [];
+  
+  try {
+    // 按 "---" 分割產品
+    const productBlocks = content.split(/---+/).map(block => block.trim()).filter(block => block);
+    
+    console.log(`📦 找到 ${productBlocks.length} 個產品`);
+
+    for (let i = 0; i < productBlocks.length; i++) {
+      const block = productBlocks[i];
+      const lineNumber = i + 1;
+      
+      try {
+        const product = parseProductBlock(block, lineNumber);
+        if (product.valid) {
+          products.push(product);
+        }
+      } catch (error) {
+        errors.push(`產品 ${lineNumber}: ${error.message}`);
+      }
+    }
+
+    return { products, errors };
+  } catch (error) {
+    console.error('❌ 解析txt文件失敗:', error);
+    return { 
+      products: [], 
+      errors: [`文件解析錯誤: ${error.message}`] 
+    };
+  }
+}
+
+// 解析單個產品塊
+function parseProductBlock(block, lineNumber) {
+  const product = {
+    valid: false,
+    lineNumber,
+    name: '',
+    price: 0,
+    stock: 0,
+    category: '其他產品',
+    description: '',
+    multi_discount: {},
+    is_active: true
+  };
+
+  const lines = block.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('#'));
+  
+  for (const line of lines) {
+    if (line.includes('名稱：') || line.includes('名稱:')) {
+      const colonIndex = line.indexOf('：') !== -1 ? line.indexOf('：') : line.indexOf(':');
+      product.name = line.substring(colonIndex + 1).trim();
+    } else if (line.includes('價格：') || line.includes('價格:')) {
+      const colonIndex = line.indexOf('：') !== -1 ? line.indexOf('：') : line.indexOf(':');
+      product.price = parseFloat(line.substring(colonIndex + 1).trim()) || 0;
+    } else if (line.includes('庫存：') || line.includes('庫存:')) {
+      const colonIndex = line.indexOf('：') !== -1 ? line.indexOf('：') : line.indexOf(':');
+      product.stock = parseInt(line.substring(colonIndex + 1).trim()) || 0;
+    } else if (line.includes('分類：') || line.includes('分類:')) {
+      const colonIndex = line.indexOf('：') !== -1 ? line.indexOf('：') : line.indexOf(':');
+      product.category = line.substring(colonIndex + 1).trim() || '其他產品';
+    } else if (line.includes('描述：') || line.includes('描述:')) {
+      const colonIndex = line.indexOf('：') !== -1 ? line.indexOf('：') : line.indexOf(':');
+      product.description = line.substring(colonIndex + 1).trim();
+    } else if (line.includes('多件優惠：') || line.includes('多件優惠:')) {
+      const colonIndex = line.indexOf('：') !== -1 ? line.indexOf('：') : line.indexOf(':');
+      try {
+        product.multi_discount = JSON.parse(line.substring(colonIndex + 1).trim()) || {};
+      } catch {
+        product.multi_discount = {};
+      }
+    } else if (line.includes('是否啟用：') || line.includes('是否啟用:')) {
+      const colonIndex = line.indexOf('：') !== -1 ? line.indexOf('：') : line.indexOf(':');
+      const value = line.substring(colonIndex + 1).trim().toLowerCase();
+      product.is_active = value === 'true' || value === '是' || value === '1';
+    }
+  }
+
+  // 驗證必要字段
+  if (!product.name) {
+    throw new Error('產品名稱不能為空');
+  }
+  if (!product.price || product.price <= 0) {
+    throw new Error('價格必須大於0');
+  }
+
+  product.valid = true;
+  return product;
+}
+
+// 批量插入產品
+async function batchInsertProducts(products) {
+  const results = {
+    successful: 0,
+    failed: 0,
+    errors: []
+  };
+
+  for (const product of products) {
+    try {
+      // 檢查是否已存在同名產品
+      const existing = await Database.get('SELECT id FROM products WHERE name = ?', [product.name]);
+      if (existing) {
+        throw new Error(`產品 "${product.name}" 已存在`);
+      }
+
+      // 插入產品
+      await Database.run(`
+        INSERT INTO products (name, price, stock, category, description, multi_discount, is_active, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
+      `, [
+        product.name,
+        product.price,
+        product.stock,
+        product.category,
+        product.description,
+        JSON.stringify(product.multi_discount),
+        product.is_active ? 1 : 0
+      ]);
+
+      console.log(`✅ 成功添加產品: ${product.name}`);
+      results.successful++;
+
+    } catch (error) {
+      console.error(`❌ 處理產品 ${product.name} 失敗:`, error.message);
+      results.failed++;
+      results.errors.push(`${product.name}: ${error.message}`);
+    }
+  }
+
+  return results;
+}
+
 // 獲取批量導入模板
 router.get('/admin/batch-import/template', (req, res) => {
   const template = `# TXT產品批量導入模板
