@@ -1,30 +1,78 @@
 import axios from 'axios';
 
-// 自動檢測 API URL - 使用 Vite 代理
-const getApiBaseUrl = () => {
-  // 開發環境和生產環境都使用相對路徑
-  // 開發環境通過 Vite 代理轉發到 localhost:3001
-  // 生產環境直接使用當前域名
-  return '/api';
-};
+// API 配置
+const isDev = import.meta.env.DEV;
+const isProd = import.meta.env.PROD;
+const currentDomain = window.location.origin;
 
-const API_BASE_URL = getApiBaseUrl();
+// 開發環境檢測
+const isLocalDev = currentDomain.includes('localhost') || currentDomain.includes('127.0.0.1');
 
-// 調試信息
+let API_BASE_URL: string;
+
+if (isLocalDev) {
+  // 本地開發環境，使用本地後端
+  API_BASE_URL = 'http://localhost:3001/api';
+} else {
+  // 生產環境，使用相對路徑
+  API_BASE_URL = '/api';
+}
+
 console.log('🔧 API 配置信息:');
-console.log('- DEV 環境:', import.meta.env.DEV);
-console.log('- PROD 環境:', import.meta.env.PROD);
-console.log('- 當前域名:', window.location.origin);
+console.log('- DEV 環境:', isDev);
+console.log('- PROD 環境:', isProd);
+console.log('- 當前域名:', currentDomain);
+console.log('- 是否本地開發:', isLocalDev);
 console.log('- 最終 API_BASE_URL:', API_BASE_URL);
-console.log('- 策略: 強制使用當前域名，忽略 VITE_API_URL');
 
+// 創建 axios 實例
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15000, // 15秒超時，考慮數據庫重連時間
 });
+
+// 請求攔截器
+api.interceptors.request.use(
+  (config) => {
+    // 獲取存儲的 token
+    const token = localStorage.getItem('adminToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // 如果是 FormData，移除 Content-Type 讓瀏覽器自動設置
+    if (config.data instanceof FormData) {
+      console.log('📤 檢測到 FormData，移除 Content-Type 讓瀏覽器自動設置');
+      delete config.headers['Content-Type'];
+    }
+
+    console.log('📤 API 請求:', config.method?.toUpperCase(), config.url);
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// 響應攔截器
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token 過期或無效，清除本地存儲並跳轉到登錄頁
+      localStorage.removeItem('adminToken');
+      if (window.location.pathname.includes('/admin')) {
+        window.location.href = '/admin/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 // 模擬數據
 const MOCK_DATA = {
@@ -106,39 +154,6 @@ const MOCK_DATA = {
 const createMockResponse = (data: any) => ({
   data: { success: true, data }
 });
-
-// 請求攔截器
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('admin_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    // 如果是 FormData，移除 Content-Type 讓瀏覽器自動設置
-    if (config.data instanceof FormData) {
-      console.log('📤 檢測到 FormData，移除 Content-Type 讓瀏覽器自動設置');
-      delete config.headers['Content-Type'];
-    }
-
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// 響應攔截器
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('admin_token');
-      if (window.location.pathname.startsWith('/admin')) {
-        window.location.href = '/admin/login';
-      }
-    }
-    return Promise.reject(error);
-  }
-);
 
 // 產品相關 API
 export const productAPI = {
@@ -303,19 +318,11 @@ export const settingsAPI = {
 
 // 產品分類API
 export const productCategoryAPI = {
-  getAll: () => api.get('/api/product-categories'),
-  getAllAdmin: () => api.get('/api/product-categories/admin', {
-    headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
-  }),
-  create: (data: any) => api.post('/api/product-categories/admin', data, {
-    headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
-  }),
-  update: (id: number, data: any) => api.put(`/api/product-categories/admin/${id}`, data, {
-    headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
-  }),
-  delete: (id: number) => api.delete(`/api/product-categories/admin/${id}`, {
-    headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
-  }),
+  getAll: () => api.get('/product-categories'),
+  getAllAdmin: () => api.get('/product-categories/admin'),
+  create: (data: any) => api.post('/product-categories/admin', data),
+  update: (id: number, data: any) => api.put(`/product-categories/admin/${id}`, data),
+  delete: (id: number) => api.delete(`/product-categories/admin/${id}`),
 };
 
 export default api;
