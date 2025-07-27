@@ -681,12 +681,11 @@ async function batchInsertProducts(products) {
 
       // 插入產品
       await Database.run(`
-        INSERT INTO products (name, price, stock, category, description, multi_discount, is_active, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        INSERT INTO products (name, price, category, description, multi_discount, is_active, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
       `, [
         product.name,
         product.price,
-        product.stock,
         product.category,
         product.description,
         JSON.stringify(product.multi_discount),
@@ -714,8 +713,9 @@ router.get('/admin/batch-import/template', (req, res) => {
 # 1. 每個產品之間用 "---" 分隔
 # 2. 每行格式: 字段名: 值 (冒號後要有空格)
 # 3. 必填字段: 名稱、價格
-# 4. 可選字段: 庫存、分類、描述、多件優惠、是否啟用
+# 4. 可選字段: 分類、描述、多件優惠、是否啟用
 # 5. 文件編碼: UTF-8
+# 6. 注意：庫存由規格管理，產品表不存儲庫存
 #
 # 可用分類: 一次性拋棄式電子煙、注油式主機與耗材、拋棄式通用煙蛋系列、小煙油系列、其他產品
 #
