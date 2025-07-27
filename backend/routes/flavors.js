@@ -181,9 +181,22 @@ function parseFlavorGroup(block, lineNumber) {
       continue;
     }
     
-    // 如果在規格列表中，每行都是一個規格
-    if (inFlavorList && line && !line.includes('：') && !line.includes(':')) {
-      group.flavors.push(line);
+    // 如果在規格列表中，處理規格行
+    if (inFlavorList && line) {
+      // 支持兩種格式：
+      // 1. "規格名稱：價格" 格式
+      // 2. "規格名稱" 純文字格式
+      if (line.includes('：') || line.includes(':')) {
+        // 提取規格名稱（冒號前的部分）
+        const colonIndex = line.indexOf('：') !== -1 ? line.indexOf('：') : line.indexOf(':');
+        const flavorName = line.substring(0, colonIndex).trim();
+        if (flavorName) {
+          group.flavors.push(flavorName);
+        }
+      } else {
+        // 純規格名稱
+        group.flavors.push(line);
+      }
     }
   }
 
