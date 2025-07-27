@@ -12,10 +12,9 @@ import { toast } from 'sonner';
 import { Product } from '../types';
 
 interface ProductFormProps {
-  product?: Product;
-  isOpen: boolean;
-  onClose: () => void;
+  product?: Product | null;
   onSuccess: () => void;
+  onCancel?: () => void;
 }
 
 interface ProductCategory {
@@ -25,11 +24,10 @@ interface ProductCategory {
   sort_order: number;
 }
 
-export const ProductForm: React.FC<ProductFormProps> = ({
-  product,
-  isOpen,
-  onClose,
-  onSuccess
+export const ProductForm: React.FC<ProductFormProps> = ({ 
+  product, 
+  onSuccess,
+  onCancel 
 }) => {
   const [formData, setFormData] = useState({
     name: '',
@@ -110,7 +108,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     }
     setImages([]);
     setNewImageUrl('');
-  }, [product, isOpen]);
+  }, [product]);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
@@ -307,7 +305,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       console.log('📦 商品提交響應:', response.data);
       
       onSuccess();
-      onClose();
+      onCancel?.();
     } catch (error) {
       console.error('保存商品失敗:', error);
       toast.error('保存商品失敗');
@@ -316,8 +314,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -325,7 +321,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           <h2 className="text-xl font-semibold">
             {product ? '編輯商品' : '新增商品'}
           </h2>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button variant="ghost" size="sm" onClick={onCancel}>
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -592,12 +588,31 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           </Card>
 
           {/* 提交按鈕 */}
-          <div className="flex justify-end space-x-3">
-            <Button type="button" variant="outline" onClick={onClose}>
-              取消
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? '保存中...' : (product ? '更新商品' : '創建商品')}
+          <div className="flex gap-4 pt-6">
+            {onCancel && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                disabled={loading}
+                className="flex-1"
+              >
+                取消
+              </Button>
+            )}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="flex-1"
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  {product ? '更新中...' : '創建中...'}
+                </>
+              ) : (
+                product ? '更新產品' : '創建產品'
+              )}
             </Button>
           </div>
         </form>
