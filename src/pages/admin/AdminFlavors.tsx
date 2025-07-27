@@ -475,9 +475,8 @@ export const AdminFlavors: React.FC = () => {
       {/* 批量新增表單 */}
       {showBatchForm && (
         <BatchFlavorForm
-          isOpen={showBatchForm}
-          onClose={() => setShowBatchForm(false)}
-          onSuccess={loadProductsWithFlavors}
+          onSubmit={loadProductsWithFlavors}
+          onCancel={() => setShowBatchForm(false)}
         />
       )}
 
