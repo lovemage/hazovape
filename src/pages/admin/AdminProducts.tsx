@@ -353,7 +353,7 @@ export const AdminProducts: React.FC = () => {
                     <li>• <span className="font-medium text-red-700">必填</span>：名稱、價格</li>
                     <li>• <span className="font-medium text-green-700">可選</span>：庫存、分類、描述</li>
                     <li>• <span className="font-medium text-purple-700">進階</span>：多件優惠、是否啟用</li>
-                    <li>• 多件優惠格式：{"2": 0.9, "5": 0.8}</li>
+                    <li>• 多件優惠格式：{`{"2": 0.9, "5": 0.8}`}</li>
                   </ul>
                 </div>
               </div>
