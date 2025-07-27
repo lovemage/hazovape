@@ -4,7 +4,8 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { useCart } from '../contexts/CartContext';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { CartItem } from '../types';
 
 interface UpsellProduct {
   id: number;
@@ -62,7 +63,7 @@ export const UpsellSection: React.FC<UpsellSectionProps> = ({ className = '' }) 
     // 如果產品有規格，使用第一個規格的價格作為基礎價格
     const basePrice = selectedFlavors.length > 0 ? selectedFlavors[0].final_price || product.price : product.price;
     
-    addItem({
+    const newItem: CartItem = {
       id: `${product.id}-${Date.now()}`,
       productId: product.id,
       productName: product.name,
@@ -70,8 +71,9 @@ export const UpsellSection: React.FC<UpsellSectionProps> = ({ className = '' }) 
       quantity,
       variants: [],
       subtotal: basePrice * quantity
-    });
+    };
 
+    addItem(newItem);
     toast.success(`已添加 ${product.name} 到購物車`);
   };
 

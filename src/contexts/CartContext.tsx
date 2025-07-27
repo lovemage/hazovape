@@ -19,19 +19,21 @@ interface CartState {
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product, quantity: number, selectedFlavors: ProductVariant[]) => void;
+  addToCart: (product: Product, quantity?: number, selectedFlavors?: ProductVariant[]) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
+  isOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
+  toggleCart: () => void;
+  getTotalQuantity: () => number;
   getTotalItems: () => number;
   getTotalPrice: () => number;
-  toggleCart: () => void;
-  isOpen: boolean;
-  // 為了兼容性，保留舊的接口
+  // 兼容舊的方法名和接口
   state: CartState;
-  addItem: (item: Omit<CartItem, 'id'>) => void;
+  addItem: (item: CartItem) => void;
   removeItem: (id: string) => void;
-  closeCart: () => void;
   getDiscountedPrice: (productId: number, quantity: number, originalPrice: number, discountRules?: any) => number;
 }
 
@@ -111,24 +113,26 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     const subtotal = totalPrice;
+    const newItem: CartItem = {
+      id: `${product.id}-${Date.now()}`,
+      productId: product.id,
+      productName: product.name,
+      productPrice: totalPrice / quantity, // 平均單價用於顯示
+      quantity,
+      variants: selectedFlavors,
+      subtotal
+    };
 
     dispatch({
       type: 'ADD_ITEM',
-      payload: {
-        id: `${product.id}-${Date.now()}`,
-        productId: product.id,
-        productName: product.name,
-        productPrice: totalPrice / quantity, // 平均單價用於顯示
-        quantity,
-        variants: selectedFlavors,
-        subtotal
-      }
+      payload: newItem
     });
   };
 
-  const addItem = (item: Omit<CartItem, 'id'>) => {
+  // 兼容舊的addItem方法
+  const addItem = (item: CartItem) => {
     dispatch({
-      type: 'ADD_ITEM',
+      type: 'ADD_ITEM', 
       payload: item
     });
   };
@@ -226,15 +230,17 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     removeFromCart,
     updateQuantity,
     clearCart,
-    getTotalItems,
+    getTotalQuantity: getTotalItems,
+    getTotalItems: getTotalItems, // 兼容性別名
     getTotalPrice,
     toggleCart,
     isOpen: state.isOpen,
+    openCart: toggleCart, // 兼容性接口
+    closeCart,
     // 兼容性接口
     state,
     addItem,
     removeItem,
-    closeCart,
     getDiscountedPrice
   };
 

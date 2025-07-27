@@ -7,6 +7,8 @@ import { flavorAPI } from '../services/api';
 import { getImageUrl } from '../utils/imageUtils';
 import { Product, Flavor } from '../types';
 import { toast } from 'sonner';
+import { ProductVariant } from '../types';
+import { CartItem } from '../types';
 
 export const FlavorsPage: React.FC = () => {
   const location = useLocation();
@@ -196,35 +198,45 @@ export const FlavorsPage: React.FC = () => {
   };
 
   const handleAddToCart = () => {
-    const totalQuantity = getTotalQuantity();
-    
-    if (!selectedProduct || totalQuantity === 0) {
-      toast.error('請選擇至少一個口味並設定數量');
-      return;
-    }
-
-    // 只加入有數量的口味
+    // 只加入有數量的規格
     const validFlavors = flavors.filter(flavor => {
       const qty = flavorQuantities[flavor.id] || 0;
       return qty > 0;
     });
 
     if (validFlavors.length === 0) {
-      toast.error('請選擇口味並設定數量');
+      toast.error('請選擇規格');
       return;
     }
 
-    addItem({
+    const totalQuantity = getTotalQuantity();
+    if (totalQuantity === 0) {
+      toast.error('請選擇規格數量');
+      return;
+    }
+
+    const totalPrice = getCurrentPrice();
+
+    // 將Flavor[]轉換為ProductVariant[]
+    const productVariants: ProductVariant[] = validFlavors.map(flavor => ({
+      id: flavor.id,
+      name: flavor.name,
+      quantity: flavorQuantities[flavor.id] || 0,
+      price: flavor.final_price || selectedProduct.price // 使用規格最終價格
+    }));
+
+    const newItem: CartItem = {
+      id: `${selectedProduct.id}-${Date.now()}`,
       productId: selectedProduct.id,
       productName: selectedProduct.name,
-      productPrice: selectedProduct.price,
+      productPrice: totalPrice / totalQuantity, // 平均單價（用於顯示）
       quantity: totalQuantity,
-      variants: validFlavors,
-      subtotal: selectedProduct.price * totalQuantity
-    });
+      variants: productVariants,
+      subtotal: totalPrice
+    };
 
-    toast.success(`已將 ${totalQuantity} 個 ${selectedProduct.name} 加入購物車`);
-    toggleCart();
+    addItem(newItem);
+    toast.success('已添加到購物車');
   };
 
   if (!selectedProduct) {

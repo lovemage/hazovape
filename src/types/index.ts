@@ -15,10 +15,21 @@ export interface Product {
   stock?: number;
   multi_discount?: string | Record<string, number>;
   images?: string | string[];
+  image?: string;
   is_active?: boolean;
   variants?: ProductVariant[];
   created_at?: string;
   updated_at?: string;
+}
+
+export interface CartItem {
+  id: string;
+  productId: number;
+  productName: string;
+  productPrice: number;
+  quantity: number;
+  variants: ProductVariant[];
+  subtotal: number;
 }
 
 // 口味相關類型
