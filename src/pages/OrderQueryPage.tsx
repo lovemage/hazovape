@@ -37,6 +37,7 @@ interface OrderData {
 const OrderQueryPage: React.FC = () => {
   const navigate = useNavigate();
   const { state } = useCart();
+  const items = state.items;
   const [orderNumber, setOrderNumber] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [orderData, setOrderData] = useState<OrderData | null>(null);

@@ -9,11 +9,10 @@ import { Product, Flavor } from '../types';
 import { toast } from 'sonner';
 
 export const FlavorsPage: React.FC = () => {
-  const navigate = useNavigate();
   const location = useLocation();
-  const { addItem, getTotalItems, toggleCart, getDiscountedPrice } = useCart();
-  
-  const selectedProduct = location.state?.selectedProduct as Product;
+  const navigate = useNavigate();
+  const { addItem, getTotalItems, toggleCart } = useCart();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [flavors, setFlavors] = useState<Flavor[]>([]);
   const [flavorQuantities, setFlavorQuantities] = useState<Record<number, number>>({});
   const [loading, setLoading] = useState(true);
@@ -118,13 +117,9 @@ export const FlavorsPage: React.FC = () => {
   };
 
   const getCurrentPrice = () => {
+    if (!selectedProduct) return 0;
     const totalQuantity = getTotalQuantity();
-    if (totalQuantity === 0) return 0;
-
-    const discountRules = getDiscountInfo();
-    if (!discountRules) return selectedProduct.price * totalQuantity;
-
-    return getDiscountedPrice(selectedProduct.id, totalQuantity, selectedProduct.price, discountRules);
+    return selectedProduct.price * totalQuantity;
   };
 
   const getAppliedDiscount = () => {
@@ -185,27 +180,20 @@ export const FlavorsPage: React.FC = () => {
 
   const handleAddToCart = () => {
     const totalQuantity = getTotalQuantity();
-    if (totalQuantity === 0) {
-      toast.error('請至少選擇一種規格和數量');
+    
+    if (!selectedProduct || totalQuantity === 0) {
+      toast.error('請選擇至少一個口味並設定數量');
       return;
     }
 
-    // 收集所有選擇的規格
-    const selectedFlavors: string[] = [];
-    Object.entries(flavorQuantities).forEach(([flavorId, quantity]) => {
-      const flavor = flavors.find(f => f.id === parseInt(flavorId));
-      if (flavor && quantity > 0) {
-        // 根據數量添加規格名稱，讓後端按每個規格扣減1件
-        for (let i = 0; i < quantity; i++) {
-          selectedFlavors.push(flavor.name);
-        }
-      }
+    // 只加入有數量的口味
+    const validFlavors = flavors.filter(flavor => {
+      const qty = flavorQuantities[flavor.id] || 0;
+      return qty > 0;
     });
 
-    const quantity = totalQuantity;
-
-    if (!selectedProduct || selectedFlavors.length === 0) {
-      toast.error('請選擇至少一個口味');
+    if (validFlavors.length === 0) {
+      toast.error('請選擇口味並設定數量');
       return;
     }
 
@@ -213,12 +201,12 @@ export const FlavorsPage: React.FC = () => {
       productId: selectedProduct.id,
       productName: selectedProduct.name,
       productPrice: selectedProduct.price,
-      quantity,
-      variants: selectedFlavors,
-      subtotal: selectedProduct.price * quantity
+      quantity: totalQuantity,
+      variants: validFlavors,
+      subtotal: selectedProduct.price * totalQuantity
     });
 
-    toast.success(`已將 ${quantity} 個 ${selectedProduct.name} 加入購物車`);
+    toast.success(`已將 ${totalQuantity} 個 ${selectedProduct.name} 加入購物車`);
     toggleCart();
   };
 

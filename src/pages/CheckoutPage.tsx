@@ -9,16 +9,18 @@ import { orderAPI } from '../services/api';
 import { CustomerInfo } from '../types';
 import { toast } from 'sonner';
 import { UpsellSection } from '../components/UpsellSection';
+import { OrderItem } from '../types';
 
 export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const { state, clearCart, getTotalPrice } = useCart();
+  const items = state.items;
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     name: '',
     phone: '',
     storeNumber: '',
     storeName: '',
-    storeAddress: '',
+    notes: ''
   });
 
   const [freeShippingThreshold, setFreeShippingThreshold] = useState(3000); // 默認3000免運
@@ -34,11 +36,11 @@ export const CheckoutPage: React.FC = () => {
       originalPrice: number;
       discountedPrice: number;
       savings: number;
-      discountType: string;
+      discountType: 'quantity_discount' | 'item_discount' | 'unknown';
       discountDisplay: string;
     }> = [];
 
-    state.items.forEach(item => {
+    items.forEach(item => {
       const originalPrice = item.originalPrice || item.price;
       const actualPrice = item.price;
       const savings = (originalPrice - actualPrice) * item.quantity;
@@ -144,9 +146,8 @@ export const CheckoutPage: React.FC = () => {
       if (finalStoreName && finalStoreId) {
         setCustomerInfo(prev => ({
           ...prev,
-          storeName: finalStoreName,
           storeNumber: finalStoreId,
-          storeAddress: finalStoreAddress || prev.storeAddress
+          storeName: finalStoreName
         }));
 
         toast.success('門市選擇成功', {
@@ -274,80 +275,100 @@ export const CheckoutPage: React.FC = () => {
     }
   };
 
+  const discountInfo: Array<{
+    productName: string;
+    quantity: number;
+    originalPrice: number;
+    discountedPrice: number;
+    savings: number;
+    discountType: 'quantity_discount' | 'item_discount' | 'unknown';
+    discountDisplay: string;
+  }> = [];
+
+  const orderItems: OrderItem[] = [];
+
+  items.forEach(item => {
+    orderItems.push({
+      product_id: item.productId,
+      productName: item.productName,
+      product_price: item.productPrice,
+      quantity: item.quantity,
+      flavors: item.variants || [],
+      subtotal: item.subtotal,
+      is_upsell: item.productName.startsWith('[加購]')
+    });
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
-      toast.error('請填寫所有必填欄位');
-      return;
-    }
-
-    if (state.items.length === 0) {
+    if (items.length === 0) {
       toast.error('購物車是空的');
       return;
     }
 
-    setLoading(true);
+    // 檢查必填字段
+    if (!customerInfo.name.trim()) {
+      toast.error('請輸入姓名');
+      return;
+    }
     
+    if (!customerInfo.phone.trim()) {
+      toast.error('請輸入電話');
+      return;
+    }
+
+    if (!customerInfo.storeNumber.trim()) {
+      toast.error('請選擇門市');
+      return;
+    }
+
     try {
-      // 準備訂單數據，區分一般商品和加購商品
+      setLoading(true);
+
       const orderData = {
         customer_name: customerInfo.name.trim(),
         customer_phone: customerInfo.phone.trim(),
         store_number: customerInfo.storeNumber.trim(),
-        items: state.items.map(item => {
-          const isUpsellItem = item.name.startsWith('[加購]');
-          return {
-            product_id: isUpsellItem ? null : item.productId,
-            upsell_product_id: isUpsellItem ? item.productId : null,
-            product_name: item.name,
-            product_price: item.price,
-            quantity: item.quantity,
-            flavors: isUpsellItem ? [] : (item.flavors || []),  // 加購商品沒有規格
-            subtotal: item.price * item.quantity,
-            is_upsell: isUpsellItem
-          };
-        }),
-        total_amount: getFinalTotal(),
+        items: orderItems,
+        total_amount: getTotalPrice(),
+        delivery_option: 'store',
+        notes: customerInfo.notes || ''
       };
 
-      console.log('🛒 提交訂單數據:', orderData);
-
-      const response = await orderAPI.create(orderData);
-      
-      if (response.data.success) {
-        // 訂單創建成功
-        const order = response.data.data;
-        clearCart(); // 清空購物車
-        
-        // 跳轉到訂單確認頁面
-        navigate('/order-confirmation', { 
-          state: { 
-            order,
-            customerInfo 
-          } 
-        });
-        
-        toast.success('訂單提交成功！');
-      } else {
-        toast.error(response.data.message || '訂單提交失敗');
-      }
-    } catch (error: any) {
-      console.error('❌ 提交訂單失敗:', error);
-      console.error('📋 錯誤詳情:', {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
       });
 
-      const errorMessage = error.response?.data?.message || error.message || '訂單提交失敗，請重試';
-      toast.error(`訂單提交失敗: ${errorMessage}`);
+      const result = await response.json();
+
+      if (result.success) {
+        // 清空購物車
+        clearCart();
+        
+        // 跳轉到訂單確認頁面
+        navigate('/order-confirmation', {
+          state: {
+            orderNumber: result.data.order_number,
+            orderData
+          }
+        });
+      } else {
+        throw new Error(result.message || '訂單提交失敗');
+      }
+    } catch (error: any) {
+      console.error('訂單提交失敗:', error);
+      toast.error(error instanceof Error ? error.message : '訂單提交失敗，請重試');
     } finally {
       setLoading(false);
     }
   };
 
-  if (state.items.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -465,16 +486,10 @@ export const CheckoutPage: React.FC = () => {
                   {/* 已選擇的門市信息 */}
                   {customerInfo.storeName && (
                     <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                      <div className="flex items-start gap-2">
-                        <MapPin className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1">
-                          <p className="font-medium text-green-900">{customerInfo.storeName}</p>
-                          {customerInfo.storeAddress && (
-                            <p className="text-sm text-green-700 mt-1">{customerInfo.storeAddress}</p>
-                          )}
-                          {customerInfo.storeNumber && (
-                            <p className="text-xs text-green-600 mt-1">店號：{customerInfo.storeNumber}</p>
-                          )}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-green-700">{customerInfo.storeName}</p>
+                          <p className="text-sm text-gray-600">門市編號: {customerInfo.storeNumber}</p>
                         </div>
                       </div>
                     </div>
@@ -569,50 +584,37 @@ export const CheckoutPage: React.FC = () => {
               
               {/* 商品列表 */}
               <div className="space-y-4 mb-6">
-                {state.items.map((item) => (
-                  <div key={item.id} className="flex gap-3">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900 text-sm">{item.name}</h4>
-                      <p className="text-xs text-gray-500">
-                        數量: {item.quantity}
-                      </p>
-                      {item.flavors && item.flavors.length > 0 && (
-                        <div className="mt-1">
-                          <p className="text-xs text-gray-500">口味:</p>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {item.flavors.map((flavor, index) => (
-                              <span
-                                key={index}
-                                className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded"
-                              >
-                                {flavor}
-                              </span>
-                            ))}
+                  {items.map((item) => (
+                    <div key={item.id} className="flex justify-between py-2 border-b border-gray-200 last:border-b-0">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900 text-sm">{item.productName}</h4>
+                        <p className="text-xs text-gray-500">數量: {item.quantity}</p>
+                        
+                        {/* 規格顯示 */}
+                        {item.variants && item.variants.length > 0 && (
+                          <div className="mt-1">
+                            <p className="text-xs text-gray-500">規格:</p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {item.variants.map((variant, index) => (
+                                <span 
+                                  key={variant.id} 
+                                  className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
+                                >
+                                  {variant.name}
+                                </span>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      {item.originalPrice && item.originalPrice > item.price ? (
-                        <div>
-                          <p className="text-xs text-gray-400 line-through">
-                            NT$ {Math.round(item.originalPrice * item.quantity).toLocaleString()}
-                          </p>
-                          <p className="font-medium text-green-600">
-                            NT$ {Math.round(item.price * item.quantity).toLocaleString()}
-                          </p>
-                          <p className="text-xs text-green-600">
-                            省 NT$ {Math.round((item.originalPrice - item.price) * item.quantity).toLocaleString()}
-                          </p>
-                        </div>
-                      ) : (
-                        <p className="font-medium text-gray-900">
-                          NT$ {Math.round(item.price * item.quantity).toLocaleString()}
+                        )}
+                      </div>
+                      
+                      <div className="text-right">
+                        <p className="font-medium text-gray-900 text-sm">
+                          NT$ {item.subtotal.toLocaleString()}
                         </p>
-                      )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
 
               {/* 優惠信息 */}

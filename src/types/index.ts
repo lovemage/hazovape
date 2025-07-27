@@ -69,15 +69,13 @@ export interface Order {
 }
 
 export interface OrderItem {
-  id: number;
-  order_id: number;
   product_id: number;
-  product_name: string;
-  product_price: number; // 數據庫中的實際字段名
-  unit_price?: number; // 向後兼容，可選
+  productName: string;
+  product_price: number;
   quantity: number;
-  flavors: string[] | string;
+  flavors: ProductVariant[] | string[];
   subtotal: number;
+  is_upsell: boolean;
 }
 
 // 公告相關類型
@@ -129,7 +127,7 @@ export interface CustomerInfo {
   phone: string;
   storeNumber: string;
   storeName?: string;
-  storeAddress?: string;
+  notes?: string;
 }
 
 // API 響應類型

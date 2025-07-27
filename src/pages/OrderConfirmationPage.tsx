@@ -323,9 +323,9 @@ export const OrderConfirmationPage: React.FC = () => {
                     return (
                       <div key={index} className="flex justify-between items-start p-4 bg-gray-50 rounded-lg">
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{item.product_name}</h4>
+                          <h4 className="font-medium text-gray-900">{item.productName}</h4>
                           <p className="text-sm text-gray-600">
-                            數量: {item.quantity} × NT$ {Math.round(item.unit_price || item.product_price || 0).toLocaleString()}
+                            數量: {item.quantity} × NT$ {Math.round(item.product_price || 0).toLocaleString()}
                           </p>
                           {flavors && flavors.length > 0 && (
                             <div className="mt-2">
