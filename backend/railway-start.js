@@ -169,6 +169,12 @@ async function initializeDatabase() {
     await addUpsellProducts();
     console.log('✅ 加購商品功能遷移完成');
     
+    // 添加規格價格欄位
+    console.log('🔄 檢查規格價格功能...');
+    const { addFlavorPriceColumn } = require('./scripts/migrate-add-flavor-price');
+    await addFlavorPriceColumn();
+    console.log('✅ 規格價格功能遷移完成');
+    
   } catch (error) {
     console.error('❌ 遷移失敗:', error.message);
     console.log('⚠️  遷移失敗，但繼續啟動服務器...');
