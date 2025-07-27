@@ -35,8 +35,8 @@ export const AdminLoginPage: React.FC = () => {
 
       if (response.data.success) {
         // 保存 token
-        localStorage.setItem('admin_token', response.data.data.token);
-        localStorage.setItem('admin_user', JSON.stringify(response.data.data.admin));
+        localStorage.setItem('adminToken', response.data.data.token);
+        localStorage.setItem('adminUser', JSON.stringify(response.data.data.admin));
 
         toast.success('登入成功！');
         navigate('/admin/dashboard');

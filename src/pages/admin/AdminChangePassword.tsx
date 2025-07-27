@@ -67,10 +67,9 @@ export const AdminChangePassword: React.FC = () => {
       );
 
       if (response.data.success) {
-        toast.success('密碼修改成功！請重新登入');
-        // 清除本地存儲的 token
-        localStorage.removeItem('admin_token');
-        // 跳轉到登入頁面
+        // 清除token，要求重新登入
+        localStorage.removeItem('adminToken');
+        toast.success('密碼修改成功，請重新登入');
         navigate('/admin/login');
       } else {
         toast.error(response.data.message || '密碼修改失敗');

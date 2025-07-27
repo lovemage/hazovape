@@ -47,7 +47,7 @@ const AdminUpsellProducts: React.FC = () => {
     try {
       const response = await fetch('/api/upsell-products/admin/all', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         }
       });
       
@@ -84,7 +84,7 @@ const AdminUpsellProducts: React.FC = () => {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         },
         body: JSON.stringify({
           name: formData.name,
@@ -128,7 +128,7 @@ const AdminUpsellProducts: React.FC = () => {
       const response = await fetch(`/api/upsell-products/admin/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         }
       });
 
@@ -150,7 +150,7 @@ const AdminUpsellProducts: React.FC = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         },
         body: JSON.stringify({
           ...product,
@@ -180,7 +180,7 @@ const AdminUpsellProducts: React.FC = () => {
       const response = await fetch(`/api/upsell-products/admin/${productId}/upload`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         },
         body: formData
       });
@@ -209,7 +209,7 @@ const AdminUpsellProducts: React.FC = () => {
       const response = await fetch(`/api/upsell-products/admin/${productId}/images/${imageName}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         }
       });
 

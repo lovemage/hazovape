@@ -46,14 +46,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   useEffect(() => {
     // 檢查登入狀態
-    const token = localStorage.getItem('admin_token');
+    const token = localStorage.getItem('adminToken');
     if (!token) {
       navigate('/admin/login');
       return;
     }
 
     // 載入用戶信息
-    const savedUser = localStorage.getItem('admin_user');
+    const savedUser = localStorage.getItem('adminUser');
     if (savedUser) {
       try {
         setUser(JSON.parse(savedUser));
@@ -128,10 +128,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem('admin_token');
-    localStorage.removeItem('admin_user');
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
     navigate('/admin/login');
-    toast.success('已安全登出');
   };
 
   const isCurrentPath = (path: string) => {

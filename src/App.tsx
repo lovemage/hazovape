@@ -30,7 +30,7 @@ import AdminUpsellProducts from './pages/admin/AdminUpsellProducts';
 
 // 管理界面保護路由組件
 const ProtectedAdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const token = localStorage.getItem('admin_token');
+  const token = localStorage.getItem('adminToken');
   return token ? <>{children}</> : <Navigate to="/admin/login" replace />;
 };
 
