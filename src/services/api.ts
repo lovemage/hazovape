@@ -158,7 +158,7 @@ const createMockResponse = (data: any) => ({
 // 產品相關 API
 export const productAPI = {
   getAll: () => api.get('/products'),
-  getAllAdmin: () => api.get('/products/admin'),
+  getAllAdmin: () => api.get('/products/admin/all'),
   getById: (id: number) => api.get(`/products/${id}`),
   create: (data: FormData | any) => {
     console.log('📤 productAPI.create 調用，數據類型:', data instanceof FormData ? 'FormData' : typeof data);
@@ -285,11 +285,10 @@ export const adminAPI = {
   }
 };
 
-// 網站設置 API
-export const settingsAPI = {
-  getAll: () => api.get('/api/settings'),
-  update: (data: any) => api.put('/api/settings', data),
-  updateBatch: (settings: Record<string, any>) => api.put('/api/settings', { settings }),
+// 系統設置相關 API
+export const systemSettingsAPI = {
+  getAll: () => api.get('/settings'),
+  update: (key: string, value: string) => api.put('/settings', { key, value }),
 };
 
 // 產品分類API
