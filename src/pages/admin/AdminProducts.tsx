@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Badge } from '../../components/ui/badge';
 import { ProductForm } from '../../components/ProductForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
+
 import { AdminLayout } from '../../components/AdminLayout';
 import { toast } from 'sonner';
 import { productAPI } from '../../services/api';
@@ -38,7 +38,6 @@ export const AdminProducts: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [showBatchImport, setShowBatchImport] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   
   // 批量導入相關狀態
@@ -70,13 +69,31 @@ export const AdminProducts: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleDelete = async () => {
-    if (!deletingProduct) return;
+  const handleToggleStatus = async (product: Product) => {
+    try {
+      if (product.is_active) {
+        await productAPI.delete(product.id);
+        toast.success('產品已停用（可透過啟用按鈕恢復）');
+      } else {
+        await productAPI.restore(product.id);
+        toast.success('產品已啟用');
+      }
+      loadProducts();
+    } catch (error) {
+      console.error('更新產品狀態失敗:', error);
+      toast.error('更新產品狀態失敗');
+    }
+  };
+
+  const handlePermanentDelete = async (product: Product) => {
+    if (!confirm(`⚠️ 危險操作：確定要永久刪除產品「${product.name}」嗎？\n\n此操作將從數據庫中完全移除此產品及其所有規格，無法恢復！\n\n如果只是暫時不需要，建議使用"停用"功能。`)) {
+      return;
+    }
 
     try {
-      const response = await productAPI.delete(deletingProduct.id);
+      const response = await productAPI.permanentDelete(product.id);
       if (response.data.success) {
-        toast.success('產品已刪除');
+        toast.success('產品已永久刪除');
         loadProducts();
       } else {
         toast.error(response.data.message || '刪除失敗');
@@ -84,29 +101,10 @@ export const AdminProducts: React.FC = () => {
     } catch (error) {
       console.error('刪除產品失敗:', error);
       toast.error('刪除產品失敗');
-    } finally {
-      setDeletingProduct(null);
     }
   };
 
-  const handleToggleActive = async (product: Product) => {
-    try {
-      const response = await productAPI.update(product.id, {
-        ...product,
-        is_active: !product.is_active
-      });
-      
-      if (response.data.success) {
-        toast.success(`產品已${!product.is_active ? '啟用' : '停用'}`);
-        loadProducts();
-      } else {
-        toast.error('更新失敗');
-      }
-    } catch (error) {
-      console.error('更新產品狀態失敗:', error);
-      toast.error('更新產品狀態失敗');
-    }
-  };
+
 
   const handleFormSuccess = () => {
     setShowForm(false);
@@ -247,27 +245,48 @@ export const AdminProducts: React.FC = () => {
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 line-clamp-2">
-                            {product.name}
-                          </h3>
+                          <div className="flex items-start gap-2">
+                            <h3 className={`font-semibold line-clamp-2 ${product.is_active ? 'text-gray-900' : 'text-gray-500'}`}>
+                              {product.name}
+                            </h3>
+                            {!product.is_active && (
+                              <Badge variant="secondary" className="text-xs">
+                                已停用
+                              </Badge>
+                            )}
+                          </div>
                           {product.category && (
                             <Badge variant="outline" className="mt-1 text-xs">
                               {product.category}
                             </Badge>
                           )}
                         </div>
-                        <Button
-                          onClick={() => handleToggleActive(product)}
-                          variant="ghost"
-                          size="sm"
-                          className={`p-1 ${product.is_active ? 'text-green-600 hover:text-green-700' : 'text-gray-400 hover:text-gray-500'}`}
-                        >
-                          {product.is_active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                        </Button>
+                        <div className="flex gap-1">
+                          <Button
+                            onClick={() => handleToggleStatus(product)}
+                            variant="ghost"
+                            size="sm"
+                            title={product.is_active ? "停用產品" : "啟用產品"}
+                            className={`p-1 ${product.is_active ? 'text-orange-600 hover:text-orange-700' : 'text-green-600 hover:text-green-700'}`}
+                          >
+                            {product.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </Button>
+                          {!product.is_active && (
+                            <Button
+                              onClick={() => handlePermanentDelete(product)}
+                              variant="ghost"
+                              size="sm"
+                              title="永久刪除產品（僅限已停用的產品）"
+                              className="p-1 text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
 
                       {/* 產品圖片 */}
-                      <div className="aspect-square bg-gray-100 rounded-lg mb-3 overflow-hidden">
+                      <div className={`aspect-square bg-gray-100 rounded-lg mb-3 overflow-hidden ${!product.is_active ? 'opacity-50' : ''}`}>
                         <img
                           src={getProductImageUrl(product)}
                           alt={product.name}
@@ -295,26 +314,15 @@ export const AdminProducts: React.FC = () => {
                           </p>
                         )}
 
-                        <div className="flex justify-between items-center pt-2">
-                          <div className="flex gap-2">
-                            <Button
-                              onClick={() => handleEdit(product)}
-                              variant="outline"
-                              size="sm"
-                            >
-                              <Edit className="w-3 h-3 mr-1" />
-                              編輯
-                            </Button>
-                            <Button
-                              onClick={() => setDeletingProduct(product)}
-                              variant="outline"
-                              size="sm"
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="w-3 h-3 mr-1" />
-                              刪除
-                            </Button>
-                          </div>
+                        <div className="flex justify-start items-center pt-2">
+                          <Button
+                            onClick={() => handleEdit(product)}
+                            variant="outline"
+                            size="sm"
+                          >
+                            <Edit className="w-3 h-3 mr-1" />
+                            編輯
+                          </Button>
                         </div>
                       </div>
                     </CardContent>
@@ -520,23 +528,7 @@ export const AdminProducts: React.FC = () => {
           </DialogContent>
         </Dialog>
 
-        {/* 刪除確認對話框 */}
-        <AlertDialog open={!!deletingProduct} onOpenChange={() => setDeletingProduct(null)}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>確認刪除</AlertDialogTitle>
-              <AlertDialogDescription>
-                確定要刪除產品「{deletingProduct?.name}」嗎？此操作無法撤銷。
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>取消</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
-                刪除
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+
       </div>
     </AdminLayout>
   );

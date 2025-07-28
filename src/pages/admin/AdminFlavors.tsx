@@ -121,7 +121,7 @@ export const AdminFlavors: React.FC = () => {
     try {
       if (currentStatus) {
         await flavorAPI.delete(id);
-        toast.success('規格已停用');
+        toast.success('規格已停用（可透過啟用按鈕恢復）');
       } else {
         await flavorAPI.restore(id);
         toast.success('規格已啟用');
@@ -134,7 +134,7 @@ export const AdminFlavors: React.FC = () => {
   };
 
   const handleDeleteFlavor = async (flavor: Flavor) => {
-    if (!confirm(`確定要永久刪除規格「${flavor.name}」嗎？此操作無法撤銷。`)) {
+    if (!confirm(`⚠️ 危險操作：確定要永久刪除規格「${flavor.name}」嗎？\n\n此操作將從數據庫中完全移除此規格，無法恢復！\n\n如果只是暫時不需要，建議使用"停用"功能。`)) {
       return;
     }
 
@@ -442,6 +442,7 @@ export const AdminFlavors: React.FC = () => {
                               size="sm"
                               variant="ghost"
                               onClick={() => handleEditFlavor(flavor)}
+                              title="編輯規格"
                             >
                               <Edit className="w-4 h-4" />
                             </Button>
@@ -449,6 +450,8 @@ export const AdminFlavors: React.FC = () => {
                               size="sm"
                               variant="ghost"
                               onClick={() => handleToggleStatus(flavor.id, flavor.is_active)}
+                              title={flavor.is_active ? "停用規格" : "啟用規格"}
+                              className={flavor.is_active ? "text-orange-600 hover:text-orange-700" : "text-green-600 hover:text-green-700"}
                             >
                               {flavor.is_active ? (
                                 <EyeOff className="w-4 h-4" />
@@ -456,13 +459,17 @@ export const AdminFlavors: React.FC = () => {
                                 <Eye className="w-4 h-4" />
                               )}
                             </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleDeleteFlavor(flavor)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                            {!flavor.is_active && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleDeleteFlavor(flavor)}
+                                title="永久刪除規格（僅限已停用的規格）"
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
                           </div>
                         </div>
                       ))}

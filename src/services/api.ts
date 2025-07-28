@@ -165,7 +165,9 @@ export const productAPI = {
     return api.post('/products/admin', data);
   },
   update: (id: number, data: FormData | any) => api.put(`/products/admin/${id}`, data),
-  delete: (id: number) => api.delete(`/products/admin/${id}`),
+  delete: (id: number) => api.delete(`/products/admin/${id}`), // 軟刪除（停用）
+  permanentDelete: (id: number) => api.delete(`/products/admin/${id}/permanent`), // 永久刪除
+  restore: (id: number) => api.put(`/products/admin/${id}/restore`), // 恢復
   batchImport: (formData: FormData) => {
     console.log('📤 productAPI.batchImport 調用');
     return api.post('/products/admin/batch-import', formData);
