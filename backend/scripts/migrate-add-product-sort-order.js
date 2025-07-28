@@ -24,12 +24,14 @@ async function migrateAddProductSortOrder() {
     console.log('✅ 成功添加 sort_order 字段');
 
     // 為現有產品設置初始排序值（按創建時間順序）
+    // 使用 id * 10 來避免連續數字，讓前端能識別這是真實的排序字段
     const products = await Database.all('SELECT id FROM products ORDER BY created_at ASC');
     
     for (let i = 0; i < products.length; i++) {
+      const sortOrder = (i + 1) * 10; // 10, 20, 30, 40... 避免連續數字
       await Database.run(
         'UPDATE products SET sort_order = ? WHERE id = ?',
-        [i + 1, products[i].id]
+        [sortOrder, products[i].id]
       );
     }
 

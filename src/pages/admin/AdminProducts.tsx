@@ -268,16 +268,25 @@ export const AdminProducts: React.FC = () => {
     }
 
     try {
+      console.log('🚀 開始執行數據庫遷移...');
       const response = await adminAPI.migrate();
+      console.log('📦 遷移 API 響應:', response.data);
+      
       if (response.data.success) {
         toast.success(response.data.message);
-        setSupportsSorting(true);
-        loadProducts(); // 重新載入產品
+        console.log('✅ 遷移成功，重新載入產品列表...');
+        
+        // 等待一秒讓數據庫操作完成
+        setTimeout(async () => {
+          await loadProducts();
+          console.log('🔄 產品列表已重新載入');
+        }, 1000);
       } else {
+        console.error('❌ 遷移API返回失敗:', response.data);
         toast.error(response.data.message || '遷移失敗');
       }
     } catch (error: any) {
-      console.error('數據庫遷移失敗:', error);
+      console.error('❌ 數據庫遷移失敗:', error);
       toast.error(error.response?.data?.message || '數據庫遷移失敗');
     }
   };
