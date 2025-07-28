@@ -287,6 +287,10 @@ export const adminAPI = {
     api.post('/admin/test-telegram', data || {}),
   changePassword: (currentPassword: string, newPassword: string, confirmPassword: string) =>
     api.put('/auth/admin/change-password', { currentPassword, newPassword, confirmPassword }),
+  
+  // 運行數據庫遷移
+  migrate: () => api.post('/admin/migrate'),
+  
   // 數據備份相關
   exportData: () => api.get('/admin/export-data', { responseType: 'blob' }),
   importData: (file: File) => {

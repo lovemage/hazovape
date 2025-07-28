@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../componen
 
 import { AdminLayout } from '../../components/AdminLayout';
 import { toast } from 'sonner';
-import { productAPI } from '../../services/api';
+import { productAPI, adminAPI } from '../../services/api';
 import { getProductImageUrl } from '../../utils/imageUtils';
 
 interface Product {
@@ -42,6 +42,7 @@ export const AdminProducts: React.FC = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isReordering, setIsReordering] = useState(false);
+  const [supportsSorting, setSupportsSorting] = useState(true); // 假設支持，實際檢測後更新
   
   // 批量導入相關狀態
   const [importFile, setImportFile] = useState<File | null>(null);
@@ -117,7 +118,7 @@ export const AdminProducts: React.FC = () => {
 
   // 處理拖拽排序
   const onDragEnd = async (result: DropResult) => {
-    if (!result.destination) return;
+    if (!result.destination || !supportsSorting) return;
 
     // 只對所有產品進行排序（不受搜索過濾影響）
     const activeProducts = products.filter(p => p.is_active);
@@ -150,11 +151,21 @@ export const AdminProducts: React.FC = () => {
         sort_order: product.sort_order!
       }));
 
-      await productAPI.updateSortOrder(sortData);
-      toast.success('產品排序已更新');
-    } catch (error) {
+      const response = await productAPI.updateSortOrder(sortData);
+      if (response.data.success) {
+        toast.success('產品排序已更新');
+      } else {
+        throw new Error(response.data.message || '更新失敗');
+      }
+    } catch (error: any) {
       console.error('更新排序失敗:', error);
-      toast.error('更新排序失敗');
+      if (error.response?.data?.message?.includes('尚未支持產品排序功能')) {
+        setSupportsSorting(false);
+        setIsReordering(false);
+        toast.error('數據庫尚未支持排序功能，請聯繫技術人員升級');
+      } else {
+        toast.error('更新排序失敗');
+      }
       // 重新載入以恢復原始順序
       loadProducts();
     }
@@ -224,6 +235,27 @@ export const AdminProducts: React.FC = () => {
     setShowBatchImport(false);
   };
 
+  // 運行數據庫遷移
+  const handleMigration = async () => {
+    if (!confirm('確定要運行數據庫遷移嗎？\n\n這將為產品表添加排序功能，操作不可逆。')) {
+      return;
+    }
+
+    try {
+      const response = await adminAPI.migrate();
+      if (response.data.success) {
+        toast.success(response.data.message);
+        setSupportsSorting(true);
+        loadProducts(); // 重新載入產品
+      } else {
+        toast.error(response.data.message || '遷移失敗');
+      }
+    } catch (error: any) {
+      console.error('數據庫遷移失敗:', error);
+      toast.error(error.response?.data?.message || '數據庫遷移失敗');
+    }
+  };
+
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -235,14 +267,16 @@ export const AdminProducts: React.FC = () => {
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">產品管理</h1>
           <div className="flex gap-3">
-            <Button
-              onClick={() => setIsReordering(!isReordering)}
-              variant="outline"
-              className={`flex items-center gap-2 ${isReordering ? 'bg-blue-100 text-blue-700' : ''}`}
-            >
-              <GripVertical className="w-4 h-4" />
-              {isReordering ? '完成排序' : '調整順序'}
-            </Button>
+            {supportsSorting && (
+              <Button
+                onClick={() => setIsReordering(!isReordering)}
+                variant="outline"
+                className={`flex items-center gap-2 ${isReordering ? 'bg-blue-100 text-blue-700' : ''}`}
+              >
+                <GripVertical className="w-4 h-4" />
+                {isReordering ? '完成排序' : '調整順序'}
+              </Button>
+            )}
             <Button
               onClick={downloadTemplate}
               variant="outline"
@@ -287,9 +321,24 @@ export const AdminProducts: React.FC = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle>產品列表 ({filteredProducts.length})</CardTitle>
-              {isReordering && (
+              {isReordering && supportsSorting && (
                 <div className="text-sm text-blue-600 bg-blue-100 px-3 py-1 rounded-lg">
                   🔄 拖拽產品卡片可調整顯示順序 (僅顯示啟用的產品)
+                </div>
+              )}
+              {!supportsSorting && (
+                <div className="flex items-center gap-3">
+                  <div className="text-sm text-amber-600 bg-amber-100 px-3 py-1 rounded-lg">
+                    ⚠️ 數據庫尚未支持產品排序功能
+                  </div>
+                  <Button
+                    onClick={handleMigration}
+                    variant="outline"
+                    size="sm"
+                    className="text-amber-700 border-amber-300 hover:bg-amber-50"
+                  >
+                    升級數據庫
+                  </Button>
                 </div>
               )}
             </div>
@@ -301,7 +350,7 @@ export const AdminProducts: React.FC = () => {
               <div className="text-center py-8 text-gray-500">
                 {searchTerm ? '沒有找到符合條件的產品' : '暫無產品'}
               </div>
-            ) : isReordering ? (
+            ) : isReordering && supportsSorting ? (
               <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="products" direction="vertical">
                   {(provided) => (

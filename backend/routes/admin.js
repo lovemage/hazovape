@@ -658,4 +658,24 @@ router.delete('/delete-image', authenticateAdmin, async (req, res) => {
   }
 });
 
+// 管理員：運行數據庫遷移
+router.post('/migrate', authenticateAdmin, async (req, res) => {
+  try {
+    console.log('🚀 管理員請求運行數據庫遷移...');
+    
+    await runProductionMigrations();
+    
+    res.json({
+      success: true,
+      message: '數據庫遷移完成！現在可以使用產品排序功能。'
+    });
+  } catch (error) {
+    console.error('❌ 數據庫遷移失敗:', error);
+    res.status(500).json({
+      success: false,
+      message: '數據庫遷移失敗: ' + error.message
+    });
+  }
+});
+
 module.exports = router;

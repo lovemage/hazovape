@@ -88,9 +88,27 @@ const txtUpload = multer({
 // 獲取所有產品（前端用戶）
 router.get('/', async (req, res) => {
   try {
-    const products = await Database.all(
-      'SELECT id, name, description, price, category, multi_discount, images, is_active, sort_order FROM products WHERE is_active = 1 ORDER BY sort_order ASC, id ASC'
-    );
+    // 先檢查是否有 sort_order 字段
+    let products;
+    try {
+      products = await Database.all(
+        'SELECT id, name, description, price, category, multi_discount, images, is_active, sort_order FROM products WHERE is_active = 1 ORDER BY sort_order ASC, id ASC'
+      );
+    } catch (error) {
+      if (error.message.includes('no such column: sort_order')) {
+        console.log('⚠️  sort_order 字段不存在，使用默認排序');
+        products = await Database.all(
+          'SELECT id, name, description, price, category, multi_discount, images, is_active FROM products WHERE is_active = 1 ORDER BY id ASC'
+        );
+        // 為每個產品添加默認 sort_order
+        products = products.map((product, index) => ({
+          ...product,
+          sort_order: index + 1
+        }));
+      } else {
+        throw error;
+      }
+    }
 
     // 解析 JSON 字段並獲取規格數據
     const formattedProducts = await Promise.all(
@@ -178,9 +196,27 @@ router.get('/:id', async (req, res) => {
 // 管理員：獲取所有產品（包括停用的）
 router.get('/admin/all', authenticateAdmin, async (req, res) => {
   try {
-    const products = await Database.all(
-      'SELECT id, name, description, price, category, multi_discount, images, is_active, created_at, sort_order FROM products ORDER BY sort_order ASC, created_at DESC'
-    );
+    // 先檢查是否有 sort_order 字段
+    let products;
+    try {
+      products = await Database.all(
+        'SELECT id, name, description, price, category, multi_discount, images, is_active, created_at, sort_order FROM products ORDER BY sort_order ASC, created_at DESC'
+      );
+    } catch (error) {
+      if (error.message.includes('no such column: sort_order')) {
+        console.log('⚠️  sort_order 字段不存在，使用默認排序');
+        products = await Database.all(
+          'SELECT id, name, description, price, category, multi_discount, images, is_active, created_at FROM products ORDER BY created_at DESC'
+        );
+        // 為每個產品添加默認 sort_order
+        products = products.map((product, index) => ({
+          ...product,
+          sort_order: index + 1
+        }));
+      } else {
+        throw error;
+      }
+    }
 
     // 解析 JSON 字段
     const formattedProducts = products.map(product => ({
@@ -262,24 +298,45 @@ router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, 
       }
     }
 
-    // 獲取下一個排序順序
-    const lastProduct = await Database.get('SELECT MAX(sort_order) as max_sort FROM products');
-    const nextSortOrder = (lastProduct?.max_sort || 0) + 1;
+    // 檢查是否有 sort_order 字段
+    const tableInfo = await Database.all("PRAGMA table_info(products)");
+    const hasSortOrder = tableInfo.some(col => col.name === 'sort_order');
 
-    // 插入產品數據
-    const result = await Database.run(
-      'INSERT INTO products (name, description, price, category, multi_discount, images, is_active, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [
-        name,
-        description || '',
-        price,
-        category || '其他產品',
-        JSON.stringify(parsedMultiDiscount),
-        JSON.stringify(allImages),
-        1,
-        nextSortOrder
-      ]
-    );
+    let result;
+    if (hasSortOrder) {
+      // 獲取下一個排序順序
+      const lastProduct = await Database.get('SELECT MAX(sort_order) as max_sort FROM products');
+      const nextSortOrder = (lastProduct?.max_sort || 0) + 1;
+
+      // 插入產品數據（包含排序）
+      result = await Database.run(
+        'INSERT INTO products (name, description, price, category, multi_discount, images, is_active, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [
+          name,
+          description || '',
+          price,
+          category || '其他產品',
+          JSON.stringify(parsedMultiDiscount),
+          JSON.stringify(allImages),
+          1,
+          nextSortOrder
+        ]
+      );
+    } else {
+      // 插入產品數據（不包含排序）
+      result = await Database.run(
+        'INSERT INTO products (name, description, price, category, multi_discount, images, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [
+          name,
+          description || '',
+          price,
+          category || '其他產品',
+          JSON.stringify(parsedMultiDiscount),
+          JSON.stringify(allImages),
+          1
+        ]
+      );
+    }
 
     console.log('✅ 產品創建成功，ID:', result.id);
     console.log('💾 保存的圖片數據:', JSON.stringify(allImages));
@@ -463,6 +520,17 @@ router.put('/admin/update-sort-order', authenticateAdmin, async (req, res) => {
       return res.status(400).json({
         success: false,
         message: '產品列表不能為空'
+      });
+    }
+
+    // 檢查是否有 sort_order 字段
+    const tableInfo = await Database.all("PRAGMA table_info(products)");
+    const hasSortOrder = tableInfo.some(col => col.name === 'sort_order');
+
+    if (!hasSortOrder) {
+      return res.status(400).json({
+        success: false,
+        message: '數據庫尚未支持產品排序功能，請聯繫管理員進行數據庫升級'
       });
     }
 

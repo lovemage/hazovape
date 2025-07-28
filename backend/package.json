@@ -15,7 +15,8 @@
     "backup:auto": "node scripts/auto-backup.js",
     "predeploy": "npm run backup:auto",
     "railway:backup": "node scripts/backup-database.js",
-    "railway:check": "node scripts/pre-deploy-check.js"
+    "railway:check": "node scripts/pre-deploy-check.js",
+    "migrate:production": "node scripts/production-migrate.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
