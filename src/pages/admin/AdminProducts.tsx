@@ -58,7 +58,19 @@ export const AdminProducts: React.FC = () => {
       setLoading(true);
       const response = await productAPI.getAllAdmin();
       if (response.data.success) {
-        setProducts(response.data.data || []);
+        const productsData = response.data.data || [];
+        setProducts(productsData);
+        
+        // 檢測數據庫是否支持排序功能
+        // 如果任何產品缺少sort_order字段，則表示數據庫尚未升級
+        const hasAnySortOrder = productsData.length > 0 && productsData.some(product => 
+          product.sort_order !== undefined && product.sort_order !== null
+        );
+        setSupportsSorting(hasAnySortOrder);
+        
+        if (!hasAnySortOrder && productsData.length > 0) {
+          console.log('⚠️ 檢測到數據庫尚未支持產品排序功能');
+        }
       }
     } catch (error) {
       console.error('載入產品失敗:', error);
