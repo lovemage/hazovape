@@ -62,14 +62,22 @@ export const AdminProducts: React.FC = () => {
         setProducts(productsData);
         
         // 檢測數據庫是否支持排序功能
-        // 如果任何產品缺少sort_order字段，則表示數據庫尚未升級
-        const hasAnySortOrder = productsData.length > 0 && productsData.some(product => 
-          product.sort_order !== undefined && product.sort_order !== null
-        );
-        setSupportsSorting(hasAnySortOrder);
-        
-        if (!hasAnySortOrder && productsData.length > 0) {
-          console.log('⚠️ 檢測到數據庫尚未支持產品排序功能');
+        if (productsData.length > 0) {
+          // 如果有產品，檢查是否所有產品都有sort_order字段
+          const hasAllSortOrder = productsData.every(product => 
+            product.sort_order !== undefined && product.sort_order !== null
+          );
+          setSupportsSorting(hasAllSortOrder);
+          
+          if (!hasAllSortOrder) {
+            console.log('⚠️ 檢測到數據庫尚未支持產品排序功能 - 將顯示升級按鈕');
+          } else {
+            console.log('✅ 數據庫已支持產品排序功能');
+          }
+        } else {
+          // 如果沒有產品，假設支持排序（避免顯示錯誤的升級按鈕）
+          setSupportsSorting(true);
+          console.log('ℹ️ 暫無產品，假設數據庫已支持排序功能');
         }
       }
     } catch (error) {
