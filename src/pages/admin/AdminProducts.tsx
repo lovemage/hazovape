@@ -63,21 +63,27 @@ export const AdminProducts: React.FC = () => {
         
         // 檢測數據庫是否支持排序功能
         if (productsData.length > 0) {
-          // 如果有產品，檢查是否所有產品都有sort_order字段
-          const hasAllSortOrder = productsData.every(product => 
-            product.sort_order !== undefined && product.sort_order !== null
-          );
-          setSupportsSorting(hasAllSortOrder);
+          // 檢查sort_order是否是真實的數據庫字段
+          // 如果sort_order都是連續的1,2,3...那很可能是後端動態添加的
+          const sortOrders = productsData.map(p => p.sort_order).filter(order => order !== undefined);
+          const isSequential = sortOrders.length === productsData.length && 
+            sortOrders.every((order, index) => order === index + 1);
           
-          if (!hasAllSortOrder) {
+          // 如果是連續的1,2,3...則認為是動態添加的，數據庫不支持排序
+          const isRealSortOrder = !isSequential;
+          setSupportsSorting(isRealSortOrder);
+          
+          if (!isRealSortOrder) {
             console.log('⚠️ 檢測到數據庫尚未支持產品排序功能 - 將顯示升級按鈕');
+            console.log('💡 sort_order值:', sortOrders, '判定為動態添加');
           } else {
             console.log('✅ 數據庫已支持產品排序功能');
+            console.log('💡 sort_order值:', sortOrders, '判定為真實字段');
           }
         } else {
-          // 如果沒有產品，假設支持排序（避免顯示錯誤的升級按鈕）
-          setSupportsSorting(true);
-          console.log('ℹ️ 暫無產品，假設數據庫已支持排序功能');
+          // 如果沒有產品，預設不支持排序，顯示升級按鈕
+          setSupportsSorting(false);
+          console.log('ℹ️ 暫無產品，預設顯示升級按鈕');
         }
       }
     } catch (error) {
