@@ -353,8 +353,8 @@ export const FlavorsPage: React.FC = () => {
           {/* 移動端佈局：圖片 - 價格 - 描述 */}
           <div className="md:hidden space-y-4">
             {/* 圖片 */}
-            <div className="flex justify-center">
-              <div className="w-56 h-56 bg-gray-200 rounded-xl overflow-hidden shadow-sm">
+            <div className="w-full">
+              <div className="w-full h-64 bg-gray-200 rounded-xl overflow-hidden shadow-sm">
                 <img
                   src={getProductImage(selectedProduct)}
                   alt={selectedProduct.name}
