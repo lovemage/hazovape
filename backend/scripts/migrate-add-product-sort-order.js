@@ -9,8 +9,29 @@ async function migrateAddProductSortOrder() {
     const hasSortOrder = tableInfo.some(col => col.name === 'sort_order');
 
     if (hasSortOrder) {
-      console.log('✅ sort_order 字段已存在，跳過遷移');
-      return;
+      console.log('⚠️ sort_order 字段已存在，檢查是否需要重新初始化...');
+      
+      // 檢查是否所有產品的sort_order都是連續的1,2,3...（表示是動態添加的）
+      const products = await Database.all('SELECT id, sort_order FROM products ORDER BY sort_order ASC');
+      const isSequential = products.length > 0 && 
+        products.every((product, index) => product.sort_order === index + 1);
+      
+      if (isSequential) {
+        console.log('🔄 檢測到連續排序值，重新初始化為非連續值...');
+        // 重新設置為非連續值
+        for (let i = 0; i < products.length; i++) {
+          const sortOrder = (i + 1) * 10; // 10, 20, 30, 40...
+          await Database.run(
+            'UPDATE products SET sort_order = ? WHERE id = ?',
+            [sortOrder, products[i].id]
+          );
+        }
+        console.log(`✅ 已重新初始化 ${products.length} 個產品的排序值`);
+        return;
+      } else {
+        console.log('✅ sort_order 字段已正確初始化，跳過遷移');
+        return;
+      }
     }
 
     console.log('📊 當前表結構:', tableInfo.map(col => col.name).join(', '));
