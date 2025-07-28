@@ -324,8 +324,8 @@ export const FlavorsPage: React.FC = () => {
         {/* 選中的商品信息 */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
           {/* 桌面端佈局 */}
-          <div className="hidden md:flex items-center gap-4">
-            <div className="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden">
+          <div className="hidden md:flex items-center gap-6">
+            <div className="w-40 h-40 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
               <img
                 src={getProductImage(selectedProduct)}
                 alt={selectedProduct.name}
@@ -354,7 +354,7 @@ export const FlavorsPage: React.FC = () => {
           <div className="md:hidden space-y-4">
             {/* 圖片 */}
             <div className="flex justify-center">
-              <div className="w-32 h-32 bg-gray-200 rounded-lg overflow-hidden">
+              <div className="w-56 h-56 bg-gray-200 rounded-xl overflow-hidden shadow-sm">
                 <img
                   src={getProductImage(selectedProduct)}
                   alt={selectedProduct.name}
