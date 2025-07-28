@@ -220,9 +220,9 @@ app.post('/checkout', (req, res) => {
         </div>
         <p id="status">正在返回結帳頁面...</p>
         <p style="font-size: 14px; opacity: 0.8; margin-top: 20px;">
-            若未自動返回，請複製商店代號貼上收件店號欄位
+            若未自動返回，請複製商店代號後關閉此視窗，再貼上收件店號欄位
         </p>
-        <button onclick="manualReturn()" style="
+        <button onclick="closeWindow()" style="
             background: rgba(255, 255, 255, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.3);
             color: white;
@@ -230,7 +230,7 @@ app.post('/checkout', (req, res) => {
             border-radius: 8px;
             cursor: pointer;
             margin-top: 15px;
-        ">手動返回結帳頁面</button>
+        ">關閉視窗</button>
     </div>
 
     <script>
@@ -246,80 +246,137 @@ app.post('/checkout', (req, res) => {
         function copyStoreId() {
             console.log('📋 嘗試複製店號:', storeId);
 
-            if (navigator.clipboard) {
+            // 方法1: 使用現代 clipboard API
+            if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(storeId).then(() => {
-                    alert('店號已複製：' + storeId);
+                    showMessage('✅ 店號已複製：' + storeId, 'success');
                     console.log('✅ 複製成功 (clipboard API)');
                 }).catch((err) => {
                     console.log('❌ clipboard API 失敗，使用降級方案:', err);
                     fallbackCopy();
                 });
             } else {
-                console.log('⚠️  不支援 clipboard API，使用降級方案');
+                console.log('⚠️  不支援 clipboard API 或非安全上下文，使用降級方案');
                 fallbackCopy();
             }
         }
 
         function fallbackCopy() {
             try {
+                // 方法2: 使用 document.execCommand (已棄用但更兼容)
                 const textArea = document.createElement('textarea');
                 textArea.value = storeId;
                 textArea.style.position = 'fixed';
-                textArea.style.opacity = '0';
+                textArea.style.left = '-9999px';
+                textArea.style.top = '-9999px';
                 document.body.appendChild(textArea);
                 textArea.focus();
                 textArea.select();
+                
                 const successful = document.execCommand('copy');
                 document.body.removeChild(textArea);
 
                 if (successful) {
-                    alert('店號已複製：' + storeId);
+                    showMessage('✅ 店號已複製：' + storeId, 'success');
                     console.log('✅ 複製成功 (execCommand)');
                 } else {
-                    alert('複製失敗，店號：' + storeId + '\\n請手動複製');
-                    console.log('❌ execCommand 複製失敗');
+                    throw new Error('execCommand 返回 false');
                 }
             } catch (err) {
-                console.log('❌ 降級複製也失敗:', err);
-                alert('複製失敗，店號：' + storeId + '\\n請手動複製');
+                console.log('❌ 所有複製方法都失敗:', err);
+                showMessage('❌ 自動複製失敗\\n店號：' + storeId + '\\n請手動選取複製', 'error');
+                
+                // 方法3: 選中文字讓用戶手動複製
+                selectStoreIdText();
             }
         }
 
-        // 手動返回功能
-        function manualReturn() {
-            console.log('🔄 手動返回被點擊');
+        function selectStoreIdText() {
+            try {
+                // 創建一個臨時的可選中元素
+                const tempDiv = document.createElement('div');
+                tempDiv.style.position = 'fixed';
+                tempDiv.style.top = '50%';
+                tempDiv.style.left = '50%';
+                tempDiv.style.transform = 'translate(-50%, -50%)';
+                tempDiv.style.background = 'white';
+                tempDiv.style.color = 'black';
+                tempDiv.style.padding = '20px';
+                tempDiv.style.border = '2px solid #007bff';
+                tempDiv.style.borderRadius = '8px';
+                tempDiv.style.fontSize = '18px';
+                tempDiv.style.fontWeight = 'bold';
+                tempDiv.style.userSelect = 'text';
+                tempDiv.style.zIndex = '9999';
+                tempDiv.textContent = storeId;
+                
+                document.body.appendChild(tempDiv);
+                
+                // 選中文字
+                const range = document.createRange();
+                range.selectNodeContents(tempDiv);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+                
+                // 3秒後移除
+                setTimeout(() => {
+                    if (document.body.contains(tempDiv)) {
+                        document.body.removeChild(tempDiv);
+                    }
+                }, 3000);
+                
+            } catch (err) {
+                console.log('❌ 選中文字也失敗:', err);
+            }
+        }
 
-            const params = new URLSearchParams();
-            if (storeName) params.append('storeName', storeName);
-            if (storeId) params.append('storeId', storeId);
-            if (storeAddress) params.append('storeAddress', storeAddress);
+        function showMessage(message, type = 'info') {
+            // 更新狀態顯示
+            const statusEl = document.getElementById('status');
+            if (statusEl) {
+                statusEl.textContent = message;
+                statusEl.style.color = type === 'success' ? '#28a745' : 
+                                     type === 'error' ? '#dc3545' : '#17a2b8';
+            }
+            
+            // 也顯示alert作為備用
+            alert(message);
+        }
 
-            const callbackUrl = '/checkout?' + params.toString();
-            console.log('🔗 構建的回調URL:', callbackUrl);
+        // 關閉視窗功能
+        function closeWindow() {
+            console.log('🔄 關閉視窗被點擊');
 
             try {
+                // 如果有父視窗，可以嘗試將門市信息傳遞回去
                 if (window.opener && !window.opener.closed) {
-                    console.log('✅ 找到父視窗，重定向父視窗');
+                    console.log('✅ 找到父視窗，傳遞門市信息');
+                    
+                    const params = new URLSearchParams();
+                    if (storeName) params.append('storeName', storeName);
+                    if (storeId) params.append('storeId', storeId);
+                    if (storeAddress) params.append('storeAddress', storeAddress);
+
+                    const callbackUrl = '/checkout?' + params.toString();
                     const fullUrl = window.opener.location.origin + callbackUrl;
-                    console.log('🔗 完整URL:', fullUrl);
+                    console.log('🔗 重定向父視窗到:', fullUrl);
                     window.opener.location.href = fullUrl;
-
-                    // 更新狀態
-                    document.getElementById('status').textContent = '✅ 已手動返回結帳頁面';
-
-                    setTimeout(() => {
-                        window.close();
-                    }, 1000);
-                } else {
-                    console.log('❌ 找不到父視窗，直接重定向當前視窗');
-                    window.location.href = callbackUrl;
                 }
+
+                // 更新狀態
+                document.getElementById('status').textContent = '✅ 視窗即將關閉';
+
+                // 關閉當前視窗
+                setTimeout(() => {
+                    console.log('🔄 關閉視窗');
+                    window.close();
+                }, 1000);
+
             } catch (error) {
-                console.error('❌ 手動返回失敗:', error);
-                // 最後的備用方案
-                const fullUrl = window.location.origin + callbackUrl;
-                console.log('🔗 備用方案URL:', fullUrl);
-                window.location.href = fullUrl;
+                console.error('❌ 關閉視窗過程中發生錯誤:', error);
+                // 強制關閉視窗
+                window.close();
             }
         }
 
@@ -343,7 +400,7 @@ app.post('/checkout', (req, res) => {
                     window.opener.location.href = callbackUrl;
 
                     // 更新狀態
-                    document.getElementById('status').textContent = '✅ 已自動返回結帳頁面';
+                    document.getElementById('status').textContent = '✅ 已自動返回結帳頁面，視窗即將關閉';
 
                     // 關閉當前視窗
                     setTimeout(() => {
