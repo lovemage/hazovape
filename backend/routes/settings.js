@@ -18,7 +18,8 @@ router.get('/', async (req, res) => {
       'popup_image': '',
       'popup_enabled': 'true',
       'order_complete_popup_image': '',
-      'order_complete_popup_enabled': 'true'
+      'order_complete_popup_enabled': 'true',
+      'hero_background_image': ''
     };
 
     try {

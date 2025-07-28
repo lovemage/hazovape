@@ -37,6 +37,7 @@ export const HomePage: React.FC = () => {
   const [telegramUrl, setTelegramUrl] = useState<string>('https://t.me/whalesale');
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [heroBackgroundImage, setHeroBackgroundImage] = useState<string>('');
 
   // 載入產品分類
   const loadCategories = useCallback(async () => {
@@ -136,6 +137,10 @@ export const HomePage: React.FC = () => {
         if (settings.contact_telegram) {
           setTelegramUrl(settings.contact_telegram);
           console.log('🏠 Telegram URL 載入成功:', settings.contact_telegram);
+        }
+        if (settings.hero_background_image) {
+          setHeroBackgroundImage(settings.hero_background_image);
+          console.log('🏠 Hero 背景圖片載入成功:', settings.hero_background_image);
         }
         if (settings.homepage_section_enabled !== undefined) {
           const enabled = settings.homepage_section_enabled === 'true' || settings.homepage_section_enabled === true;
@@ -358,7 +363,7 @@ export const HomePage: React.FC = () => {
       <div 
         className="relative min-h-[38vh] md:min-h-screen bg-contain bg-center bg-no-repeat overflow-hidden pt-16"
         style={{
-          backgroundImage: `url('/images/seep-vape-hero.png')`,
+          backgroundImage: `url('${heroBackgroundImage || '/images/seep-vape-hero.png'}')`,
           backgroundSize: 'contain'
         }}
       >

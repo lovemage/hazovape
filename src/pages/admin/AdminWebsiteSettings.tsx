@@ -153,6 +153,12 @@ export const AdminWebsiteSettings: React.FC = () => {
           rows: 3
         },
         {
+          key: 'hero_background_image',
+          label: 'Hero 背景圖片',
+          description: '首頁 Hero 區域的背景圖片（建議尺寸：1920x1080 或更高）',
+          type: 'image'
+        },
+        {
           key: 'homepage_section_enabled',
           label: '啟用標題副標題區塊',
           description: '是否在首頁顯示額外的標題副標題區塊',
@@ -500,7 +506,7 @@ export const AdminWebsiteSettings: React.FC = () => {
                 <div 
                   className="relative min-h-[400px] bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex flex-col justify-center items-center text-white"
                   style={{
-                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/images/seep-vape-hero.png')`,
+                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('${settings.hero_background_image || '/images/seep-vape-hero.png'}')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                   }}
