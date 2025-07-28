@@ -152,10 +152,10 @@ export const AdminProducts: React.FC = () => {
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-    // 更新排序順序
+    // 更新排序順序（保持10的倍數間隔）
     const updatedProducts = items.map((product, index) => ({
       ...product,
-      sort_order: index + 1
+      sort_order: (index + 1) * 10  // 10, 20, 30, 40... 保持非連續值
     }));
 
     // 更新本地狀態
