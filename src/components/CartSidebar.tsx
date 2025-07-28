@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, X, Plus, Minus, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { useCart } from '../contexts/CartContext';
 
 export const CartSidebar: React.FC = () => {
+  const navigate = useNavigate();
   const { items, isOpen, toggleCart, updateQuantity, removeFromCart, getTotalItems, getTotalPrice } = useCart();
 
   if (!isOpen) return null;
@@ -131,7 +133,7 @@ export const CartSidebar: React.FC = () => {
                   className="w-full"
                   onClick={() => {
                     toggleCart();
-                    window.location.href = '/checkout';
+                    navigate('/checkout');
                   }}
                 >
                   前往結帳
