@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShoppingBag, User, Phone, MapPin, CreditCard, Search, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, User, Phone, MapPin, CreditCard, Search, ExternalLink, Copy, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -27,6 +27,17 @@ export const CheckoutPage: React.FC = () => {
   const [shippingFee, setShippingFee] = useState(60); // 默認60元運費
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Partial<CustomerInfo>>({});
+
+  // 複製店號功能
+  const handleCopyStoreNumber = async (storeNumber: string) => {
+    try {
+      await navigator.clipboard.writeText(storeNumber);
+      toast.success('店號已複製到剪貼板');
+    } catch (error) {
+      console.error('複製失敗:', error);
+      toast.error('複製失敗');
+    }
+  };
 
   // 計算優惠信息
   const getDiscountInfo = () => {
@@ -245,7 +256,7 @@ export const CheckoutPage: React.FC = () => {
       searchWindow.focus();
       toast.info('已開啟 7-11 門市查詢視窗', {
         duration: 8000,
-        description: '1. 在 ibon 門市查詢系統中搜尋門市\n2. 記下門市的6位數店號\n3. 將店號輸入到下方欄位中',
+        description: '1. 在 ibon 門市查詢系統中搜尋門市\n2. 記下門市的6位數店號\n3. 關閉查詢視窗後，將店號輸入到下方欄位中',
       });
     } else {
       toast.error('無法開啟查詢視窗', {
@@ -470,10 +481,33 @@ export const CheckoutPage: React.FC = () => {
                   {customerInfo.storeName && (
                     <div className="p-3 bg-green-50 rounded-lg border border-green-200">
                       <div className="flex items-center justify-between">
-                        <div>
+                        <div className="flex-1">
                           <p className="font-medium text-green-700">{customerInfo.storeName}</p>
-                          <p className="text-sm text-gray-600">門市編號: {customerInfo.storeNumber}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <p className="text-sm text-gray-600">門市編號: {customerInfo.storeNumber}</p>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleCopyStoreNumber(customerInfo.storeNumber)}
+                              className="h-6 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-100"
+                              title="複製店號"
+                            >
+                              <Copy className="w-3 h-3 mr-1" />
+                              複製
+                            </Button>
+                          </div>
                         </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setCustomerInfo(prev => ({ ...prev, storeName: '', storeNumber: '' }))}
+                          className="h-6 w-6 p-0 text-gray-500 hover:text-red-600 hover:bg-red-100"
+                          title="清除選擇"
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
                       </div>
                     </div>
                   )}
@@ -525,7 +559,7 @@ export const CheckoutPage: React.FC = () => {
                       <div className="text-xs text-blue-700">
                         <p className="font-medium mb-1">門市選擇方式：</p>
                         <ul className="space-y-1 text-blue-600">
-                          <li>• <strong>推薦</strong>：點擊「查詢門市」手動查詢後輸入店號</li>
+                          <li>• <strong>推薦</strong>：點擊「查詢門市」→ 查詢店號 → 關閉視窗 → 輸入店號</li>
                           <li>• 或點擊「選擇門市(Beta)」在地圖上直接選擇（測試功能）</li>
                           <li>• 店號格式：6位數字（例：123456）</li>
                         </ul>
