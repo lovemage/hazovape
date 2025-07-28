@@ -166,7 +166,11 @@ export const productAPI = {
   },
   update: (id: number, data: FormData | any) => api.put(`/products/admin/${id}`, data),
   delete: (id: number) => api.delete(`/products/admin/${id}`), // 軟刪除（停用）
-  permanentDelete: (id: number) => api.delete(`/products/admin/${id}/permanent`), // 永久刪除
+  permanentDelete: (id: number) => api.delete(`/products/admin/${id}/permanent`),
+  
+  // 更新產品排序
+  updateSortOrder: (products: { id: number; sort_order: number }[]) =>
+    api.put('/products/admin/update-sort-order', { products }), // 永久刪除
   restore: (id: number) => api.put(`/products/admin/${id}/restore`), // 恢復
   batchImport: (formData: FormData) => {
     console.log('📤 productAPI.batchImport 調用');

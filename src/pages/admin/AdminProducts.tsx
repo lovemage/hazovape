@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Eye, EyeOff, FileText, Upload, Download, AlertCircle, CheckCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, EyeOff, FileText, Upload, Download, AlertCircle, CheckCircle, GripVertical } from 'lucide-react';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
@@ -21,6 +22,7 @@ interface Product {
   multi_discount?: string;
   images?: string[];
   is_active: boolean;
+  sort_order?: number;
   created_at?: string;
   updated_at?: string;
 }
@@ -39,6 +41,7 @@ export const AdminProducts: React.FC = () => {
   const [showBatchImport, setShowBatchImport] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isReordering, setIsReordering] = useState(false);
   
   // 批量導入相關狀態
   const [importFile, setImportFile] = useState<File | null>(null);
@@ -110,6 +113,51 @@ export const AdminProducts: React.FC = () => {
     setShowForm(false);
     setEditingProduct(null);
     loadProducts();
+  };
+
+  // 處理拖拽排序
+  const onDragEnd = async (result: DropResult) => {
+    if (!result.destination) return;
+
+    // 只對所有產品進行排序（不受搜索過濾影響）
+    const activeProducts = products.filter(p => p.is_active);
+    const items = Array.from(activeProducts);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    // 更新排序順序
+    const updatedProducts = items.map((product, index) => ({
+      ...product,
+      sort_order: index + 1
+    }));
+
+    // 更新本地狀態
+    setProducts(prevProducts => {
+      const newProducts = [...prevProducts];
+      updatedProducts.forEach(updatedProduct => {
+        const index = newProducts.findIndex(p => p.id === updatedProduct.id);
+        if (index !== -1) {
+          newProducts[index] = updatedProduct;
+        }
+      });
+      return newProducts;
+    });
+
+    try {
+      // 發送到後端更新
+      const sortData = updatedProducts.map(product => ({
+        id: product.id,
+        sort_order: product.sort_order!
+      }));
+
+      await productAPI.updateSortOrder(sortData);
+      toast.success('產品排序已更新');
+    } catch (error) {
+      console.error('更新排序失敗:', error);
+      toast.error('更新排序失敗');
+      // 重新載入以恢復原始順序
+      loadProducts();
+    }
   };
 
   // 批量導入處理
@@ -188,6 +236,14 @@ export const AdminProducts: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">產品管理</h1>
           <div className="flex gap-3">
             <Button
+              onClick={() => setIsReordering(!isReordering)}
+              variant="outline"
+              className={`flex items-center gap-2 ${isReordering ? 'bg-blue-100 text-blue-700' : ''}`}
+            >
+              <GripVertical className="w-4 h-4" />
+              {isReordering ? '完成排序' : '調整順序'}
+            </Button>
+            <Button
               onClick={downloadTemplate}
               variant="outline"
               className="flex items-center gap-2"
@@ -229,7 +285,14 @@ export const AdminProducts: React.FC = () => {
         {/* 產品列表 */}
         <Card>
           <CardHeader>
-            <CardTitle>產品列表 ({filteredProducts.length})</CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle>產品列表 ({filteredProducts.length})</CardTitle>
+              {isReordering && (
+                <div className="text-sm text-blue-600 bg-blue-100 px-3 py-1 rounded-lg">
+                  🔄 拖拽產品卡片可調整顯示順序 (僅顯示啟用的產品)
+                </div>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -238,6 +301,85 @@ export const AdminProducts: React.FC = () => {
               <div className="text-center py-8 text-gray-500">
                 {searchTerm ? '沒有找到符合條件的產品' : '暫無產品'}
               </div>
+            ) : isReordering ? (
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="products" direction="vertical">
+                  {(provided) => (
+                    <div
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className="space-y-4"
+                    >
+                      {/* 排序模式下只顯示啟用的產品 */}
+                      {products.filter(p => p.is_active).map((product, index) => (
+                        <Draggable key={product.id} draggableId={String(product.id)} index={index}>
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              className={`
+                                flex items-center gap-4 p-4 border rounded-lg bg-white 
+                                ${snapshot.isDragging ? 'shadow-lg rotate-2' : 'hover:shadow-md'}
+                                transition-all duration-200
+                              `}
+                            >
+                              <div
+                                {...provided.dragHandleProps}
+                                className="flex items-center text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
+                              >
+                                <GripVertical className="w-5 h-5" />
+                              </div>
+                              
+                              <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                <img
+                                  src={getProductImageUrl(product)}
+                                  alt={product.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
+                                  }}
+                                />
+                              </div>
+                              
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h3 className={`font-semibold truncate ${product.is_active ? 'text-gray-900' : 'text-gray-500'}`}>
+                                    {product.name}
+                                  </h3>
+                                  {!product.is_active && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      已停用
+                                    </Badge>
+                                  )}
+                                </div>
+                                {product.category && (
+                                  <Badge variant="outline" className="text-xs mb-1">
+                                    {product.category}
+                                  </Badge>
+                                )}
+                                <div className="text-sm text-gray-600">
+                                  NT$ {Math.round(product.price).toLocaleString()}
+                                  {product.description && (
+                                    <span className="ml-2 text-gray-500 truncate">
+                                      {product.description.substring(0, 50)}...
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-2 text-sm text-gray-500">
+                                <span>第 {index + 1} 位</span>
+                              </div>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {filteredProducts.map((product) => (

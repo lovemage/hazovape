@@ -18,6 +18,7 @@ export interface Product {
   image?: string;
   is_active?: boolean;
   variants?: ProductVariant[];
+  sort_order?: number;
   created_at?: string;
   updated_at?: string;
 }

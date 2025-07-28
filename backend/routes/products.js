@@ -89,7 +89,7 @@ const txtUpload = multer({
 router.get('/', async (req, res) => {
   try {
     const products = await Database.all(
-      'SELECT id, name, description, price, category, multi_discount, images, is_active FROM products WHERE is_active = 1 ORDER BY id'
+      'SELECT id, name, description, price, category, multi_discount, images, is_active, sort_order FROM products WHERE is_active = 1 ORDER BY sort_order ASC, id ASC'
     );
 
     // 解析 JSON 字段並獲取規格數據
@@ -179,7 +179,7 @@ router.get('/:id', async (req, res) => {
 router.get('/admin/all', authenticateAdmin, async (req, res) => {
   try {
     const products = await Database.all(
-      'SELECT id, name, description, price, category, multi_discount, images, is_active, created_at FROM products ORDER BY created_at DESC'
+      'SELECT id, name, description, price, category, multi_discount, images, is_active, created_at, sort_order FROM products ORDER BY sort_order ASC, created_at DESC'
     );
 
     // 解析 JSON 字段
@@ -262,9 +262,13 @@ router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, 
       }
     }
 
+    // 獲取下一個排序順序
+    const lastProduct = await Database.get('SELECT MAX(sort_order) as max_sort FROM products');
+    const nextSortOrder = (lastProduct?.max_sort || 0) + 1;
+
     // 插入產品數據
     const result = await Database.run(
-      'INSERT INTO products (name, description, price, category, multi_discount, images, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO products (name, description, price, category, multi_discount, images, is_active, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       [
         name,
         description || '',
@@ -272,7 +276,8 @@ router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, 
         category || '其他產品',
         JSON.stringify(parsedMultiDiscount),
         JSON.stringify(allImages),
-        1
+        1,
+        nextSortOrder
       ]
     );
 
@@ -443,6 +448,56 @@ router.put('/admin/:id/restore', authenticateAdmin, async (req, res) => {
     res.status(500).json({
       success: false,
       message: '恢復產品失敗'
+    });
+  }
+});
+
+// 管理員：更新產品排序
+router.put('/admin/update-sort-order', authenticateAdmin, async (req, res) => {
+  try {
+    const { products } = req.body;
+    
+    console.log('🔄 更新產品排序:', products);
+
+    if (!Array.isArray(products) || products.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: '產品列表不能為空'
+      });
+    }
+
+    // 開始事務
+    await Database.beginTransaction();
+
+    try {
+      // 批量更新排序
+      for (const product of products) {
+        const { id, sort_order } = product;
+        if (id && typeof sort_order === 'number') {
+          await Database.run(
+            'UPDATE products SET sort_order = ? WHERE id = ?',
+            [sort_order, id]
+          );
+        }
+      }
+
+      await Database.commit();
+      
+      console.log('✅ 產品排序更新成功');
+
+      res.json({
+        success: true,
+        message: '產品排序更新成功'
+      });
+    } catch (error) {
+      await Database.rollback();
+      throw error;
+    }
+  } catch (error) {
+    console.error('❌ 更新產品排序失敗:', error);
+    res.status(500).json({
+      success: false,
+      message: '更新產品排序失敗: ' + error.message
     });
   }
 });

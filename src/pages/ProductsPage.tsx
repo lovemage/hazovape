@@ -94,6 +94,7 @@ export const ProductsPage: React.FC = () => {
       setLoading(true);
       const response = await productAPI.getAll();
       if (response.data.success) {
+        // 產品已經按 sort_order 從後端排序了，直接設置
         setProducts(response.data.data || []);
       }
     } catch (error) {
