@@ -449,6 +449,9 @@ const OrderQueryPage: React.FC = () => {
         )}
         </div>
       </div>
+      
+      {/* 移動端底部導航的佔位空間 */}
+      <div className="h-16 md:hidden" />
     </div>
   );
 };

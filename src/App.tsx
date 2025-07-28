@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'sonner';
 import { CartProvider } from './contexts/CartContext';
 import { CartSidebar } from './components/CartSidebar';
+import { MobileNavigation } from './components/MobileNavigation';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // 用戶界面頁面
@@ -149,6 +150,9 @@ function App() {
 
             {/* 購物車側邊欄 */}
             <CartSidebar />
+
+            {/* 移動端底部導航 */}
+            <MobileNavigation />
 
             {/* 全局通知 */}
             <Toaster 
