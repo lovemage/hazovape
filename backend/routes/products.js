@@ -355,6 +355,67 @@ router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, 
   }
 });
 
+// 管理員：更新產品排序 (必須在 :id 路由之前)
+router.put('/admin/update-sort-order', authenticateAdmin, async (req, res) => {
+  try {
+    const { products } = req.body;
+    
+    console.log('🔄 更新產品排序:', products);
+
+    if (!Array.isArray(products) || products.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: '產品列表不能為空'
+      });
+    }
+
+    // 檢查是否有 sort_order 字段
+    const tableInfo = await Database.all("PRAGMA table_info(products)");
+    const hasSortOrder = tableInfo.some(col => col.name === 'sort_order');
+
+    if (!hasSortOrder) {
+      return res.status(400).json({
+        success: false,
+        message: '數據庫尚未支持產品排序功能，請聯繫管理員進行數據庫升級'
+      });
+    }
+
+    // 開始事務
+    await Database.beginTransaction();
+
+    try {
+      // 批量更新排序
+      for (const product of products) {
+        const { id, sort_order } = product;
+        if (id && typeof sort_order === 'number') {
+          await Database.run(
+            'UPDATE products SET sort_order = ? WHERE id = ?',
+            [sort_order, id]
+          );
+        }
+      }
+
+      await Database.commit();
+      
+      console.log('✅ 產品排序更新成功');
+
+      res.json({
+        success: true,
+        message: '產品排序更新成功'
+      });
+    } catch (error) {
+      await Database.rollback();
+      throw error;
+    }
+  } catch (error) {
+    console.error('❌ 更新產品排序失敗:', error);
+    res.status(500).json({
+      success: false,
+      message: '更新產品排序失敗: ' + error.message
+    });
+  }
+});
+
 // 管理員：更新產品
 router.put('/admin/:id', authenticateAdmin, upload.array('images', 5), async (req, res) => {
   try {
@@ -505,67 +566,6 @@ router.put('/admin/:id/restore', authenticateAdmin, async (req, res) => {
     res.status(500).json({
       success: false,
       message: '恢復產品失敗'
-    });
-  }
-});
-
-// 管理員：更新產品排序
-router.put('/admin/update-sort-order', authenticateAdmin, async (req, res) => {
-  try {
-    const { products } = req.body;
-    
-    console.log('🔄 更新產品排序:', products);
-
-    if (!Array.isArray(products) || products.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: '產品列表不能為空'
-      });
-    }
-
-    // 檢查是否有 sort_order 字段
-    const tableInfo = await Database.all("PRAGMA table_info(products)");
-    const hasSortOrder = tableInfo.some(col => col.name === 'sort_order');
-
-    if (!hasSortOrder) {
-      return res.status(400).json({
-        success: false,
-        message: '數據庫尚未支持產品排序功能，請聯繫管理員進行數據庫升級'
-      });
-    }
-
-    // 開始事務
-    await Database.beginTransaction();
-
-    try {
-      // 批量更新排序
-      for (const product of products) {
-        const { id, sort_order } = product;
-        if (id && typeof sort_order === 'number') {
-          await Database.run(
-            'UPDATE products SET sort_order = ? WHERE id = ?',
-            [sort_order, id]
-          );
-        }
-      }
-
-      await Database.commit();
-      
-      console.log('✅ 產品排序更新成功');
-
-      res.json({
-        success: true,
-        message: '產品排序更新成功'
-      });
-    } catch (error) {
-      await Database.rollback();
-      throw error;
-    }
-  } catch (error) {
-    console.error('❌ 更新產品排序失敗:', error);
-    res.status(500).json({
-      success: false,
-      message: '更新產品排序失敗: ' + error.message
     });
   }
 });
