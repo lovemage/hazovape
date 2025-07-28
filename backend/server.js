@@ -5,6 +5,8 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
 
+// v1.0.1 - 強制部署解決緩存問題
+
 // 導入數據庫檢查和恢復功能（如果存在）
 let checkAndRestoreDatabase = null;
 let restoreProductionData = null;
