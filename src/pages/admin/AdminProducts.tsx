@@ -59,7 +59,6 @@ export const AdminProducts: React.FC = () => {
       const response = await productAPI.getAllAdmin();
       if (response.data.success) {
         const productsData = response.data.data || [];
-        setProducts(productsData);
         
         // 檢測數據庫是否支持排序功能
         if (productsData.length > 0) {
@@ -85,6 +84,19 @@ export const AdminProducts: React.FC = () => {
           setSupportsSorting(false);
           console.log('ℹ️ 暫無產品，預設顯示升級按鈕');
         }
+        
+        // 對產品進行排序：啟用產品按sort_order排序在前，停用產品在後
+        const activeProducts = productsData.filter(p => p.is_active);
+        const inactiveProducts = productsData.filter(p => !p.is_active);
+        
+        // 啟用產品按sort_order排序
+        activeProducts.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+        
+        // 停用產品可以按名稱排序
+        inactiveProducts.sort((a, b) => a.name.localeCompare(b.name));
+        
+        // 設置排序後的產品列表
+        setProducts([...activeProducts, ...inactiveProducts]);
       }
     } catch (error) {
       console.error('載入產品失敗:', error);
@@ -158,16 +170,27 @@ export const AdminProducts: React.FC = () => {
       sort_order: (index + 1) * 10  // 10, 20, 30, 40... 保持非連續值
     }));
 
-    // 更新本地狀態
+    // 立即更新本地狀態 - 重新排序整個產品數組
     setProducts(prevProducts => {
       const newProducts = [...prevProducts];
+      
+      // 先更新啟用產品的sort_order
       updatedProducts.forEach(updatedProduct => {
         const index = newProducts.findIndex(p => p.id === updatedProduct.id);
         if (index !== -1) {
           newProducts[index] = updatedProduct;
         }
       });
-      return newProducts;
+      
+      // 重新排序：啟用產品按sort_order排序，停用產品保持原位置
+      const activeProductsNew = newProducts.filter(p => p.is_active);
+      const inactiveProductsNew = newProducts.filter(p => !p.is_active);
+      
+      // 按sort_order排序啟用產品
+      activeProductsNew.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+      
+      // 合併：啟用產品在前，停用產品在後
+      return [...activeProductsNew, ...inactiveProductsNew];
     });
 
     try {
