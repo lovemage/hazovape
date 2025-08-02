@@ -37,7 +37,7 @@ export const getImageUrl = (imagePath: string): string => {
     // 如果是相對路徑，處理為後端靜態文件路徑
     const baseUrl = getImageBaseUrl();
 
-    if (imagePath.startsWith('products/')) {
+    if (imagePath.startsWith('products/') || imagePath.startsWith('flavors/') || imagePath.startsWith('upsell/')) {
       finalUrl = `${baseUrl}/uploads/${imagePath}`;
     } else {
       finalUrl = `${baseUrl}/uploads/products/${imagePath}`;

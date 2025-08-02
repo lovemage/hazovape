@@ -78,7 +78,7 @@ export const FlavorForm: React.FC<FlavorFormProps> = ({
       // 設定圖片數據
       const image = (flavor as any).image;
       setExistingImage(image || null);
-      setImageUrl('');
+      setImageUrl(image || ''); // 如果有現有圖片，顯示在URL輸入框中
       setImageFile(null);
       setPreviewUrl(null);
     } else {
