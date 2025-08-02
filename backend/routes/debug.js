@@ -257,4 +257,111 @@ router.get('/migrate-add-image-field', async (req, res) => {
   }
 });
 
+// 檢查文件系統狀態
+router.get('/filesystem-check', async (req, res) => {
+  try {
+    const fs = require('fs').promises;
+    const path = require('path');
+    
+    console.log('🔍 檢查文件系統狀態...');
+    
+    // 獲取當前工作目錄
+    const cwd = process.cwd();
+    
+    // 檢查不同路徑下的uploads目錄
+    const pathsToCheck = [
+      path.join(cwd, 'uploads'),
+      path.join(cwd, 'backend', 'uploads'), 
+      '/app/data/uploads',
+      '/app/uploads'
+    ];
+    
+    const results = [];
+    
+    for (const checkPath of pathsToCheck) {
+      try {
+        const stat = await fs.stat(checkPath);
+        let subDirs = [];
+        
+        if (stat.isDirectory()) {
+          try {
+            const items = await fs.readdir(checkPath);
+            const dirChecks = await Promise.all(items.map(async item => {
+              try {
+                const itemStat = await fs.stat(path.join(checkPath, item));
+                return itemStat.isDirectory() ? item : null;
+              } catch {
+                return null;
+              }
+            }));
+            subDirs = dirChecks.filter(item => item !== null);
+          } catch (e) {
+            subDirs = ['無法讀取'];
+          }
+        }
+        
+        results.push({
+          path: checkPath,
+          exists: true,
+          type: stat.isDirectory() ? 'directory' : 'file',
+          subDirectories: subDirs
+        });
+      } catch (error) {
+        results.push({
+          path: checkPath,
+          exists: false,
+          error: error.message
+        });
+      }
+    }
+    
+    // 檢查特定的flavors圖片文件
+    const flavorImagePath = 'uploads/flavors/flavor_1754157058559_wkgjz3jme.png';
+    const possiblePaths = [
+      path.join(cwd, flavorImagePath),
+      path.join(cwd, 'backend', flavorImagePath),
+      path.join('/app/data', flavorImagePath),
+      path.join('/app', flavorImagePath)
+    ];
+    
+    const flavorFileResults = [];
+    for (const filePath of possiblePaths) {
+      try {
+        const stat = await fs.stat(filePath);
+        flavorFileResults.push({
+          path: filePath,
+          exists: true,
+          size: stat.size,
+          modified: stat.mtime
+        });
+      } catch (error) {
+        flavorFileResults.push({
+          path: filePath,
+          exists: false,
+          error: error.message
+        });
+      }
+    }
+    
+    console.log('📋 文件系統檢查結果:', { results, flavorFileResults });
+    
+    res.json({
+      success: true,
+      data: {
+        currentWorkingDirectory: cwd,
+        uploadPaths: results,
+        flavorImageSearch: flavorFileResults,
+        configuredStaticPath: process.env.NODE_ENV === 'production' ? '/app/data/uploads' : path.join(__dirname, 'uploads')
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ 文件系統檢查失敗:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
 module.exports = router;
