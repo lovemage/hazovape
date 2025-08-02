@@ -196,8 +196,8 @@ router.get('/flavors-list', async (req, res) => {
   }
 });
 
-// 生產環境數據庫遷移 - 添加image字段
-router.post('/migrate-add-image-field', async (req, res) => {
+// 生產環境數據庫遷移 - 添加image字段 (GET版本)
+router.get('/migrate-add-image-field', async (req, res) => {
   try {
     console.log('🔄 開始為生產環境添加image字段...');
     
