@@ -504,10 +504,24 @@ router.get('/product/:productId', async (req, res) => {
 router.get('/admin/all', authenticateAdmin, async (req, res) => {
   try {
     const hasPriceField = await checkFlavorPriceColumn();
+    const hasImageField = await checkFlavorImageColumn();
     
     let query;
-    if (hasPriceField) {
-      // 有price欄位的完整查詢
+    if (hasPriceField && hasImageField) {
+      // 有price和image欄位的完整查詢
+      query = `
+        SELECT f.id, f.name, f.product_id, f.category_id, f.stock, f.sort_order, 
+               f.is_active, f.created_at, f.price, f.image,
+               p.name as product_name, p.price as product_base_price,
+               fc.name as category_name,
+               CASE WHEN f.price IS NOT NULL THEN f.price ELSE p.price END as final_price
+        FROM flavors f
+        LEFT JOIN products p ON f.product_id = p.id
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        ORDER BY p.name, fc.sort_order, f.sort_order, f.id
+      `;
+    } else if (hasPriceField) {
+      // 有price欄位的查詢
       query = `
         SELECT f.id, f.name, f.product_id, f.category_id, f.stock, f.sort_order, 
                f.is_active, f.created_at, f.price,
@@ -519,8 +533,21 @@ router.get('/admin/all', authenticateAdmin, async (req, res) => {
         LEFT JOIN flavor_categories fc ON f.category_id = fc.id
         ORDER BY p.name, fc.sort_order, f.sort_order, f.id
       `;
+    } else if (hasImageField) {
+      // 有image欄位的查詢
+      query = `
+        SELECT f.id, f.name, f.product_id, f.category_id, f.stock, f.sort_order, 
+               f.is_active, f.created_at, f.image,
+               p.name as product_name, p.price as product_base_price,
+               fc.name as category_name,
+               p.price as final_price
+        FROM flavors f
+        LEFT JOIN products p ON f.product_id = p.id
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        ORDER BY p.name, fc.sort_order, f.sort_order, f.id
+      `;
     } else {
-      // 沒有price欄位的兼容查詢
+      // 沒有price和image欄位的兼容查詢
       query = `
         SELECT f.id, f.name, f.product_id, f.category_id, f.stock, f.sort_order, 
                f.is_active, f.created_at,
