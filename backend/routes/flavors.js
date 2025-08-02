@@ -3,8 +3,20 @@ const Database = require('../config/database');
 const { authenticateAdmin } = require('./auth');
 const multer = require('multer');
 const fs = require('fs').promises;
+const path = require('path');
 
 const router = express.Router();
+
+// 獲取正確的上傳路徑（與server.js保持一致）
+const getUploadsPath = () => {
+  if (process.env.NODE_ENV === 'production') {
+    // Railway 生產環境：使用 Volume 路徑
+    return '/app/data/uploads';
+  } else {
+    // 本地開發環境：使用相對路徑
+    return path.join(__dirname, 'uploads');
+  }
+};
 
 // 檢查flavors表是否有price欄位的通用函數
 async function checkFlavorPriceColumn() {
@@ -42,7 +54,7 @@ const upload = multer({
 
 // 設置規格圖片上傳
 const flavorImageUpload = multer({
-  dest: 'uploads/flavors/',
+  dest: path.join(getUploadsPath(), 'flavors'),
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB
   },
@@ -707,7 +719,7 @@ router.post('/admin/with-image', authenticateAdmin, flavorImageUpload.single('im
     // 處理圖片：優先使用上傳的文件，其次使用URL
     if (req.file) {
       // 確保目錄存在
-      const flavorDir = 'uploads/flavors';
+      const flavorDir = path.join(getUploadsPath(), 'flavors');
       try {
         await fs.mkdir(flavorDir, { recursive: true });
       } catch (dirError) {
@@ -717,7 +729,9 @@ router.post('/admin/with-image', authenticateAdmin, flavorImageUpload.single('im
       // 生成新的文件名
       const fileExtension = req.file.originalname.split('.').pop();
       const newFileName = `flavor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
-      const newPath = `uploads/flavors/${newFileName}`;
+      const newPath = path.join(flavorDir, newFileName);
+      // 保存相對路徑到數據庫（用於前端URL構建）
+      const relativePath = `uploads/flavors/${newFileName}`;
       
       console.log('📁 創建規格文件上傳詳情:', {
         原始文件: req.file.originalname,
@@ -728,7 +742,7 @@ router.post('/admin/with-image', authenticateAdmin, flavorImageUpload.single('im
       // 移動文件到正確位置
       await fs.rename(req.file.path, newPath);
       console.log('✅ 創建規格文件移動成功到:', newPath);
-      imagePath = newPath;
+      imagePath = relativePath;
     } else if (imageUrl && imageUrl.trim()) {
       imagePath = imageUrl.trim();
     }
@@ -948,14 +962,15 @@ router.put('/admin/:id/with-image', authenticateAdmin, flavorImageUpload.single(
       // 刪除舊圖片文件（如果存在且是本地文件）
       if (flavor.image && flavor.image.startsWith('uploads/')) {
         try {
-          await fs.unlink(flavor.image);
+          const oldFullPath = path.join(getUploadsPath(), flavor.image.replace('uploads/', ''));
+          await fs.unlink(oldFullPath);
         } catch (error) {
           console.warn('刪除舊圖片失敗:', error);
         }
       }
 
       // 確保目錄存在
-      const flavorDir = 'uploads/flavors';
+      const flavorDir = path.join(getUploadsPath(), 'flavors');
       try {
         await fs.mkdir(flavorDir, { recursive: true });
       } catch (dirError) {
@@ -965,7 +980,9 @@ router.put('/admin/:id/with-image', authenticateAdmin, flavorImageUpload.single(
       // 生成新的文件名
       const fileExtension = req.file.originalname.split('.').pop();
       const newFileName = `flavor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
-      const newPath = `uploads/flavors/${newFileName}`;
+      const newPath = path.join(flavorDir, newFileName);
+      // 保存相對路徑到數據庫（用於前端URL構建）
+      const relativePath = `uploads/flavors/${newFileName}`;
       
       console.log('📁 文件上傳詳情:', {
         原始文件: req.file.originalname,
@@ -976,7 +993,7 @@ router.put('/admin/:id/with-image', authenticateAdmin, flavorImageUpload.single(
       // 移動文件到正確位置
       await fs.rename(req.file.path, newPath);
       console.log('✅ 文件移動成功到:', newPath);
-      imagePath = newPath;
+      imagePath = relativePath;
     } else if (imageUrl !== undefined) {
       // 如果提供了imageUrl（包括空字符串），則更新
       if (imageUrl && imageUrl.trim()) {
@@ -985,7 +1002,8 @@ router.put('/admin/:id/with-image', authenticateAdmin, flavorImageUpload.single(
         // 清空圖片
         if (flavor.image && flavor.image.startsWith('uploads/')) {
           try {
-            await fs.unlink(flavor.image);
+            const oldFullPath = path.join(getUploadsPath(), flavor.image.replace('uploads/', ''));
+            await fs.unlink(oldFullPath);
           } catch (error) {
             console.warn('刪除圖片失敗:', error);
           }
