@@ -195,6 +195,23 @@ export const flavorAPI = {
   getAllAdmin: () => api.get('/flavors/admin/all'),
   create: (data: any) => api.post('/flavors/admin', data),
   update: (id: number, data: any) => api.put(`/flavors/admin/${id}`, data),
+  // 帶圖片上傳的新增和更新API
+  createWithImage: (formData: FormData) => {
+    console.log('📤 flavorAPI.createWithImage 調用');
+    return api.post('/flavors/admin/with-image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+  updateWithImage: (id: number, formData: FormData) => {
+    console.log('📤 flavorAPI.updateWithImage 調用，ID:', id);
+    return api.put(`/flavors/admin/${id}/with-image`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
   delete: (id: number) => api.delete(`/flavors/admin/${id}`), // 軟刪除（停用）
   permanentDelete: (id: number) => api.delete(`/flavors/admin/${id}/permanent`), // 永久刪除
   restore: (id: number) => api.put(`/flavors/admin/${id}/restore`),

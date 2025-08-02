@@ -17,6 +17,17 @@ async function checkFlavorPriceColumn() {
   }
 }
 
+// 檢查flavors表是否有image欄位的通用函數
+async function checkFlavorImageColumn() {
+  try {
+    const tableInfo = await Database.all("PRAGMA table_info(flavors)");
+    return tableInfo.some(column => column.name === 'image');
+  } catch (error) {
+    console.warn('檢查圖片欄位失敗:', error);
+    return false;
+  }
+}
+
 // 設置文件上傳（用於批量導入）
 const upload = multer({
   dest: 'uploads/temp/',
@@ -25,6 +36,21 @@ const upload = multer({
       cb(null, true);
     } else {
       cb(new Error('只允許上傳 txt 文件'), false);
+    }
+  }
+});
+
+// 設置規格圖片上傳
+const flavorImageUpload = multer({
+  dest: 'uploads/flavors/',
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('只允許上傳圖片文件'), false);
     }
   }
 });
@@ -329,11 +355,34 @@ router.get('/admin/batch-import/template', (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const hasPriceField = await checkFlavorPriceColumn();
+    const hasImageField = await checkFlavorImageColumn();
     
     let query;
-    if (hasPriceField) {
+    if (hasPriceField && hasImageField) {
+      query = `
+        SELECT f.id, f.name, f.sort_order, f.stock, f.product_id, f.category_id, f.price, f.image,
+               p.name as product_name, p.price as product_base_price,
+               fc.name as category_name
+        FROM flavors f
+        LEFT JOIN products p ON f.product_id = p.id
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        WHERE f.is_active = 1 AND p.is_active = 1
+        ORDER BY p.name, fc.sort_order, f.sort_order, f.id
+      `;
+    } else if (hasPriceField) {
       query = `
         SELECT f.id, f.name, f.sort_order, f.stock, f.product_id, f.category_id, f.price,
+               p.name as product_name, p.price as product_base_price,
+               fc.name as category_name
+        FROM flavors f
+        LEFT JOIN products p ON f.product_id = p.id
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        WHERE f.is_active = 1 AND p.is_active = 1
+        ORDER BY p.name, fc.sort_order, f.sort_order, f.id
+      `;
+    } else if (hasImageField) {
+      query = `
+        SELECT f.id, f.name, f.sort_order, f.stock, f.product_id, f.category_id, f.image,
                p.name as product_name, p.price as product_base_price,
                fc.name as category_name
         FROM flavors f
@@ -557,6 +606,147 @@ router.post('/admin', authenticateAdmin, async (req, res) => {
   }
 });
 
+// 創建帶圖片的新規格（管理員）
+router.post('/admin/with-image', authenticateAdmin, flavorImageUpload.single('image'), async (req, res) => {
+  try {
+    const { name, product_id, category_id, stock, sort_order, price, imageUrl } = req.body;
+
+    console.log('📝 創建帶圖片規格請求:', { name, product_id, category_id, stock, sort_order, price, imageUrl, hasFile: !!req.file });
+
+    // 驗證必要字段
+    if (!name || !product_id) {
+      return res.status(400).json({
+        success: false,
+        message: '規格名稱和商品ID為必填項'
+      });
+    }
+
+    // 驗證產品是否存在
+    const product = await Database.get('SELECT id, name, price FROM products WHERE id = ?', [product_id]);
+    if (!product) {
+      return res.status(400).json({
+        success: false,
+        message: '指定的商品不存在'
+      });
+    }
+
+    // 檢查同一商品下是否已有相同名稱的規格
+    const existing = await Database.get(
+      'SELECT id FROM flavors WHERE product_id = ? AND name = ?',
+      [product_id, name]
+    );
+
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        message: '該商品已存在相同名稱的規格'
+      });
+    }
+
+    // 處理價格和圖片
+    const flavorPrice = price && price > 0 ? parseFloat(price) : null;
+    let imagePath = null;
+
+    // 處理圖片：優先使用上傳的文件，其次使用URL
+    if (req.file) {
+      // 生成新的文件名
+      const fileExtension = req.file.originalname.split('.').pop();
+      const newFileName = `flavor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
+      const newPath = `uploads/flavors/${newFileName}`;
+      
+      // 移動文件到正確位置
+      await fs.rename(req.file.path, newPath);
+      imagePath = newPath;
+    } else if (imageUrl && imageUrl.trim()) {
+      imagePath = imageUrl.trim();
+    }
+
+    // 檢查是否支持image字段
+    const hasImageField = await checkFlavorImageColumn();
+    
+    let insertQuery, insertParams;
+    if (hasImageField) {
+      insertQuery = `
+        INSERT INTO flavors (name, product_id, category_id, stock, sort_order, price, image, is_active, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 1, datetime('now'))
+      `;
+      insertParams = [
+        name,
+        product_id,
+        category_id || 1,
+        parseInt(stock) || 0,
+        parseInt(sort_order) || 0,
+        flavorPrice,
+        imagePath
+      ];
+    } else {
+      insertQuery = `
+        INSERT INTO flavors (name, product_id, category_id, stock, sort_order, price, is_active, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, 1, datetime('now'))
+      `;
+      insertParams = [
+        name,
+        product_id,
+        category_id || 1,
+        parseInt(stock) || 0,
+        parseInt(sort_order) || 0,
+        flavorPrice
+      ];
+    }
+
+    const result = await Database.run(insertQuery, insertParams);
+
+    console.log('✅ 帶圖片規格創建成功:', result.lastID);
+
+    // 返回創建的規格信息
+    let selectQuery;
+    if (hasImageField) {
+      selectQuery = `
+        SELECT f.*, fc.name as category_name, p.price as product_base_price,
+               CASE WHEN f.price IS NOT NULL THEN f.price ELSE p.price END as final_price
+        FROM flavors f
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        LEFT JOIN products p ON f.product_id = p.id
+        WHERE f.id = ?
+      `;
+    } else {
+      selectQuery = `
+        SELECT f.*, fc.name as category_name, p.price as product_base_price,
+               CASE WHEN f.price IS NOT NULL THEN f.price ELSE p.price END as final_price
+        FROM flavors f
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        LEFT JOIN products p ON f.product_id = p.id
+        WHERE f.id = ?
+      `;
+    }
+
+    const newFlavor = await Database.get(selectQuery, [result.lastID]);
+
+    res.json({
+      success: true,
+      message: '規格創建成功',
+      data: newFlavor
+    });
+
+  } catch (error) {
+    console.error('創建帶圖片規格錯誤:', error);
+    
+    // 清理上傳的文件
+    if (req.file) {
+      try {
+        await fs.unlink(req.file.path);
+      } catch (cleanupError) {
+        console.error('清理文件失敗:', cleanupError);
+      }
+    }
+
+    res.status(500).json({
+      success: false,
+      message: '創建規格失敗: ' + error.message
+    });
+  }
+});
+
 // 更新規格（管理員）
 router.put('/admin/:id', authenticateAdmin, async (req, res) => {
   try {
@@ -632,6 +822,182 @@ router.put('/admin/:id', authenticateAdmin, async (req, res) => {
 
   } catch (error) {
     console.error('更新規格錯誤:', error);
+    res.status(500).json({
+      success: false,
+      message: '更新規格失敗: ' + error.message
+    });
+  }
+});
+
+// 更新帶圖片的規格（管理員）
+router.put('/admin/:id/with-image', authenticateAdmin, flavorImageUpload.single('image'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, category_id, stock, sort_order, is_active, price, imageUrl } = req.body;
+
+    console.log('📝 更新帶圖片規格請求:', { id, name, category_id, stock, sort_order, is_active, price, imageUrl, hasFile: !!req.file });
+
+    // 檢查規格是否存在
+    const hasImageField = await checkFlavorImageColumn();
+    let selectQuery = hasImageField 
+      ? 'SELECT * FROM flavors WHERE id = ?'
+      : 'SELECT id, name, product_id, category_id, stock, sort_order, is_active, created_at, price FROM flavors WHERE id = ?';
+    
+    const flavor = await Database.get(selectQuery, [id]);
+    if (!flavor) {
+      return res.status(404).json({
+        success: false,
+        message: '規格不存在'
+      });
+    }
+
+    // 如果要更新名稱，檢查同一商品下是否已有相同名稱的其他規格
+    if (name && name !== flavor.name) {
+      const existing = await Database.get(
+        'SELECT id FROM flavors WHERE product_id = ? AND name = ? AND id != ?',
+        [flavor.product_id, name, id]
+      );
+
+      if (existing) {
+        return res.status(400).json({
+          success: false,
+          message: '該商品已存在相同名稱的規格'
+        });
+      }
+    }
+
+    // 處理價格和圖片
+    const flavorPrice = price && price > 0 ? parseFloat(price) : null;
+    let imagePath = flavor.image || null; // 保持原有圖片
+
+    // 處理新圖片：優先使用上傳的文件，其次使用URL
+    if (req.file) {
+      // 刪除舊圖片文件（如果存在且是本地文件）
+      if (flavor.image && flavor.image.startsWith('uploads/')) {
+        try {
+          await fs.unlink(flavor.image);
+        } catch (error) {
+          console.warn('刪除舊圖片失敗:', error);
+        }
+      }
+
+      // 生成新的文件名
+      const fileExtension = req.file.originalname.split('.').pop();
+      const newFileName = `flavor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
+      const newPath = `uploads/flavors/${newFileName}`;
+      
+      // 移動文件到正確位置
+      await fs.rename(req.file.path, newPath);
+      imagePath = newPath;
+    } else if (imageUrl !== undefined) {
+      // 如果提供了imageUrl（包括空字符串），則更新
+      if (imageUrl && imageUrl.trim()) {
+        imagePath = imageUrl.trim();
+      } else {
+        // 清空圖片
+        if (flavor.image && flavor.image.startsWith('uploads/')) {
+          try {
+            await fs.unlink(flavor.image);
+          } catch (error) {
+            console.warn('刪除圖片失敗:', error);
+          }
+        }
+        imagePath = null;
+      }
+    }
+
+    // 更新規格
+    let updateQuery, updateParams;
+    if (hasImageField) {
+      updateQuery = `
+        UPDATE flavors 
+        SET name = COALESCE(?, name),
+            category_id = COALESCE(?, category_id),
+            stock = COALESCE(?, stock),
+            sort_order = COALESCE(?, sort_order),
+            is_active = COALESCE(?, is_active),
+            price = ?,
+            image = ?
+        WHERE id = ?
+      `;
+      updateParams = [
+        name,
+        category_id,
+        stock !== undefined ? parseInt(stock) : undefined,
+        sort_order !== undefined ? parseInt(sort_order) : undefined,
+        is_active !== undefined ? (is_active ? 1 : 0) : undefined,
+        flavorPrice,
+        imagePath,
+        id
+      ];
+    } else {
+      updateQuery = `
+        UPDATE flavors 
+        SET name = COALESCE(?, name),
+            category_id = COALESCE(?, category_id),
+            stock = COALESCE(?, stock),
+            sort_order = COALESCE(?, sort_order),
+            is_active = COALESCE(?, is_active),
+            price = ?
+        WHERE id = ?
+      `;
+      updateParams = [
+        name,
+        category_id,
+        stock !== undefined ? parseInt(stock) : undefined,
+        sort_order !== undefined ? parseInt(sort_order) : undefined,
+        is_active !== undefined ? (is_active ? 1 : 0) : undefined,
+        flavorPrice,
+        id
+      ];
+    }
+
+    await Database.run(updateQuery, updateParams);
+
+    console.log('✅ 帶圖片規格更新成功:', id);
+
+    // 返回更新後的規格信息
+    let resultQuery;
+    if (hasImageField) {
+      resultQuery = `
+        SELECT f.*, fc.name as category_name, p.price as product_base_price,
+               CASE WHEN f.price IS NOT NULL THEN f.price ELSE p.price END as final_price
+        FROM flavors f
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        LEFT JOIN products p ON f.product_id = p.id
+        WHERE f.id = ?
+      `;
+    } else {
+      resultQuery = `
+        SELECT f.*, fc.name as category_name, p.price as product_base_price,
+               CASE WHEN f.price IS NOT NULL THEN f.price ELSE p.price END as final_price
+        FROM flavors f
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        LEFT JOIN products p ON f.product_id = p.id
+        WHERE f.id = ?
+      `;
+    }
+
+    const updatedFlavor = await Database.get(resultQuery, [id]);
+
+    res.json({
+      success: true,
+      message: '規格更新成功',
+      data: updatedFlavor
+    });
+
+  } catch (error) {
+    console.error('更新帶圖片規格錯誤:', error);
+    
+    // 清理上傳的文件
+    if (req.file) {
+      try {
+        await fs.unlink(req.file.path);
+      } catch (cleanupError) {
+        console.error('清理文件失敗:', cleanupError);
+      }
+    }
+
     res.status(500).json({
       success: false,
       message: '更新規格失敗: ' + error.message

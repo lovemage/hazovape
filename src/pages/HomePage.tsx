@@ -87,12 +87,12 @@ export const HomePage: React.FC = () => {
         });
         setProducts(activeProducts.slice(0, 6)); // 首頁最多顯示6個商品
         
-        // 隨機選擇 4 個產品作為精選產品
+        // 隨機選擇 6 個產品作為精選產品
         const shuffled = [...activeProducts].sort(() => 0.5 - Math.random());
-        setFeaturedProducts(shuffled.slice(0, 4));
+        setFeaturedProducts(shuffled.slice(0, 6));
         
         console.log('🏠 首頁商品載入成功，共', activeProducts.length, '個啟用商品');
-        console.log('🎲 隨機精選產品:', shuffled.slice(0, 4).map(p => p.name));
+        console.log('🎲 隨機精選產品:', shuffled.slice(0, 6).map(p => p.name));
         console.log('📋 啟用的商品:', activeProducts.map(p => ({ name: p.name, is_active: p.is_active })));
       }
     } catch (error) {
@@ -458,7 +458,7 @@ export const HomePage: React.FC = () => {
 
       {/* 主要內容 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* 精選商品跑馬燈 */}
+        {/* 精選商品 */}
         <div id="products" className="mb-12">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">精選商品</h2>
@@ -471,28 +471,14 @@ export const HomePage: React.FC = () => {
               <span className="ml-3 text-gray-600">載入商品中...</span>
             </div>
           ) : featuredProducts.length > 0 ? (
-            <div className="relative overflow-hidden">
-              <style>
-                {`
-                  @keyframes marquee {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                  }
-                  .marquee-container {
-                    animation: marquee 30s linear infinite;
-                  }
-                  .marquee-container:hover {
-                    animation-play-state: paused;
-                  }
-                `}
-              </style>
-              <div className="marquee-container flex space-x-6">
-                {/* 第一組產品 */}
+            <div className="overflow-hidden">
+              {/* 桌面端網格佈局 */}
+              <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {featuredProducts.map((product) => (
                   <div
-                    key={`first-${product.id}`}
+                    key={product.id}
                     onClick={() => handleProductClick(product)}
-                    className="flex-none w-80 bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer"
+                    className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer"
                   >
                     <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
                       <img
@@ -517,36 +503,51 @@ export const HomePage: React.FC = () => {
                     </div>
                   </div>
                 ))}
-                {/* 第二組產品 (複製用於無縫循環) */}
-                {featuredProducts.map((product) => (
-                  <div
-                    key={`second-${product.id}`}
-                    onClick={() => handleProductClick(product)}
-                    className="flex-none w-80 bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer"
-                  >
-                    <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
-                      <img
-                        src={getProductImageUrl(product)}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
-                        }}
-                      />
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-1">{product.name}</h3>
-                      <p className="text-gray-600 mb-4 text-sm line-clamp-2">
-                        優質商品，值得您的選擇
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-2xl font-bold text-vintage-green">{formatPrice(product)}</span>
-                        <span className="text-sm text-vintage-brown">點擊選購</span>
+              </div>
+
+              {/* 移動端橫向滑動 */}
+              <div className="md:hidden">
+                <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4 px-1" style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none'
+                }}>
+                  {featuredProducts.map((product) => (
+                    <div
+                      key={product.id}
+                      onClick={() => handleProductClick(product)}
+                      className="flex-none w-72 bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer snap-start"
+                    >
+                      <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
+                        <img
+                          src={getProductImageUrl(product)}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
+                          }}
+                        />
+                      </div>
+                      <div className="p-6">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-1">{product.name}</h3>
+                        <p className="text-gray-600 mb-4 text-sm line-clamp-2">
+                          優質商品，值得您的選擇
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-2xl font-bold text-vintage-green">{formatPrice(product)}</span>
+                          <span className="text-sm text-vintage-brown">點擊選購</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <style>
+                  {`
+                    .scrollbar-hide::-webkit-scrollbar {
+                      display: none;
+                    }
+                  `}
+                </style>
               </div>
             </div>
           ) : (

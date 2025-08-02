@@ -19,6 +19,7 @@ export const FlavorsPage: React.FC = () => {
   const [flavorQuantities, setFlavorQuantities] = useState<Record<number, number>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFlavorForImage, setSelectedFlavorForImage] = useState<Flavor | null>(null);
 
   // 從 location.state 獲取傳遞的產品數據
   useEffect(() => {
@@ -56,6 +57,25 @@ export const FlavorsPage: React.FC = () => {
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
   };
 
+  // 獲取當前顯示的圖片（規格圖片優先，沒有則使用產品圖片）
+  const getCurrentDisplayImage = (): string => {
+    // 如果有選中的規格且該規格有圖片，則使用規格圖片
+    if (selectedFlavorForImage?.image) {
+      const flavorImage = (selectedFlavorForImage.image as string);
+      console.log('🖼️ 使用規格圖片:', selectedFlavorForImage.name, flavorImage);
+      if (flavorImage.startsWith('http')) {
+        return flavorImage;
+      } else {
+        return getImageUrl(flavorImage);
+      }
+    }
+    
+    // 否則使用產品主圖片
+    const productImage = selectedProduct ? getProductImage(selectedProduct) : '';
+    console.log('🖼️ 使用產品主圖片');
+    return productImage;
+  };
+
   useEffect(() => {
     if (selectedProduct) {
       console.log('🔄 開始載入規格，產品:', selectedProduct.name);
@@ -87,18 +107,31 @@ export const FlavorsPage: React.FC = () => {
   };
 
   const handleFlavorQuantityChange = (flavorId: number, delta: number) => {
+    const flavor = flavors.find(f => f.id === flavorId);
+    
     setFlavorQuantities(prev => {
       const currentQuantity = prev[flavorId] || 0;
       const newQuantity = currentQuantity + delta;
 
       if (newQuantity <= 0) {
         const { [flavorId]: removed, ...rest } = prev;
+        
+        // 如果移除的是當前選中的規格圖片，則清空選中狀態
+        if (selectedFlavorForImage?.id === flavorId) {
+          setSelectedFlavorForImage(null);
+        }
+        
         return rest;
       }
 
       // 檢查規格庫存
-      const flavor = flavors.find(f => f.id === flavorId);
       if (flavor && newQuantity <= flavor.stock) {
+        // 當選擇規格時，如果該規格有圖片，則設為當前圖片顯示的規格
+        if (flavor.image && (!selectedFlavorForImage || selectedFlavorForImage.id !== flavorId)) {
+          console.log('🖼️ 切換到規格圖片:', flavor.name, flavor.image);
+          setSelectedFlavorForImage(flavor);
+        }
+        
         return {
           ...prev,
           [flavorId]: newQuantity
@@ -327,12 +360,12 @@ export const FlavorsPage: React.FC = () => {
           <div className="hidden md:flex items-center gap-6">
             <div className="w-40 h-40 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
               <img
-                src={getProductImage(selectedProduct)}
-                alt={selectedProduct.name}
+                src={getCurrentDisplayImage()}
+                alt={selectedFlavorForImage ? `${selectedProduct.name} - ${selectedFlavorForImage.name}` : selectedProduct.name}
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
+                  target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ci8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
                 }}
               />
             </div>
@@ -356,8 +389,8 @@ export const FlavorsPage: React.FC = () => {
             <div className="w-full">
               <div className="w-full h-64 bg-gray-200 rounded-xl overflow-hidden shadow-sm">
                 <img
-                  src={getProductImage(selectedProduct)}
-                  alt={selectedProduct.name}
+                  src={getCurrentDisplayImage()}
+                  alt={selectedFlavorForImage ? `${selectedProduct.name} - ${selectedFlavorForImage.name}` : selectedProduct.name}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
@@ -408,18 +441,58 @@ export const FlavorsPage: React.FC = () => {
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <h4 className="text-base font-medium text-gray-900">
-                            {flavor.name}
-                          </h4>
-                          <p className="text-sm text-gray-500">
-                            庫存: {flavor.stock} 件
-                          </p>
-                          {quantity > 0 && (
-                            <p className="text-sm text-blue-600 mt-1">
-                              已選擇 {quantity} 件
-                            </p>
+                        <div className="flex items-center gap-3 flex-1">
+                          {/* 規格小圖 */}
+                          {flavor.image && (
+                            <div 
+                              className={`w-12 h-12 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer transition-all duration-200 ${
+                                selectedFlavorForImage?.id === flavor.id
+                                  ? 'ring-2 ring-blue-500 ring-offset-1'
+                                  : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-1'
+                              }`}
+                              onClick={() => setSelectedFlavorForImage(flavor)}
+                              title="點擊查看大圖"
+                            >
+                              <img
+                                src={flavor.image.startsWith('http') ? flavor.image : getImageUrl(flavor.image)}
+                                alt={`${flavor.name} 圖片`}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                }}
+                              />
+                            </div>
                           )}
+                          
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-base font-medium text-gray-900">
+                                {flavor.name}
+                              </h4>
+                              {flavor.image && (
+                                <span 
+                                  className={`text-xs px-2 py-1 rounded-full cursor-pointer transition-colors ${
+                                    selectedFlavorForImage?.id === flavor.id
+                                      ? 'bg-blue-100 text-blue-700'
+                                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                  }`}
+                                  onClick={() => setSelectedFlavorForImage(flavor)}
+                                  title="點擊查看大圖"
+                                >
+                                  圖片
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-500">
+                              庫存: {flavor.stock} 件
+                            </p>
+                            {quantity > 0 && (
+                              <p className="text-sm text-blue-600 mt-1">
+                                已選擇 {quantity} 件
+                              </p>
+                            )}
+                          </div>
                         </div>
 
                         <div className="flex items-center gap-3">

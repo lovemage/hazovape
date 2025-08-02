@@ -44,6 +44,7 @@ export interface Flavor {
   is_active: boolean;
   created_at: string;
   price?: number | null; // 規格獨立價格，null時使用產品基礎價格
+  image?: string | null; // 規格圖片路徑
   category_name?: string;
   product_name?: string;
   product_base_price?: number; // 產品基礎價格
