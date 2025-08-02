@@ -563,6 +563,13 @@ router.get('/admin/all', authenticateAdmin, async (req, res) => {
 
     const flavors = await Database.all(query);
 
+    // 調試：檢查返回的數據中是否包含image字段
+    if (flavors.length > 0) {
+      const sampleFlavor = flavors[0];
+      console.log('📋 規格列表範例數據字段:', Object.keys(sampleFlavor));
+      console.log('📷 範例規格的image值:', sampleFlavor.image);
+    }
+
     res.json({
       success: true,
       data: flavors
@@ -699,13 +706,28 @@ router.post('/admin/with-image', authenticateAdmin, flavorImageUpload.single('im
 
     // 處理圖片：優先使用上傳的文件，其次使用URL
     if (req.file) {
+      // 確保目錄存在
+      const flavorDir = 'uploads/flavors';
+      try {
+        await fs.mkdir(flavorDir, { recursive: true });
+      } catch (dirError) {
+        console.log('目錄已存在或創建成功:', flavorDir);
+      }
+
       // 生成新的文件名
       const fileExtension = req.file.originalname.split('.').pop();
       const newFileName = `flavor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
       const newPath = `uploads/flavors/${newFileName}`;
       
+      console.log('📁 創建規格文件上傳詳情:', {
+        原始文件: req.file.originalname,
+        臨時路徑: req.file.path,
+        目標路徑: newPath
+      });
+
       // 移動文件到正確位置
       await fs.rename(req.file.path, newPath);
+      console.log('✅ 創建規格文件移動成功到:', newPath);
       imagePath = newPath;
     } else if (imageUrl && imageUrl.trim()) {
       imagePath = imageUrl.trim();
@@ -747,6 +769,7 @@ router.post('/admin/with-image', authenticateAdmin, flavorImageUpload.single('im
     const result = await Database.run(insertQuery, insertParams);
 
     console.log('✅ 帶圖片規格創建成功:', result.lastID);
+    console.log('📁 創建的圖片路徑:', imagePath);
 
     // 返回創建的規格信息
     let selectQuery;
@@ -931,13 +954,28 @@ router.put('/admin/:id/with-image', authenticateAdmin, flavorImageUpload.single(
         }
       }
 
+      // 確保目錄存在
+      const flavorDir = 'uploads/flavors';
+      try {
+        await fs.mkdir(flavorDir, { recursive: true });
+      } catch (dirError) {
+        console.log('目錄已存在或創建成功:', flavorDir);
+      }
+
       // 生成新的文件名
       const fileExtension = req.file.originalname.split('.').pop();
       const newFileName = `flavor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
       const newPath = `uploads/flavors/${newFileName}`;
       
+      console.log('📁 文件上傳詳情:', {
+        原始文件: req.file.originalname,
+        臨時路徑: req.file.path,
+        目標路徑: newPath
+      });
+
       // 移動文件到正確位置
       await fs.rename(req.file.path, newPath);
+      console.log('✅ 文件移動成功到:', newPath);
       imagePath = newPath;
     } else if (imageUrl !== undefined) {
       // 如果提供了imageUrl（包括空字符串），則更新
@@ -1005,6 +1043,7 @@ router.put('/admin/:id/with-image', authenticateAdmin, flavorImageUpload.single(
     await Database.run(updateQuery, updateParams);
 
     console.log('✅ 帶圖片規格更新成功:', id);
+    console.log('📁 更新的圖片路徑:', imagePath);
 
     // 返回更新後的規格信息
     let resultQuery;
