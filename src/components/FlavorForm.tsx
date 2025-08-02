@@ -234,7 +234,8 @@ export const FlavorForm: React.FC<FlavorFormProps> = ({
       // 處理圖片
       if (imageFile) {
         formDataObj.append('image', imageFile);
-      } else if (imageUrl.trim() && imageUrl !== existingImage) {
+      } else if (imageUrl.trim() !== existingImage) {
+        // 如果imageUrl不等於existingImage（包括空字符串），都要發送到後端
         formDataObj.append('imageUrl', imageUrl.trim());
       }
 

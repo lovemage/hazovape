@@ -1003,9 +1003,14 @@ router.put('/admin/:id/with-image', authenticateAdmin, flavorImageUpload.single(
         if (flavor.image && flavor.image.startsWith('uploads/')) {
           try {
             const oldFullPath = path.join(getUploadsPath(), flavor.image.replace('uploads/', ''));
+            console.log('🗑️ 刪除規格圖片:', {
+              原始路徑: flavor.image,
+              完整路徑: oldFullPath
+            });
             await fs.unlink(oldFullPath);
+            console.log('✅ 規格圖片刪除成功');
           } catch (error) {
-            console.warn('刪除圖片失敗:', error);
+            console.warn('❌ 刪除圖片失敗:', error);
           }
         }
         imagePath = null;
@@ -1198,6 +1203,23 @@ router.delete('/admin/:id/permanent', authenticateAdmin, async (req, res) => {
     }
 
     console.log('✅ 找到規格:', flavor.name);
+
+    // 刪除關聯的圖片文件（如果存在）
+    if (flavor.image && flavor.image.startsWith('uploads/')) {
+      try {
+        const oldFullPath = path.join(getUploadsPath(), flavor.image.replace('uploads/', ''));
+        console.log('🗑️ 刪除規格關聯圖片:', {
+          規格ID: id,
+          規格名稱: flavor.name,
+          原始路徑: flavor.image,
+          完整路徑: oldFullPath
+        });
+        await fs.unlink(oldFullPath);
+        console.log('✅ 規格關聯圖片刪除成功');
+      } catch (error) {
+        console.warn('❌ 刪除規格關聯圖片失敗:', error);
+      }
+    }
 
     // 永久刪除（從數據庫中移除）
     const result = await Database.run(
