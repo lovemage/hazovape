@@ -430,11 +430,34 @@ router.get('/product/:productId', async (req, res) => {
   try {
     const { productId } = req.params;
     const hasPriceField = await checkFlavorPriceColumn();
+    const hasImageField = await checkFlavorImageColumn();
 
     let query;
-    if (hasPriceField) {
+    if (hasPriceField && hasImageField) {
+      query = `
+        SELECT f.id, f.name, f.sort_order, f.stock, f.category_id, f.price, f.image,
+               fc.name as category_name,
+               p.price as product_base_price
+        FROM flavors f
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        LEFT JOIN products p ON f.product_id = p.id
+        WHERE f.product_id = ? AND f.is_active = 1
+        ORDER BY fc.sort_order, f.sort_order, f.id
+      `;
+    } else if (hasPriceField) {
       query = `
         SELECT f.id, f.name, f.sort_order, f.stock, f.category_id, f.price,
+               fc.name as category_name,
+               p.price as product_base_price
+        FROM flavors f
+        LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+        LEFT JOIN products p ON f.product_id = p.id
+        WHERE f.product_id = ? AND f.is_active = 1
+        ORDER BY fc.sort_order, f.sort_order, f.id
+      `;
+    } else if (hasImageField) {
+      query = `
+        SELECT f.id, f.name, f.sort_order, f.stock, f.category_id, f.image,
                fc.name as category_name,
                p.price as product_base_price
         FROM flavors f
