@@ -1,60 +1,61 @@
-// 測試API響應，檢查是否包含image字段
+// 測試調試API，檢查規格圖片問題
 const https = require('https');
 
-function testAPI() {
-  const options = {
-    hostname: 'vjvape-production.up.railway.app',
-    port: 443,
-    path: '/api/flavors/admin/all',
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  };
-
-  const req = https.request(options, (res) => {
-    let data = '';
-
-    res.on('data', (chunk) => {
-      data += chunk;
-    });
-
-    res.on('end', () => {
-      try {
-        const response = JSON.parse(data);
-        console.log('🔍 API 響應狀態:', response.success);
-        
-        if (response.success && response.data && response.data.length > 0) {
-          const firstFlavor = response.data[0];
-          console.log('📋 第一個規格的所有字段:', Object.keys(firstFlavor));
-          console.log('📷 是否包含image字段:', firstFlavor.hasOwnProperty('image'));
-          console.log('🔍 image字段值:', firstFlavor.image);
-          
-          // 找ID=16的規格
-          const flavor16 = response.data.find(f => f.id == 16);
-          if (flavor16) {
-            console.log('🎯 ID=16規格的image:', flavor16.image);
-            console.log('🎯 ID=16規格的所有字段:', Object.keys(flavor16));
-          } else {
-            console.log('❌ 找不到ID=16的規格');
-          }
-        } else {
-          console.log('❌ API響應沒有數據或失敗');
-          console.log('📄 完整響應:', data);
-        }
-      } catch (error) {
-        console.error('❌ 解析JSON失敗:', error);
-        console.log('📄 原始響應:', data);
+function testDebugAPI(path, description) {
+  return new Promise((resolve, reject) => {
+    console.log(`\n🚀 測試 ${description}...`);
+    
+    const options = {
+      hostname: 'vjvape-production.up.railway.app',
+      port: 443,
+      path: path,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
       }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      res.on('end', () => {
+        try {
+          const response = JSON.parse(data);
+          console.log(`✅ ${description} 響應:`, JSON.stringify(response, null, 2));
+          resolve(response);
+        } catch (error) {
+          console.error(`❌ ${description} 解析JSON失敗:`, error);
+          console.log('📄 原始響應:', data);
+          reject(error);
+        }
+      });
     });
-  });
 
-  req.on('error', (error) => {
-    console.error('❌ 請求失敗:', error);
-  });
+    req.on('error', (error) => {
+      console.error(`❌ ${description} 請求失敗:`, error);
+      reject(error);
+    });
 
-  req.end();
+    req.end();
+  });
 }
 
-console.log('🚀 開始測試API...');
-testAPI();
+async function runTests() {
+  try {
+    // 測試規格16的詳細信息
+    await testDebugAPI('/api/debug/flavors/16', '規格16詳細信息');
+    
+    // 測試規格列表查詢
+    await testDebugAPI('/api/debug/flavors-list', '規格列表查詢');
+    
+    console.log('\n🎉 所有測試完成！');
+  } catch (error) {
+    console.error('\n❌ 測試過程中出現錯誤:', error);
+  }
+}
+
+runTests();

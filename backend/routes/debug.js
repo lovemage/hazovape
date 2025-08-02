@@ -196,4 +196,65 @@ router.get('/flavors-list', async (req, res) => {
   }
 });
 
+// 生產環境數據庫遷移 - 添加image字段
+router.post('/migrate-add-image-field', async (req, res) => {
+  try {
+    console.log('🔄 開始為生產環境添加image字段...');
+    
+    // 檢查image字段是否已存在
+    const tableInfo = await Database.all("PRAGMA table_info(flavors)");
+    const hasImageField = tableInfo.some(col => col.name === 'image');
+    
+    if (hasImageField) {
+      console.log('✅ image字段已存在，無需遷移');
+      return res.json({
+        success: true,
+        message: 'image字段已存在，無需遷移',
+        hasImageField: true
+      });
+    }
+    
+    console.log('📋 當前表結構:', tableInfo.map(col => col.name));
+    
+    // 添加image字段
+    await Database.run(`
+      ALTER TABLE flavors
+      ADD COLUMN image TEXT NULL
+    `);
+    
+    console.log('✅ 成功添加image字段');
+    
+    // 驗證字段已添加
+    const updatedTableInfo = await Database.all("PRAGMA table_info(flavors)");
+    const newHasImageField = updatedTableInfo.some(col => col.name === 'image');
+    
+    // 檢查現有規格數量
+    const flavorCount = await Database.get('SELECT COUNT(*) as count FROM flavors');
+    
+    console.log('📊 遷移完成統計:', {
+      新字段已添加: newHasImageField,
+      現有規格數量: flavorCount.count,
+      新表結構: updatedTableInfo.map(col => col.name)
+    });
+    
+    res.json({
+      success: true,
+      message: '成功為生產環境添加image字段',
+      migration: {
+        hasImageFieldBefore: false,
+        hasImageFieldAfter: newHasImageField,
+        existingFlavorsCount: flavorCount.count,
+        newTableColumns: updatedTableInfo.map(col => col.name)
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ 添加image字段失敗:', error);
+    res.status(500).json({
+      success: false,
+      message: '數據庫遷移失敗: ' + error.message
+    });
+  }
+});
+
 module.exports = router;
