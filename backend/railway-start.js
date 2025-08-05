@@ -70,7 +70,16 @@ if (!fs.existsSync(dbDir)) {
 
 // 設置環境變量
 process.env.DATABASE_PATH = dbPath;
-process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+
+// 檢測是否為本地開發環境
+const isLocalDevelopment = !process.env.RAILWAY_ENVIRONMENT && !process.env.PORT && process.platform !== 'linux';
+
+// 只在非本地環境設置為 production
+if (!isLocalDevelopment) {
+  process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+} else {
+  process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+}
 
 console.log('🌍 環境:', process.env.NODE_ENV);
 console.log('📄 數據庫文件存在:', fs.existsSync(dbPath));

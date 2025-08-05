@@ -287,7 +287,7 @@ export const CheckoutPage: React.FC = () => {
       productName: item.productName,
       product_price: item.productPrice,
       quantity: item.quantity,
-      flavors: item.variants || [],
+      flavors: item.variants ? item.variants.map(variant => variant.name) : [],
       subtotal: item.subtotal,
       is_upsell: item.productName.startsWith('[加購]')
     });
