@@ -344,11 +344,11 @@ export const CheckoutPage: React.FC = () => {
         // 清空購物車
         clearCart();
         
-        // 跳轉到訂單確認頁面
-        navigate('/order-confirmation', {
+        // 跳轉到訂單確認頁面，並在 URL 中包含訂單號
+        navigate(`/order-confirmation?orderNumber=${result.data.order_number}`, {
           state: {
-            orderNumber: result.data.order_number,
-            orderData
+            order: result.data,
+            customerInfo: customerInfo
           }
         });
       } else {

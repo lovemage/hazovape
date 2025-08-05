@@ -13,6 +13,10 @@ export const OrderConfirmationPage: React.FC = () => {
   const order = location.state?.order as Order;
   const customerInfo = location.state?.customerInfo as CustomerInfo;
   
+  // 從 URL 參數中獲取訂單號
+  const urlParams = new URLSearchParams(location.search);
+  const orderNumberFromUrl = urlParams.get('orderNumber');
+  
   const [showAdPopup, setShowAdPopup] = useState(false);
   const [popupImage, setPopupImage] = useState<string>('/uploads/static/unlock-popup.png');
   const [popupEnabled, setPopupEnabled] = useState<boolean>(true);
@@ -57,11 +61,37 @@ export const OrderConfirmationPage: React.FC = () => {
   };
 
   if (!order) {
+    // 如果有 URL 中的訂單號，自動跳轉到查詢頁面並預填訂單號
+    if (orderNumberFromUrl) {
+      navigate('/order-query', {
+        state: {
+          prefilledOrderNumber: orderNumberFromUrl
+        }
+      });
+      return null;
+    }
+    
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">訂單信息不存在</p>
-          <Button onClick={() => navigate('/')}>返回首頁</Button>
+          <p className="text-gray-600 mb-6">
+            如果您剛完成下單，請使用訂單查詢功能查看您的訂單詳情
+          </p>
+          <div className="space-y-3">
+            <Button 
+              onClick={() => navigate('/order-query')}
+              className="bg-blue-600 hover:bg-blue-700 text-white mr-3"
+            >
+              查詢訂單
+            </Button>
+            <Button 
+              onClick={() => navigate('/')}
+              variant="outline"
+            >
+              返回首頁
+            </Button>
+          </div>
         </div>
       </div>
     );

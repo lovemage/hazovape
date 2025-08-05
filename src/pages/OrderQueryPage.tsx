@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, Package, Clock, CheckCircle, XCircle, Truck, MapPin, MessageCircle, AlertTriangle, ShoppingBag, Settings, Copy, ExternalLink } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -36,9 +36,14 @@ interface OrderData {
 
 const OrderQueryPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { state } = useCart();
   const items = state.items;
-  const [orderNumber, setOrderNumber] = useState('');
+  
+  // 檢查是否有預填的訂單號
+  const prefilledOrderNumber = location.state?.prefilledOrderNumber;
+  
+  const [orderNumber, setOrderNumber] = useState(prefilledOrderNumber || '');
   const [verificationCode, setVerificationCode] = useState('');
   const [orderData, setOrderData] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(false);
