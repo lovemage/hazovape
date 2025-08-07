@@ -55,6 +55,15 @@ if (process.env.NODE_ENV === 'production') {
 
 app.use(cors(corsOptions));
 
+// 簡單的健康檢查路由 (在所有其他中間件之前)
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime() 
+  });
+});
+
 // 限制請求頻率（Railway 環境配置）
 const limiterConfig = {
   windowMs: 15 * 60 * 1000, // 15 分鐘

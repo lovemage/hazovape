@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:backend": "cd backend && npm install --production",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "pnpm build && node backend/railway-start.js"
+    "start": "node backend/railway-start.js"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",

@@ -1,12 +1,12 @@
 [build]
 builder = "nixpacks"
-buildCommand = "pnpm install && pnpm build"
+buildCommand = "pnpm install && pnpm build && cd backend && npm install --production"
 
 [deploy]
 startCommand = "node backend/railway-start.js"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 300
-restartPolicyType = "on_failure"
+restartPolicyType = "never"
 
 # Volume 配置說明
 # 需要在 Railway Dashboard 中手動創建 Volume：

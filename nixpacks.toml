@@ -1,0 +1,19 @@
+[phases.setup]
+nixPkgs = ['nodejs_18', 'pnpm-9_x']
+
+[phases.install]
+cmds = [
+  'pnpm install --frozen-lockfile',
+  'cd backend && npm install --production'
+]
+
+[phases.build]
+cmds = [
+  'pnpm build'
+]
+
+[start]
+cmd = 'node backend/railway-start.js'
+
+[variables]
+NODE_ENV = 'production'
