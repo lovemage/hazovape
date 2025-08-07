@@ -53,6 +53,7 @@ export const AdminFlavors: React.FC = () => {
   const [batchStockValue, setBatchStockValue] = useState('');
   const [stockUpdateMode, setStockUpdateMode] = useState<'set' | 'add' | 'subtract'>('set');
   const [updatingStock, setUpdatingStock] = useState(false);
+  const [flavorSearchTerm, setFlavorSearchTerm] = useState('');
 
   useEffect(() => {
     loadProductsWithFlavors();
@@ -82,13 +83,8 @@ export const AdminFlavors: React.FC = () => {
 
         setProducts(productsWithFlavors);
 
-        // 默認展開有規格的商品
-        const hasFlavorProducts = new Set(
-          productsWithFlavors
-            .filter(p => p.flavors.length > 0)
-            .map(p => p.id)
-        );
-        setExpandedProducts(hasFlavorProducts);
+        // 預設所有商品都收合
+        setExpandedProducts(new Set());
 
         console.log('✅ 載入完成，共', productsWithFlavors.length, '個商品');
       } else {
@@ -282,6 +278,7 @@ export const AdminFlavors: React.FC = () => {
     setSelectedFlavors(new Set());
     setBatchStockValue('');
     setStockUpdateMode('set');
+    setFlavorSearchTerm('');
     setShowBatchStock(false);
   };
 
@@ -488,20 +485,6 @@ export const AdminFlavors: React.FC = () => {
                           className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
                         >
                           <div className="flex items-center space-x-3">
-                            {showBatchStock && (
-                              <Checkbox
-                                checked={selectedFlavors.has(flavor.id)}
-                                onCheckedChange={(checked) => {
-                                  const newSelected = new Set(selectedFlavors);
-                                  if (checked) {
-                                    newSelected.add(flavor.id);
-                                  } else {
-                                    newSelected.delete(flavor.id);
-                                  }
-                                  setSelectedFlavors(newSelected);
-                                }}
-                              />
-                            )}
                             <Coffee className="w-5 h-5 text-gray-600" />
                             <div>
                               <div className="flex items-center space-x-2">
@@ -771,20 +754,183 @@ export const AdminFlavors: React.FC = () => {
           </DialogHeader>
 
           <div className="space-y-6">
-            {/* 選擇統計 */}
+            {/* 選擇統計和操作 */}
             <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-3">
                 <span className="text-sm text-blue-700">
                   已選擇 {selectedFlavors.size} 個規格
                 </span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={toggleSelectAllFlavors}
-                  className="text-xs"
-                >
-                  {selectedFlavors.size === products.flatMap(p => p.flavors).length ? '取消全選' : '全選'}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedFlavors(new Set())}
+                    className="text-xs"
+                    disabled={selectedFlavors.size === 0}
+                  >
+                    清除選擇
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      // 只選擇啟用的規格
+                      const activeFlavors = products.flatMap(p => p.flavors.filter(f => f.is_active).map(f => f.id));
+                      setSelectedFlavors(new Set(activeFlavors));
+                    }}
+                    className="text-xs"
+                  >
+                    選擇啟用規格
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={toggleSelectAllFlavors}
+                    className="text-xs"
+                  >
+                    {selectedFlavors.size === products.flatMap(p => p.flavors).length ? '取消全選' : '全選'}
+                  </Button>
+                </div>
+              </div>
+              
+              {/* 顯示已選擇的規格 */}
+              {selectedFlavors.size > 0 && (
+                <div className="mt-3">
+                  <div className="text-xs text-blue-600 mb-2">已選擇的規格：</div>
+                  <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto">
+                    {Array.from(selectedFlavors).map(flavorId => {
+                      const flavor = products.flatMap(p => p.flavors).find(f => f.id === flavorId);
+                      const product = products.find(p => p.flavors.some(f => f.id === flavorId));
+                      return flavor ? (
+                        <span key={flavorId} className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
+                          {product?.name} - {flavor.name}
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 規格選擇區域 */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-sm font-medium text-gray-700">
+                    選擇要修改的規格
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    💡 可以選擇不同商品的規格進行批量修改，點擊商品名稱展開規格列表
+                  </p>
+                </div>
+                <div className="flex-1 max-w-sm ml-4">
+                  <Input
+                    placeholder="搜索商品或規格..."
+                    value={flavorSearchTerm}
+                    onChange={(e) => setFlavorSearchTerm(e.target.value)}
+                    className="text-sm"
+                  />
+                </div>
+              </div>
+              <div className="border rounded-lg max-h-64 overflow-y-auto">
+                {products.filter(product => {
+                  if (!flavorSearchTerm) return true;
+                  const searchLower = flavorSearchTerm.toLowerCase();
+                  return product.name.toLowerCase().includes(searchLower) ||
+                         product.flavors.some(flavor => flavor.name.toLowerCase().includes(searchLower));
+                }).map(product => {
+                  const filteredFlavors = product.flavors.filter(flavor => {
+                    if (!flavorSearchTerm) return true;
+                    const searchLower = flavorSearchTerm.toLowerCase();
+                    return product.name.toLowerCase().includes(searchLower) ||
+                           flavor.name.toLowerCase().includes(searchLower);
+                  });
+                  
+                  if (filteredFlavors.length === 0) return null;
+                  
+                  return (
+                  <div key={product.id} className="border-b last:border-b-0">
+                    <div 
+                      className="p-3 bg-gray-50 cursor-pointer hover:bg-gray-100 flex items-center justify-between"
+                      onClick={() => {
+                        const expanded = new Set(expandedProducts);
+                        if (expanded.has(product.id)) {
+                          expanded.delete(product.id);
+                        } else {
+                          expanded.add(product.id);
+                        }
+                        setExpandedProducts(expanded);
+                      }}
+                    >
+                      <span className="font-medium text-sm">{product.name}</span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // 選擇/取消選擇該商品的所有規格
+                            const productFlavorIds = filteredFlavors.map(f => f.id);
+                            const allSelected = productFlavorIds.every(id => selectedFlavors.has(id));
+                            const newSelected = new Set(selectedFlavors);
+                            
+                            if (allSelected) {
+                              // 取消選擇該商品所有規格
+                              productFlavorIds.forEach(id => newSelected.delete(id));
+                            } else {
+                              // 選擇該商品所有規格
+                              productFlavorIds.forEach(id => newSelected.add(id));
+                            }
+                            setSelectedFlavors(newSelected);
+                          }}
+                          className="text-xs px-2 py-1 h-6"
+                        >
+                          {filteredFlavors.every(f => selectedFlavors.has(f.id)) ? '取消全選' : '全選此商品'}
+                        </Button>
+                        <span className="text-xs text-gray-500">
+                          {filteredFlavors.length} 個規格
+                        </span>
+                        {expandedProducts.has(product.id) ? 
+                          <ChevronDown className="w-4 h-4" /> : 
+                          <ChevronRight className="w-4 h-4" />
+                        }
+                      </div>
+                    </div>
+                    
+                    {expandedProducts.has(product.id) && (
+                      <div className="p-2 space-y-1">
+                        {filteredFlavors.map(flavor => (
+                          <div key={flavor.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
+                            <Checkbox
+                              checked={selectedFlavors.has(flavor.id)}
+                              onCheckedChange={(checked) => {
+                                const newSelected = new Set(selectedFlavors);
+                                if (checked) {
+                                  newSelected.add(flavor.id);
+                                } else {
+                                  newSelected.delete(flavor.id);
+                                }
+                                setSelectedFlavors(newSelected);
+                              }}
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium">{flavor.name}</span>
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                  <span>庫存: {flavor.stock}</span>
+                                  {!flavor.is_active && (
+                                    <Badge variant="secondary" className="text-xs">已停用</Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  );
+                })}
               </div>
             </div>
 
