@@ -478,19 +478,19 @@ export const AdminFlavors: React.FC = () => {
                       </Button>
                     </div>
                   ) : (
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       {product.flavors.map((flavor) => (
                         <div
                           key={flavor.id}
-                          className="flex items-center justify-between p-2 bg-gray-50 rounded"
+                          className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm"
                         >
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-3">
                             <Coffee className="w-4 h-4 text-gray-600" />
                             <div>
                               <div className="flex items-center space-x-2">
-                                <span className="text-sm font-medium">{flavor.name}</span>
+                                <span className="font-medium">{flavor.name}</span>
                                 {!flavor.is_active && (
-                                  <Badge variant="secondary" className="text-xs px-1 py-0">
+                                  <Badge variant="secondary" className="text-xs">
                                     已停用
                                   </Badge>
                                 )}
@@ -499,37 +499,36 @@ export const AdminFlavors: React.FC = () => {
                                 <span>庫存: {flavor.stock}</span>
                                 <span>分類: {flavor.category_name || '未分類'}</span>
                                 {/* 顯示價格信息 */}
-                                <span className="text-xs font-medium text-blue-600">
+                                <span className="font-medium text-blue-600">
                                   {flavor.price !== null && flavor.price !== undefined ? (
                                     <>NT$ {Math.round(flavor.price).toLocaleString()}</>
                                   ) : (
-                                    <>基礎: NT$ {Math.round(flavor.product_base_price || 0).toLocaleString()}</>
+                                    <>NT$ {Math.round(flavor.product_base_price || 0).toLocaleString()}</>
                                   )}
                                 </span>
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center space-x-1">
+                          <div className="flex items-center space-x-2">
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => handleEditFlavor(flavor)}
                               title="編輯規格"
-                              className="h-6 w-6 p-0"
                             >
-                              <Edit className="w-3 h-3" />
+                              <Edit className="w-4 h-4" />
                             </Button>
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => handleToggleStatus(flavor.id, flavor.is_active)}
                               title={flavor.is_active ? "停用規格" : "啟用規格"}
-                              className={`h-6 w-6 p-0 ${flavor.is_active ? "text-orange-600 hover:text-orange-700" : "text-green-600 hover:text-green-700"}`}
+                              className={flavor.is_active ? "text-orange-600 hover:text-orange-700" : "text-green-600 hover:text-green-700"}
                             >
                               {flavor.is_active ? (
-                                <EyeOff className="w-3 h-3" />
+                                <EyeOff className="w-4 h-4" />
                               ) : (
-                                <Eye className="w-3 h-3" />
+                                <Eye className="w-4 h-4" />
                               )}
                             </Button>
                             {!flavor.is_active && (
@@ -538,9 +537,9 @@ export const AdminFlavors: React.FC = () => {
                                 variant="ghost"
                                 onClick={() => handleDeleteFlavor(flavor)}
                                 title="永久刪除規格（僅限已停用的規格）"
-                                className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
+                                className="text-red-600 hover:text-red-700"
                               >
-                                <Trash2 className="w-3 h-3" />
+                                <Trash2 className="w-4 h-4" />
                               </Button>
                             )}
                           </div>
@@ -833,7 +832,7 @@ export const AdminFlavors: React.FC = () => {
                   />
                 </div>
               </div>
-              <div className="border rounded-lg max-h-80 overflow-y-auto">
+              <div className="border rounded-lg max-h-64 overflow-y-auto">
                 {products.filter(product => {
                   if (!flavorSearchTerm) return true;
                   const searchLower = flavorSearchTerm.toLowerCase();
@@ -863,7 +862,7 @@ export const AdminFlavors: React.FC = () => {
                         setExpandedProducts(expanded);
                       }}
                     >
-                      <span className="text-sm font-medium">{product.name}</span>
+                      <span className="font-medium text-sm">{product.name}</span>
                       <div className="flex items-center gap-2">
                         <Button
                           size="sm"
@@ -884,16 +883,16 @@ export const AdminFlavors: React.FC = () => {
                             }
                             setSelectedFlavors(newSelected);
                           }}
-                          className="text-xs px-1 py-0 h-5"
+                          className="text-xs px-2 py-1 h-6"
                         >
-                          {filteredFlavors.every(f => selectedFlavors.has(f.id)) ? '取消' : '全選'}
+                          {filteredFlavors.every(f => selectedFlavors.has(f.id)) ? '取消全選' : '全選此商品'}
                         </Button>
                         <span className="text-xs text-gray-500">
-                          {filteredFlavors.length} 個
+                          {filteredFlavors.length} 個規格
                         </span>
                         {expandedProducts.has(product.id) ? 
-                          <ChevronDown className="w-3 h-3" /> : 
-                          <ChevronRight className="w-3 h-3" />
+                          <ChevronDown className="w-4 h-4" /> : 
+                          <ChevronRight className="w-4 h-4" />
                         }
                       </div>
                     </div>
@@ -901,7 +900,7 @@ export const AdminFlavors: React.FC = () => {
                     {expandedProducts.has(product.id) && (
                       <div className="p-1 space-y-0.5">
                         {filteredFlavors.map(flavor => (
-                          <div key={flavor.id} className="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded text-xs">
+                          <div key={flavor.id} className="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded text-sm">
                             <Checkbox
                               checked={selectedFlavors.has(flavor.id)}
                               onCheckedChange={(checked) => {
@@ -913,15 +912,14 @@ export const AdminFlavors: React.FC = () => {
                                 }
                                 setSelectedFlavors(newSelected);
                               }}
-                              className="w-3 h-3"
                             />
                             <div className="flex-1">
                               <div className="flex items-center justify-between">
-                                <span className="font-medium">{flavor.name}</span>
+                                <span className="text-sm font-medium">{flavor.name}</span>
                                 <div className="flex items-center gap-2 text-xs text-gray-500">
-                                  <span>庫存:{flavor.stock}</span>
+                                  <span>庫存: {flavor.stock}</span>
                                   {!flavor.is_active && (
-                                    <Badge variant="secondary" className="text-xs px-1 py-0">停用</Badge>
+                                    <Badge variant="secondary" className="text-xs py-0 px-1 h-4">已停用</Badge>
                                   )}
                                 </div>
                               </div>
