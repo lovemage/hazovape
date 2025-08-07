@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import {
   Coffee, Plus, Edit, Trash2, Eye, EyeOff, ArrowUp, ArrowDown,
   Search, ChevronDown, ChevronRight, Package, Grid3X3, Layers, PlusCircle,
-  FileText, Upload, Download, AlertCircle, CheckCircle
+  FileText, Upload, Download, AlertCircle, CheckCircle, BoxSelect, BarChart3
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { Input } from '../../components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog';
+import { Checkbox } from '../../components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { AdminLayout } from '../../components/AdminLayout';
 import { FlavorForm } from '../../components/FlavorForm';
 import { BatchFlavorForm } from '../../components/BatchFlavorForm';
@@ -37,6 +39,7 @@ export const AdminFlavors: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [showBatchForm, setShowBatchForm] = useState(false);
   const [showBatchImport, setShowBatchImport] = useState(false);
+  const [showBatchStock, setShowBatchStock] = useState(false);
   const [editingFlavor, setEditingFlavor] = useState<Flavor | undefined>(undefined);
   const [selectedProductId, setSelectedProductId] = useState<number | undefined>(undefined);
   
@@ -44,6 +47,12 @@ export const AdminFlavors: React.FC = () => {
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<BatchImportResult | null>(null);
+
+  // 批量修改庫存相關狀態
+  const [selectedFlavors, setSelectedFlavors] = useState<Set<number>>(new Set());
+  const [batchStockValue, setBatchStockValue] = useState('');
+  const [stockUpdateMode, setStockUpdateMode] = useState<'set' | 'add' | 'subtract'>('set');
+  const [updatingStock, setUpdatingStock] = useState(false);
 
   useEffect(() => {
     loadProductsWithFlavors();
@@ -227,6 +236,64 @@ export const AdminFlavors: React.FC = () => {
     setShowBatchImport(false);
   };
 
+  // 批量修改庫存相關函數
+  const handleBatchStockUpdate = async () => {
+    if (selectedFlavors.size === 0) {
+      toast.error('請選擇要修改的規格');
+      return;
+    }
+
+    if (!batchStockValue.trim()) {
+      toast.error('請輸入庫存數量');
+      return;
+    }
+
+    const stockValue = parseInt(batchStockValue);
+    if (isNaN(stockValue) || stockValue < 0) {
+      toast.error('請輸入有效的庫存數量');
+      return;
+    }
+
+    try {
+      setUpdatingStock(true);
+      
+      const response = await flavorAPI.batchUpdateStock({
+        flavorIds: Array.from(selectedFlavors),
+        mode: stockUpdateMode,
+        value: stockValue
+      });
+      
+      if (response.data.success) {
+        toast.success(`成功更新 ${selectedFlavors.size} 個規格的庫存`);
+        loadProductsWithFlavors(); // 重新載入數據
+        resetBatchStock();
+      } else {
+        toast.error(response.data.message || '批量修改庫存失敗');
+      }
+    } catch (error) {
+      console.error('批量修改庫存失敗:', error);
+      toast.error('批量修改庫存失敗');
+    } finally {
+      setUpdatingStock(false);
+    }
+  };
+
+  const resetBatchStock = () => {
+    setSelectedFlavors(new Set());
+    setBatchStockValue('');
+    setStockUpdateMode('set');
+    setShowBatchStock(false);
+  };
+
+  const toggleSelectAllFlavors = () => {
+    const allFlavors = products.flatMap(product => product.flavors.map(flavor => flavor.id));
+    if (selectedFlavors.size === allFlavors.length) {
+      setSelectedFlavors(new Set());
+    } else {
+      setSelectedFlavors(new Set(allFlavors));
+    }
+  };
+
   if (loading) {
     return (
       <AdminLayout>
@@ -291,6 +358,14 @@ export const AdminFlavors: React.FC = () => {
             >
               <Upload className="w-4 h-4" />
               <span>批量導入</span>
+            </Button>
+            <Button
+              onClick={() => setShowBatchStock(true)}
+              variant="outline"
+              className="flex items-center space-x-2"
+            >
+              <BarChart3 className="w-4 h-4" />
+              <span>批量修改庫存</span>
             </Button>
             <Button
               onClick={() => setShowBatchForm(true)}
@@ -413,6 +488,20 @@ export const AdminFlavors: React.FC = () => {
                           className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
                         >
                           <div className="flex items-center space-x-3">
+                            {showBatchStock && (
+                              <Checkbox
+                                checked={selectedFlavors.has(flavor.id)}
+                                onCheckedChange={(checked) => {
+                                  const newSelected = new Set(selectedFlavors);
+                                  if (checked) {
+                                    newSelected.add(flavor.id);
+                                  } else {
+                                    newSelected.delete(flavor.id);
+                                  }
+                                  setSelectedFlavors(newSelected);
+                                }}
+                              />
+                            )}
                             <Coffee className="w-5 h-5 text-gray-600" />
                             <div>
                               <div className="flex items-center space-x-2">
@@ -666,6 +755,108 @@ export const AdminFlavors: React.FC = () => {
                   )}
                 </Button>
               </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 批量修改庫存對話框 */}
+      <Dialog open={showBatchStock} onOpenChange={resetBatchStock}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BarChart3 className="w-5 h-5" />
+              批量修改庫存
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {/* 選擇統計 */}
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-blue-700">
+                  已選擇 {selectedFlavors.size} 個規格
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={toggleSelectAllFlavors}
+                  className="text-xs"
+                >
+                  {selectedFlavors.size === products.flatMap(p => p.flavors).length ? '取消全選' : '全選'}
+                </Button>
+              </div>
+            </div>
+
+            {/* 修改模式選擇 */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-gray-700">
+                修改模式
+              </label>
+              <Select value={stockUpdateMode} onValueChange={(value) => setStockUpdateMode(value as 'set' | 'add' | 'subtract')}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="set">設定為指定數量</SelectItem>
+                  <SelectItem value="add">增加指定數量</SelectItem>
+                  <SelectItem value="subtract">減少指定數量</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 庫存數量輸入 */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-gray-700">
+                {stockUpdateMode === 'set' ? '設定庫存數量' : 
+                 stockUpdateMode === 'add' ? '增加庫存數量' : '減少庫存數量'}
+              </label>
+              <Input
+                type="number"
+                value={batchStockValue}
+                onChange={(e) => setBatchStockValue(e.target.value)}
+                placeholder="請輸入數量"
+                min="0"
+              />
+            </div>
+
+            {/* 預覽效果 */}
+            {batchStockValue && selectedFlavors.size > 0 && (
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="text-sm text-gray-600">
+                  預覽：{selectedFlavors.size} 個規格的庫存將
+                  {stockUpdateMode === 'set' ? `設定為 ${batchStockValue}` :
+                   stockUpdateMode === 'add' ? `增加 ${batchStockValue}` :
+                   `減少 ${batchStockValue}`}
+                </div>
+              </div>
+            )}
+
+            {/* 操作按鈕 */}
+            <div className="flex justify-end gap-3">
+              <Button
+                onClick={resetBatchStock}
+                variant="outline"
+              >
+                取消
+              </Button>
+              <Button
+                onClick={handleBatchStockUpdate}
+                disabled={!batchStockValue || selectedFlavors.size === 0 || updatingStock}
+                className="flex items-center gap-2"
+              >
+                {updatingStock ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    更新中...
+                  </>
+                ) : (
+                  <>
+                    <BarChart3 className="w-4 h-4" />
+                    確認修改
+                  </>
+                )}
+              </Button>
             </div>
           </div>
         </DialogContent>

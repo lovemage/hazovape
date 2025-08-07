@@ -222,6 +222,10 @@ export const flavorAPI = {
     console.log('📤 flavorAPI.batchImport 調用');
     return api.post('/flavors/admin/batch-import', formData);
   },
+  batchUpdateStock: (data: { flavorIds: number[]; mode: 'set' | 'add' | 'subtract'; value: number }) => {
+    console.log('📤 flavorAPI.batchUpdateStock 調用', data);
+    return api.put('/flavors/admin/batch-update-stock', data);
+  },
 };
 
 // 口味類別相關 API

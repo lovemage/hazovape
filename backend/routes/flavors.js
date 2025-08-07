@@ -1284,4 +1284,106 @@ router.put('/admin/batch-sort', authenticateAdmin, async (req, res) => {
   }
 });
 
+// 管理員：批量更新庫存
+router.put('/admin/batch-update-stock', authenticateAdmin, async (req, res) => {
+  try {
+    const { flavorIds, mode, value } = req.body;
+
+    console.log('📦 批量更新庫存請求:', { 
+      規格數量: flavorIds?.length, 
+      模式: mode, 
+      數值: value 
+    });
+
+    // 驗證輸入
+    if (!Array.isArray(flavorIds) || flavorIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: '請提供要更新的規格ID列表'
+      });
+    }
+
+    if (!['set', 'add', 'subtract'].includes(mode)) {
+      return res.status(400).json({
+        success: false,
+        message: '無效的更新模式'
+      });
+    }
+
+    if (typeof value !== 'number' || value < 0) {
+      return res.status(400).json({
+        success: false,
+        message: '請提供有效的庫存數量'
+      });
+    }
+
+    // 開始事務
+    await Database.beginTransaction();
+
+    try {
+      let updateQuery;
+      let params;
+
+      switch (mode) {
+        case 'set':
+          updateQuery = 'UPDATE flavors SET stock = ? WHERE id = ?';
+          break;
+        case 'add':
+          updateQuery = 'UPDATE flavors SET stock = stock + ? WHERE id = ?';
+          break;
+        case 'subtract':
+          updateQuery = 'UPDATE flavors SET stock = MAX(0, stock - ?) WHERE id = ?';
+          break;
+      }
+
+      let successCount = 0;
+      const errors = [];
+
+      // 批量更新每個規格的庫存
+      for (const flavorId of flavorIds) {
+        try {
+          const result = await Database.run(updateQuery, [value, flavorId]);
+          if (result.changes > 0) {
+            successCount++;
+          } else {
+            errors.push(`規格 ID ${flavorId} 更新失敗：規格不存在`);
+          }
+        } catch (error) {
+          console.error(`更新規格 ${flavorId} 庫存失敗:`, error);
+          errors.push(`規格 ID ${flavorId} 更新失敗：${error.message}`);
+        }
+      }
+
+      // 提交事務
+      await Database.commit();
+
+      console.log('✅ 批量更新庫存完成:', { 
+        成功: successCount, 
+        錯誤: errors.length 
+      });
+
+      res.json({
+        success: true,
+        message: `成功更新 ${successCount} 個規格的庫存`,
+        data: {
+          successCount,
+          errorCount: errors.length,
+          errors: errors.length > 0 ? errors : undefined
+        }
+      });
+
+    } catch (error) {
+      await Database.rollback();
+      throw error;
+    }
+
+  } catch (error) {
+    console.error('❌ 批量更新庫存錯誤:', error);
+    res.status(500).json({
+      success: false,
+      message: '批量更新庫存失敗: ' + error.message
+    });
+  }
+});
+
 module.exports = router;

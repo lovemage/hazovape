@@ -362,7 +362,7 @@ router.post('/test-telegram', authenticateAdmin, async (req, res) => {
     const TelegramBot = require('node-telegram-bot-api');
     const testBot = new TelegramBot(bot_token, { polling: false });
 
-    const testMessage = `🤖 Mist Mall 測試消息\n\n✅ Telegram Bot 連接成功！\n🕐 測試時間: ${new Date().toLocaleString('zh-TW')}\n\n📋 環境變數配置正確`;
+    const testMessage = `🤖 VJVape 測試消息\n\n✅ Telegram Bot 連接成功！\n🕐 測試時間: ${new Date().toLocaleString('zh-TW')}\n\n📋 環境變數配置正確`;
 
     await testBot.sendMessage(chat_id, testMessage);
 
