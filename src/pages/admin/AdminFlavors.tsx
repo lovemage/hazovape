@@ -793,23 +793,7 @@ export const AdminFlavors: React.FC = () => {
                 </div>
               </div>
               
-              {/* 顯示已選擇的規格 */}
-              {selectedFlavors.size > 0 && (
-                <div className="mt-3">
-                  <div className="text-xs text-blue-600 mb-2">已選擇的規格：</div>
-                  <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto">
-                    {Array.from(selectedFlavors).map(flavorId => {
-                      const flavor = products.flatMap(p => p.flavors).find(f => f.id === flavorId);
-                      const product = products.find(p => p.flavors.some(f => f.id === flavorId));
-                      return flavor ? (
-                        <span key={flavorId} className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
-                          {product?.name} - {flavor.name}
-                        </span>
-                      ) : null;
-                    })}
-                  </div>
-                </div>
-              )}
+              {/* 已選擇規格明細列表移除，保留勾選與操作，避免頁面過長 */}
             </div>
 
             {/* 規格選擇區域 */}
