@@ -1,4 +1,5 @@
 const migrateAddProductSortOrder = require('./migrate-add-product-sort-order');
+const migrateAddCoupons = require('./migrate-add-coupons');
 
 async function runProductionMigrations() {
   console.log('🚀 開始生產環境數據庫遷移...');
@@ -6,6 +7,8 @@ async function runProductionMigrations() {
   try {
     // 運行產品排序字段遷移
     await migrateAddProductSortOrder();
+    // 建立優惠券與相關表、欄位
+    await migrateAddCoupons();
     
     console.log('🎉 所有生產環境遷移完成！');
   } catch (error) {
