@@ -91,21 +91,37 @@ export const AdminCoupons: React.FC = () => {
     } catch (error: any) {
       console.error('載入優惠券失敗:', error);
       
-      // 檢查是否為數據庫表不存在的錯誤
-      const errorString = JSON.stringify(error);
-      const errorMessage = error.response?.data?.message || error.message || errorString;
-      const isTableMissingError = errorMessage.includes('no such table') || 
-                                 errorMessage.includes('SQLITE_ERROR') ||
-                                 errorMessage.includes('coupons');
+      // 詳細的錯誤檢測和調試
+      console.log('🔍 完整錯誤對象:', error);
+      console.log('🔍 response:', error.response);
+      console.log('🔍 response.data:', error.response?.data);
+      console.log('🔍 response.status:', error.response?.status);
       
-      console.log('🔍 錯誤檢測:', { 
-        status: error.response?.status, 
-        message: errorMessage,
+      // 嘗試從多個地方獲取錯誤信息
+      const errorString = JSON.stringify(error);
+      const responseMessage = error.response?.data?.message || '';
+      const statusText = error.response?.statusText || '';
+      const errorMessage = error.message || '';
+      
+      // 檢查所有可能包含錯誤信息的地方
+      const allErrorText = `${responseMessage} ${statusText} ${errorMessage} ${errorString}`.toLowerCase();
+      
+      const isTableMissingError = allErrorText.includes('no such table') || 
+                                 allErrorText.includes('sqlite_error') ||
+                                 allErrorText.includes('coupons') ||
+                                 error.response?.status === 500; // 暫時簡化：所有500錯誤都視為需要遷移
+      
+      console.log('🔍 錯誤檢測詳情:', { 
+        status: error.response?.status,
+        responseMessage,
+        statusText,
+        errorMessage,
+        allErrorText,
         isTableMissing: isTableMissingError 
       });
       
       if (isTableMissingError) {
-        console.log('🔍 檢測到數據庫表不存在，顯示遷移按鈕');
+        console.log('🔍 檢測到需要數據庫遷移，顯示遷移按鈕');
         setNeedsMigration(true);
         // 不顯示錯誤 toast，因為這是預期的情況
       } else {
