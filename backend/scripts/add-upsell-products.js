@@ -39,67 +39,8 @@ async function addUpsellProducts() {
       console.log('✅ 訂單項目表字段已存在，跳過添加');
     }
 
-    // 3. 檢查是否已有加購商品，只有在沒有任何商品時才插入範例
-    console.log('📦 檢查現有加購商品...');
-    const existingProducts = await Database.get('SELECT COUNT(*) as count FROM upsell_products');
-    
-    if (existingProducts.count > 0) {
-      console.log(`✅ 已有 ${existingProducts.count} 個加購商品，跳過範例商品插入`);
-    } else {
-      console.log('📦 插入範例加購商品...');
-      
-      const sampleProducts = [
-      {
-        name: '精選茶包組合',
-        price: 99.00,
-        stock: 50,
-        description: '多種口味茶包，隨時享受好茶',
-        images: '[]',
-        sort_order: 1
-      },
-      {
-        name: '便攜保溫杯',
-        price: 199.00,
-        stock: 30,
-        description: '304不鏽鋼，保溫6小時',
-        images: '[]',
-        sort_order: 2
-      },
-      {
-        name: '手工餅乾禮盒',
-        price: 149.00,
-        stock: 25,
-        description: '酥脆香甜，茶點首選',
-        images: '[]',
-        sort_order: 3
-      },
-      {
-        name: '蜂蜜檸檬片',
-        price: 79.00,
-        stock: 40,
-        description: '天然蜂蜜製作，泡茶好夥伴',
-        images: '[]',
-        sort_order: 4
-      }
-    ];
-
-    for (const product of sampleProducts) {
-      await Database.run(`
-        INSERT OR IGNORE INTO upsell_products 
-        (name, price, stock, description, images, sort_order, is_active)
-        VALUES (?, ?, ?, ?, ?, ?, 1)
-      `, [
-        product.name,
-        product.price,
-        product.stock,
-        product.description,
-        product.images,
-        product.sort_order
-      ]);
-    }
-    
-    console.log('✅ 範例加購商品插入成功');
-    }
+    // 3. 不插入任何範例商品，保持資料表為空
+    console.log('✅ 加購商品表已準備就緒，無範例商品插入');
 
     // 4. 驗證創建結果
     console.log('🔍 驗證創建結果...');

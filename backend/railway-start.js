@@ -176,6 +176,12 @@ async function initializeDatabase() {
     console.log('🔄 檢查加購商品功能...');
     const addUpsellProducts = require('./scripts/add-upsell-products');
     await addUpsellProducts();
+    
+    // 清理範例商品
+    console.log('🧹 清理加購商品範例數據...');
+    const cleanUpsellSamples = require('./scripts/clean-upsell-samples');
+    await cleanUpsellSamples();
+    
     console.log('✅ 加購商品功能遷移完成');
     
     // 添加規格價格欄位
