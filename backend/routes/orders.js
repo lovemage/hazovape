@@ -87,6 +87,19 @@ async function sendTelegramNotification(order, orderItems) {
       return `${item.product_name} x${item.quantity} - $${item.subtotal} (口味: ${flavorsText})`;
     }).join('\n');
 
+    // 準備優惠券信息
+    let couponInfo = '';
+    if (order.coupon_code && order.discount_amount && order.discount_amount > 0) {
+      couponInfo = `\n🎫 優惠券: ${order.coupon_code} (折扣: $${order.discount_amount})`;
+    }
+
+    // 計算原始金額（如果有折扣）
+    let amountInfo = `💰 總金額: $${order.total_amount}`;
+    if (order.discount_amount && order.discount_amount > 0) {
+      const originalAmount = parseInt(order.total_amount) + parseInt(order.discount_amount);
+      amountInfo = `💰 原價: $${originalAmount}\n💰 折扣後: $${order.total_amount}`;
+    }
+
     const message = `
 🛒 新訂單通知
 
@@ -94,7 +107,7 @@ async function sendTelegramNotification(order, orderItems) {
 👤 客戶: ${order.customer_name}
 📞 電話: ${order.customer_phone}
 🏪 店號: ${order.store_number}
-💰 總金額: $${order.total_amount}
+${amountInfo}${couponInfo}
 🕐 下單時間: ${order.created_at}
 
 📦 訂購商品:
