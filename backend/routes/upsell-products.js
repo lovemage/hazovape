@@ -273,40 +273,6 @@ router.delete('/admin/:id/images/:imageName', authenticateAdmin, async (req, res
   }
 });
 
-// 管理員 API：刪除加購商品
-router.delete('/admin/:id', authenticateAdmin, async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // 獲取商品信息以刪除圖片
-    const product = await Database.get('SELECT images FROM upsell_products WHERE id = ?', [id]);
-
-    if (product) {
-      const images = JSON.parse(product.images || '[]');
-      // 刪除圖片文件
-      images.forEach(imagePath => {
-        const fullPath = path.join(uploadDir, imagePath);
-        if (fs.existsSync(fullPath)) {
-          fs.unlinkSync(fullPath);
-        }
-      });
-    }
-
-    await Database.run('DELETE FROM upsell_products WHERE id = ?', [id]);
-
-    res.json({
-      success: true,
-      message: '加購商品刪除成功'
-    });
-  } catch (error) {
-    console.error('刪除加購商品失敗:', error);
-    res.status(500).json({
-      success: false,
-      message: '刪除加購商品失敗'
-    });
-  }
-});
-
 // 管理員 API：批量刪除加購商品
 router.delete('/admin/batch', authenticateAdmin, async (req, res) => {
   try {
@@ -367,6 +333,40 @@ router.delete('/admin/batch', authenticateAdmin, async (req, res) => {
     res.status(500).json({
       success: false,
       message: '批量刪除加購商品失敗'
+    });
+  }
+});
+
+// 管理員 API：刪除加購商品
+router.delete('/admin/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 獲取商品信息以刪除圖片
+    const product = await Database.get('SELECT images FROM upsell_products WHERE id = ?', [id]);
+
+    if (product) {
+      const images = JSON.parse(product.images || '[]');
+      // 刪除圖片文件
+      images.forEach(imagePath => {
+        const fullPath = path.join(uploadDir, imagePath);
+        if (fs.existsSync(fullPath)) {
+          fs.unlinkSync(fullPath);
+        }
+      });
+    }
+
+    await Database.run('DELETE FROM upsell_products WHERE id = ?', [id]);
+
+    res.json({
+      success: true,
+      message: '加購商品刪除成功'
+    });
+  } catch (error) {
+    console.error('刪除加購商品失敗:', error);
+    res.status(500).json({
+      success: false,
+      message: '刪除加購商品失敗'
     });
   }
 });
