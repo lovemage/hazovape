@@ -39,10 +39,16 @@ async function addUpsellProducts() {
       console.log('✅ 訂單項目表字段已存在，跳過添加');
     }
 
-    // 3. 插入範例加購商品
-    console.log('📦 插入範例加購商品...');
+    // 3. 檢查是否已有加購商品，只有在沒有任何商品時才插入範例
+    console.log('📦 檢查現有加購商品...');
+    const existingProducts = await Database.get('SELECT COUNT(*) as count FROM upsell_products');
     
-    const sampleProducts = [
+    if (existingProducts.count > 0) {
+      console.log(`✅ 已有 ${existingProducts.count} 個加購商品，跳過範例商品插入`);
+    } else {
+      console.log('📦 插入範例加購商品...');
+      
+      const sampleProducts = [
       {
         name: '精選茶包組合',
         price: 99.00,
@@ -93,6 +99,7 @@ async function addUpsellProducts() {
     }
     
     console.log('✅ 範例加購商品插入成功');
+    }
 
     // 4. 驗證創建結果
     console.log('🔍 驗證創建結果...');
