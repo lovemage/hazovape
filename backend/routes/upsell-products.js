@@ -307,4 +307,68 @@ router.delete('/admin/:id', authenticateAdmin, async (req, res) => {
   }
 });
 
+// 管理員 API：批量刪除加購商品
+router.delete('/admin/batch', authenticateAdmin, async (req, res) => {
+  try {
+    const { ids } = req.body || {};
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: '請提供要刪除的加購商品ID列表'
+      });
+    }
+
+    // 開始事務
+    await Database.beginTransaction();
+    let successCount = 0;
+    const errors = [];
+
+    try {
+      for (const id of ids) {
+        try {
+          // 取得商品圖片並刪檔
+          const product = await Database.get('SELECT images FROM upsell_products WHERE id = ?', [id]);
+          if (product) {
+            const images = JSON.parse(product.images || '[]');
+            images.forEach((imagePath) => {
+              const fullPath = path.join(uploadDir, imagePath);
+              if (fs.existsSync(fullPath)) {
+                try { fs.unlinkSync(fullPath); } catch (e) { /* 忽略單張刪除錯誤 */ }
+              }
+            });
+          }
+
+          // 刪除資料
+          const result = await Database.run('DELETE FROM upsell_products WHERE id = ?', [id]);
+          if (result.changes > 0) {
+            successCount++;
+          } else {
+            errors.push(`ID ${id} 刪除失敗或不存在`);
+          }
+        } catch (innerErr) {
+          errors.push(`ID ${id} 刪除錯誤: ${innerErr.message}`);
+        }
+      }
+
+      await Database.commit();
+
+      return res.json({
+        success: true,
+        message: `批量刪除完成：成功 ${successCount} 筆` + (errors.length ? `，失敗 ${errors.length} 筆` : ''),
+        data: { successCount, errorCount: errors.length, errors: errors.length ? errors : undefined }
+      });
+    } catch (error) {
+      await Database.rollback();
+      throw error;
+    }
+  } catch (error) {
+    console.error('批量刪除加購商品失敗:', error);
+    res.status(500).json({
+      success: false,
+      message: '批量刪除加購商品失敗'
+    });
+  }
+});
+
 module.exports = router;

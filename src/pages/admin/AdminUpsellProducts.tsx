@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Upload, Eye, EyeOff, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Upload, Eye, EyeOff, X, CheckSquare, Square, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,6 +30,7 @@ interface UpsellProductForm {
 const AdminUpsellProducts: React.FC = () => {
   const [products, setProducts] = useState<UpsellProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<UpsellProduct | null>(null);
   const [formData, setFormData] = useState<UpsellProductForm>({
@@ -54,6 +55,7 @@ const AdminUpsellProducts: React.FC = () => {
       if (response.ok) {
         const result = await response.json();
         setProducts(result.data.products);
+        setSelectedIds(new Set());
       } else {
         toast.error('獲取加購商品失敗');
       }
@@ -141,6 +143,51 @@ const AdminUpsellProducts: React.FC = () => {
     } catch (error) {
       console.error('刪除失敗:', error);
       toast.error('刪除失敗');
+    }
+  };
+
+  const toggleSelect = (id: number) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === products.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(products.map(p => p.id)));
+    }
+  };
+
+  const handleBatchDelete = async () => {
+    if (selectedIds.size === 0) {
+      toast.error('請先勾選要刪除的加購商品');
+      return;
+    }
+    if (!confirm(`確定批量刪除 ${selectedIds.size} 筆加購商品嗎？`)) return;
+
+    try {
+      const response = await fetch('/api/upsell-products/admin/batch', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ ids: Array.from(selectedIds) })
+      });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        toast.success(result.message || '批量刪除成功');
+        fetchProducts();
+      } else {
+        toast.error(result.message || '批量刪除失敗');
+      }
+    } catch (error) {
+      console.error('批量刪除失敗:', error);
+      toast.error('批量刪除失敗');
     }
   };
 
@@ -239,10 +286,22 @@ const AdminUpsellProducts: React.FC = () => {
       <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">加購商品管理</h1>
-        <Button onClick={() => setShowForm(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          新增加購商品
-        </Button>
+        <div className="flex gap-2">
+          {products.length > 0 && (
+            <Button variant="outline" onClick={toggleSelectAll}>
+              {selectedIds.size === products.length ? '取消全選' : '全選'}
+            </Button>
+          )}
+          {selectedIds.size > 0 && (
+            <Button variant="destructive" onClick={handleBatchDelete}>
+              <Trash className="w-4 h-4 mr-1" /> 批量刪除 ({selectedIds.size})
+            </Button>
+          )}
+          <Button onClick={() => setShowForm(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            新增加購商品
+          </Button>
+        </div>
       </div>
 
       {/* 商品表單 */}
@@ -389,81 +448,63 @@ const AdminUpsellProducts: React.FC = () => {
         </Card>
       )}
 
-      {/* 商品列表 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product) => (
-          <Card key={product.id} className={!product.is_active ? 'opacity-60' : ''}>
-            <CardContent className="p-4">
-              <div className="space-y-3">
-                <div className="flex justify-between items-start">
-                  <h3 className="font-medium text-lg">{product.name}</h3>
-                  <div className="flex gap-1">
+      {/* 商品條列式列表 */}
+      <Card>
+        <CardHeader>
+          <CardTitle>加購商品列表（{products.length}）</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {products.length === 0 ? (
+            <div className="text-center text-gray-500 py-8">尚無加購商品</div>
+          ) : (
+            <div className="divide-y border rounded-lg">
+              {/* 表頭 */}
+              <div className="grid grid-cols-12 items-center px-3 py-2 bg-gray-50 text-sm font-medium text-gray-600 rounded-t-lg">
+                <div className="col-span-1">
+                  <button onClick={toggleSelectAll} className="p-1" title="全選/取消全選">
+                    {selectedIds.size === products.length ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                  </button>
+                </div>
+                <div className="col-span-3">名稱</div>
+                <div className="col-span-2">價格</div>
+                <div className="col-span-2">庫存</div>
+                <div className="col-span-2">狀態</div>
+                <div className="col-span-2 text-right">操作</div>
+              </div>
+
+              {/* 列表 */}
+              {products.map((product) => (
+                <div key={product.id} className={`grid grid-cols-12 items-center px-3 py-2 text-sm ${!product.is_active ? 'opacity-60' : ''}`}>
+                  <div className="col-span-1">
+                    <button onClick={() => toggleSelect(product.id)} className="p-1">
+                      {selectedIds.has(product.id) ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <div className="col-span-3 truncate" title={product.name}>{product.name}</div>
+                  <div className="col-span-2">NT$ {product.price}</div>
+                  <div className="col-span-2">{product.stock}</div>
+                  <div className="col-span-2">
                     <Badge variant={product.is_active ? 'default' : 'secondary'}>
                       {product.is_active ? '啟用' : '停用'}
                     </Badge>
                   </div>
-                </div>
-                
-                <div className="text-sm text-gray-600">
-                  <p>價格: NT$ {product.price}</p>
-                  <p>庫存: {product.stock}</p>
-                  <p>創建時間: {new Date(product.created_at).toLocaleDateString()}</p>
-                </div>
-                
-                {product.description && (
-                  <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>
-                )}
-
-                {/* 圖片預覽 */}
-                {product.images.length > 0 && (
-                  <div className="flex gap-1 overflow-x-auto">
-                    {product.images.slice(0, 3).map((image, index) => (
-                      <img
-                        key={index}
-                        src={`/uploads/upsell/${image}`}
-                        alt={`${product.name} 圖片 ${index + 1}`}
-                        className="w-12 h-12 object-cover rounded border flex-shrink-0"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          if (!target.dataset.errorHandled) {
-                            target.dataset.errorHandled = 'true';
-                            target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzlmYTZiNyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePiTwvdGV4dD48L3N2Zz4=';
-                          }
-                        }}
-                      />
-                    ))}
-                    {product.images.length > 3 && (
-                      <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center text-xs text-gray-500">
-                        +{product.images.length - 3}
-                      </div>
-                    )}
+                  <div className="col-span-2 flex justify-end gap-2">
+                    <Button size="sm" variant="outline" onClick={() => handleEdit(product)}>
+                      <Edit className="w-3 h-3" />
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => toggleActive(product)}>
+                      {product.is_active ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => handleDelete(product.id)}>
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
                   </div>
-                )}
-                
-                <div className="flex gap-2 pt-2">
-                  <Button size="sm" variant="outline" onClick={() => handleEdit(product)}>
-                    <Edit className="w-3 h-3" />
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={() => toggleActive(product)}
-                  >
-                    {product.is_active ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleDelete(product.id)}
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {products.length === 0 && (
         <div className="text-center py-12 text-gray-500">
