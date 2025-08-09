@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Ticket, Plus, Search, Filter, Edit2, Trash2, Calendar, Users, TrendingUp, Eye } from 'lucide-react';
+import { Ticket, Plus, Search, Filter, Edit2, Trash2, Calendar, Users, TrendingUp, Eye, Database } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
@@ -8,7 +8,7 @@ import { Label } from '../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/dialog';
 import { AdminLayout } from '../../components/AdminLayout';
-import { couponAPI } from '../../services/api';
+import { couponAPI, adminAPI } from '../../services/api';
 import { Coupon } from '../../types';
 import { toast } from 'sonner';
 
@@ -45,6 +45,7 @@ export const AdminCoupons: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [needsMigration, setNeedsMigration] = useState(false);
 
   // 表單相關狀態
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -72,12 +73,24 @@ export const AdminCoupons: React.FC = () => {
       if (response.data.success) {
         setCoupons(response.data.data.coupons);
         setTotalPages(response.data.data.pagination.total_pages);
+        setNeedsMigration(false);
+      } else {
+        // 如果返回失敗且可能是數據庫表不存在，標記需要遷移
+        if (response.data.message?.includes('no such table') || response.data.message?.includes('coupons')) {
+          setNeedsMigration(true);
+        }
+        toast.error('載入優惠券失敗');
+      }
+    } catch (error: any) {
+      console.error('載入優惠券失敗:', error);
+      // 如果是數據庫相關錯誤，標記需要遷移
+      if (error.response?.status === 500 && 
+          (error.response?.data?.message?.includes('no such table') || 
+           error.response?.data?.message?.includes('coupons'))) {
+        setNeedsMigration(true);
       } else {
         toast.error('載入優惠券失敗');
       }
-    } catch (error) {
-      console.error('載入優惠券失敗:', error);
-      toast.error('載入優惠券失敗');
     } finally {
       setLoading(false);
     }
@@ -176,6 +189,36 @@ export const AdminCoupons: React.FC = () => {
       valid_until: coupon.valid_until.slice(0, 16),
     });
     setShowEditDialog(true);
+  };
+
+  // 運行數據庫遷移
+  const handleMigration = async () => {
+    if (!confirm('確定要運行優惠券數據庫遷移嗎？\n\n這將創建優惠券相關的數據表和字段，操作不可逆。')) {
+      return;
+    }
+
+    try {
+      console.log('🚀 開始執行優惠券數據庫遷移...');
+      const response = await adminAPI.migrate();
+      console.log('📦 遷移 API 響應:', response.data);
+      
+      if (response.data.success) {
+        toast.success('優惠券數據庫遷移完成！');
+        console.log('✅ 遷移成功，重新載入優惠券列表...');
+        
+        // 等待一秒讓數據庫操作完成
+        setTimeout(async () => {
+          await loadCoupons();
+          console.log('🔄 優惠券列表已重新載入');
+        }, 1000);
+      } else {
+        console.error('❌ 遷移API返回失敗:', response.data);
+        toast.error(response.data.message || '優惠券數據庫遷移失敗');
+      }
+    } catch (error: any) {
+      console.error('❌ 優惠券數據庫遷移失敗:', error);
+      toast.error(error.response?.data?.message || '優惠券數據庫遷移失敗');
+    }
   };
 
   const getTypeText = (type: string) => {
@@ -290,8 +333,28 @@ export const AdminCoupons: React.FC = () => {
         {/* 優惠券列表 */}
         <Card>
           <CardHeader>
-            <CardTitle>優惠券列表</CardTitle>
-            <CardDescription>目前共有 {coupons.length} 個優惠券</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>優惠券列表</CardTitle>
+                <CardDescription>目前共有 {coupons.length} 個優惠券</CardDescription>
+              </div>
+              {needsMigration && (
+                <div className="flex items-center gap-3">
+                  <div className="text-sm text-amber-600 bg-amber-100 px-3 py-1 rounded-lg">
+                    ⚠️ 數據庫尚未支持優惠券功能
+                  </div>
+                  <Button
+                    onClick={handleMigration}
+                    variant="outline"
+                    size="sm"
+                    className="text-amber-700 border-amber-300 hover:bg-amber-50"
+                  >
+                    <Database className="w-4 h-4 mr-2" />
+                    升級數據庫
+                  </Button>
+                </div>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             {loading ? (
