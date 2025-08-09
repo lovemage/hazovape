@@ -17,7 +17,8 @@ import {
   Plus,
   Home,
   Tag,
-  Palette
+  Palette,
+  Ticket
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -100,6 +101,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       label: '訂單管理',
       icon: <ShoppingCart className="w-5 h-5" />,
       path: '/admin/orders',
+    },
+    {
+      id: 'coupons',
+      label: '優惠券管理',
+      icon: <Ticket className="w-5 h-5" />,
+      path: '/admin/coupons',
     },
     {
       id: 'upsell-products',

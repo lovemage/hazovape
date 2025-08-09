@@ -27,6 +27,7 @@ import { AdminOrders } from './pages/admin/AdminOrders';
 import { AdminAnnouncements } from './pages/admin/AdminAnnouncements';
 import { AdminChangePassword } from './pages/admin/AdminChangePassword';
 import AdminUpsellProducts from './pages/admin/AdminUpsellProducts';
+import { AdminCoupons } from './pages/admin/AdminCoupons';
 // import { AdminFlavorCategories } from './pages/admin/AdminFlavorCategories';
 
 // 管理界面保護路由組件
@@ -115,6 +116,14 @@ function App() {
                 element={
                   <ProtectedAdminRoute>
                     <AdminOrders />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/coupons"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminCoupons />
                   </ProtectedAdminRoute>
                 }
               />
