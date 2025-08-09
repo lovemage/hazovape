@@ -46,9 +46,13 @@ const AdminUpsellProducts: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('/api/upsell-products/admin/all', {
+      // 添加時間戳避免快取
+      const timestamp = Date.now();
+      const response = await fetch(`/api/upsell-products/admin/all?t=${timestamp}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
         }
       });
       
@@ -136,7 +140,8 @@ const AdminUpsellProducts: React.FC = () => {
 
       if (response.ok) {
         toast.success('加購商品刪除成功');
-        fetchProducts();
+        // 重新載入商品列表
+        await fetchProducts();
       } else {
         toast.error('刪除失敗');
       }
@@ -181,7 +186,10 @@ const AdminUpsellProducts: React.FC = () => {
       const result = await response.json();
       if (response.ok && result.success) {
         toast.success(result.message || '批量刪除成功');
-        fetchProducts();
+        // 確保清空選中的ID
+        setSelectedIds(new Set());
+        // 重新載入商品列表
+        await fetchProducts();
       } else {
         toast.error(result.message || '批量刪除失敗');
       }
