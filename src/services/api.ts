@@ -228,6 +228,19 @@ export const flavorAPI = {
   },
 };
 
+// 優惠券相關 API
+export const couponAPI = {
+  validate: (data: { code: string; customerPhone: string; subtotal: number }) => 
+    api.post('/coupons/validate', data),
+  // 管理員API
+  getAllAdmin: (params?: { page?: number; limit?: number; search?: string; status?: string }) => 
+    api.get('/coupons/admin/all', { params }),
+  create: (data: any) => api.post('/coupons/admin', data),
+  update: (id: number, data: any) => api.put(`/coupons/admin/${id}`, data),
+  delete: (id: number) => api.delete(`/coupons/admin/${id}`),
+  getStats: (id: number) => api.get(`/coupons/admin/${id}/stats`),
+};
+
 // 口味類別相關 API
 export const flavorCategoryAPI = {
   getAll: () => api.get('/flavor-categories'),

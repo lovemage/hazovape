@@ -99,6 +99,39 @@ export interface Announcement {
   updated_at: string;
 }
 
+export interface Coupon {
+  id: number;
+  code: string;
+  name: string;
+  description?: string;
+  type: 'percentage' | 'fixed_amount' | 'free_shipping';
+  value: number;
+  min_order_amount: number;
+  max_discount?: number;
+  usage_limit?: number;
+  used_count: number;
+  per_user_limit: number;
+  valid_from: string;
+  valid_until: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CouponValidationResult {
+  coupon: {
+    id: number;
+    code: string;
+    name: string;
+    description?: string;
+    type: string;
+    value: number;
+  };
+  discountAmount: number;
+  freeShipping: boolean;
+  message: string;
+}
+
 // 管理員相關類型
 export interface AdminUser {
   id: number;

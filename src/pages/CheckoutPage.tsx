@@ -5,8 +5,8 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { useCart } from '../contexts/CartContext';
-import { orderAPI } from '../services/api';
-import { CustomerInfo } from '../types';
+import { orderAPI, couponAPI } from '../services/api';
+import { CustomerInfo, CouponValidationResult } from '../types';
 import { toast } from 'sonner';
 import { UpsellSection } from '../components/UpsellSection';
 import { OrderItem } from '../types';
@@ -28,6 +28,11 @@ export const CheckoutPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Partial<CustomerInfo>>({});
 
+  // 優惠券相關狀態
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<CouponValidationResult | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+
   // 複製店號功能
   const handleCopyStoreNumber = async (storeNumber: string) => {
     try {
@@ -37,6 +42,47 @@ export const CheckoutPage: React.FC = () => {
       console.error('複製失敗:', error);
       toast.error('複製失敗');
     }
+  };
+
+  // 驗證優惠券
+  const handleValidateCoupon = async () => {
+    if (!couponCode.trim()) {
+      toast.error('請輸入優惠券代碼');
+      return;
+    }
+
+    if (!customerInfo.phone) {
+      toast.error('請先填寫電話號碼');
+      return;
+    }
+
+    try {
+      setCouponLoading(true);
+      const response = await couponAPI.validate({
+        code: couponCode.trim(),
+        customerPhone: customerInfo.phone,
+        subtotal: getTotalPrice()
+      });
+
+      if (response.data.success) {
+        setAppliedCoupon(response.data.data);
+        toast.success(response.data.data.message);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error('驗證優惠券失敗:', error);
+      toast.error('驗證優惠券失敗');
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  // 移除優惠券
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    toast.success('已移除優惠券');
   };
 
   // 計算優惠信息
@@ -60,15 +106,31 @@ export const CheckoutPage: React.FC = () => {
     return getDiscountInfo().reduce((total, info) => total + info.savings, 0);
   };
 
+  // 計算優惠券折扣金額
+  const getCouponDiscount = () => {
+    return appliedCoupon ? appliedCoupon.discountAmount : 0;
+  };
+
   // 計算運費
   const getShippingFee = () => {
     const subtotal = getTotalPrice();
-    return subtotal >= freeShippingThreshold ? 0 : shippingFee; // 未滿免運門檻收取設定的運費
+    const afterDiscount = subtotal - getCouponDiscount();
+    
+    // 如果有免運優惠券，直接免運
+    if (appliedCoupon && appliedCoupon.freeShipping) {
+      return 0;
+    }
+    
+    // 否則檢查折扣後是否達到免運門檻
+    return afterDiscount >= freeShippingThreshold ? 0 : shippingFee;
   };
 
-  // 計算最終總額（包含運費）
+  // 計算最終總額（包含運費，扣除優惠券折扣）
   const getFinalTotal = () => {
-    return getTotalPrice() + getShippingFee();
+    const subtotal = getTotalPrice();
+    const discount = getCouponDiscount();
+    const shipping = getShippingFee();
+    return Math.max(0, subtotal - discount + shipping);
   };
 
   // 檢查是否符合免運
@@ -325,7 +387,12 @@ export const CheckoutPage: React.FC = () => {
         customer_phone: customerInfo.phone.trim(),
         store_number: customerInfo.storeNumber.trim(),
         items: orderItems,
-        total_amount: getTotalPrice(),
+        total_amount: getFinalTotal(), // 使用包含優惠券折扣的最終總額
+        subtotal: getTotalPrice(), // 商品小計
+        shipping_fee: getShippingFee(), // 運費
+        coupon_code: appliedCoupon?.coupon.code || null, // 優惠券代碼
+        coupon_id: appliedCoupon?.coupon.id || null, // 優惠券ID
+        discount_amount: getCouponDiscount(), // 折扣金額
         delivery_option: 'store',
         notes: customerInfo.notes || ''
       };
@@ -666,6 +733,77 @@ export const CheckoutPage: React.FC = () => {
                 </div>
               )}
 
+              {/* 優惠券區域 */}
+              <div className="mb-4 p-4 bg-gray-50 rounded-lg border">
+                <h4 className="text-sm font-medium text-gray-900 mb-3">優惠券</h4>
+                
+                {!appliedCoupon ? (
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="請輸入優惠券代碼"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        className="flex-1 text-sm"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleValidateCoupon();
+                          }
+                        }}
+                      />
+                      <Button
+                        onClick={handleValidateCoupon}
+                        disabled={couponLoading || !couponCode.trim() || !customerInfo.phone}
+                        className="px-4 py-2 text-sm"
+                      >
+                        {couponLoading ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        ) : (
+                          '套用'
+                        )}
+                      </Button>
+                    </div>
+                    
+                    {!customerInfo.phone && (
+                      <p className="text-xs text-amber-600">
+                        💡 請先填寫電話號碼才能使用優惠券
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                      <div>
+                        <p className="text-sm font-medium text-green-800">
+                          🎫 {appliedCoupon.coupon.name}
+                        </p>
+                        <p className="text-xs text-green-600">
+                          {appliedCoupon.coupon.description}
+                        </p>
+                        {appliedCoupon.discountAmount > 0 && (
+                          <p className="text-xs text-green-700 font-medium">
+                            折扣: -NT$ {appliedCoupon.discountAmount.toLocaleString()}
+                          </p>
+                        )}
+                        {appliedCoupon.freeShipping && (
+                          <p className="text-xs text-green-700 font-medium">
+                            免運優惠已套用
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        onClick={handleRemoveCoupon}
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-600 hover:text-red-700 p-1"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* 費用明細 */}
               <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between items-center">
@@ -675,10 +813,20 @@ export const CheckoutPage: React.FC = () => {
                   </span>
                 </div>
 
+                {/* 優惠券折扣 */}
+                {appliedCoupon && appliedCoupon.discountAmount > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">優惠券折扣:</span>
+                    <span className="text-sm text-green-600">
+                      -NT$ {appliedCoupon.discountAmount.toLocaleString()}
+                    </span>
+                  </div>
+                )}
+
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">運費:</span>
-                  <span className={`text-sm ${isFreeShipping() ? 'text-green-600' : 'text-gray-900'}`}>
-                    {isFreeShipping() ? '免運' : `NT$ ${getShippingFee()}`}
+                  <span className={`text-sm ${getShippingFee() === 0 ? 'text-green-600' : 'text-gray-900'}`}>
+                    {getShippingFee() === 0 ? '免運' : `NT$ ${getShippingFee()}`}
                   </span>
                 </div>
 

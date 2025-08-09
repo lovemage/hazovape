@@ -142,7 +142,10 @@ ${itemsText}
 router.post('/', async (req, res) => {
   try {
     console.log('🛒 收到訂單創建請求:', req.body);
-    const { customer_name, customer_phone, store_number, items, total_amount } = req.body;
+    const { 
+      customer_name, customer_phone, store_number, items, total_amount, 
+      subtotal, shipping_fee, coupon_code, coupon_id, discount_amount 
+    } = req.body;
 
     // 驗證必填字段
     if (!customer_name || !customer_phone || !store_number || !items || !Array.isArray(items) || items.length === 0) {
@@ -417,9 +420,9 @@ router.post('/', async (req, res) => {
 
       // 創建訂單
       const orderResult = await Database.run(
-        `INSERT INTO orders (order_number, customer_name, customer_phone, store_number, total_amount, verification_code)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [orderNumber, customer_name, customer_phone, store_number, finalTotalAmount, verificationCode]
+        `INSERT INTO orders (order_number, customer_name, customer_phone, store_number, total_amount, verification_code, coupon_id, coupon_code, discount_amount)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [orderNumber, customer_name, customer_phone, store_number, finalTotalAmount, verificationCode, coupon_id || null, coupon_code || null, discount_amount || 0]
       );
 
       // 創建訂單項目
@@ -429,6 +432,25 @@ router.post('/', async (req, res) => {
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [orderResult.id, item.product_id, item.upsell_product_id, item.product_name, item.product_price, item.quantity, item.flavors, item.subtotal, item.is_upsell]
         );
+      }
+
+      // 如果使用了優惠券，記錄使用情況
+      if (coupon_id && discount_amount > 0) {
+        console.log('🎫 記錄優惠券使用:', { coupon_id, discount_amount, customer_phone });
+        
+        await Database.run(
+          `INSERT INTO coupon_usages (coupon_id, order_id, customer_phone, discount_amount)
+           VALUES (?, ?, ?, ?)`,
+          [coupon_id, orderResult.id, customer_phone, discount_amount]
+        );
+
+        // 更新優惠券使用次數
+        await Database.run(
+          `UPDATE coupons SET used_count = used_count + 1 WHERE id = ?`,
+          [coupon_id]
+        );
+
+        console.log('✅ 優惠券使用記錄完成');
       }
 
       await Database.commit();
