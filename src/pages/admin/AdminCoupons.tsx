@@ -76,18 +76,38 @@ export const AdminCoupons: React.FC = () => {
         setNeedsMigration(false);
       } else {
         // 如果返回失敗且可能是數據庫表不存在，標記需要遷移
-        if (response.data.message?.includes('no such table') || response.data.message?.includes('coupons')) {
+        const errorMessage = response.data.message || '';
+        const isTableMissingError = errorMessage.includes('no such table') || 
+                                   errorMessage.includes('SQLITE_ERROR') ||
+                                   errorMessage.includes('coupons');
+        
+        if (isTableMissingError) {
+          console.log('🔍 從響應中檢測到數據庫表不存在，顯示遷移按鈕');
           setNeedsMigration(true);
+        } else {
+          toast.error('載入優惠券失敗');
         }
-        toast.error('載入優惠券失敗');
       }
     } catch (error: any) {
       console.error('載入優惠券失敗:', error);
-      // 如果是數據庫相關錯誤，標記需要遷移
-      if (error.response?.status === 500 && 
-          (error.response?.data?.message?.includes('no such table') || 
-           error.response?.data?.message?.includes('coupons'))) {
+      
+      // 檢查是否為數據庫表不存在的錯誤
+      const errorString = JSON.stringify(error);
+      const errorMessage = error.response?.data?.message || error.message || errorString;
+      const isTableMissingError = errorMessage.includes('no such table') || 
+                                 errorMessage.includes('SQLITE_ERROR') ||
+                                 errorMessage.includes('coupons');
+      
+      console.log('🔍 錯誤檢測:', { 
+        status: error.response?.status, 
+        message: errorMessage,
+        isTableMissing: isTableMissingError 
+      });
+      
+      if (isTableMissingError) {
+        console.log('🔍 檢測到數據庫表不存在，顯示遷移按鈕');
         setNeedsMigration(true);
+        // 不顯示錯誤 toast，因為這是預期的情況
       } else {
         toast.error('載入優惠券失敗');
       }
