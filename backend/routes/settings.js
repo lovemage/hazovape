@@ -32,7 +32,8 @@ router.get('/', async (req, res) => {
         settingsMap[setting.setting_key] = setting.setting_value;
       });
 
-      console.log('✅ 從數據庫加載設置成功');
+      console.log('✅ 從數據庫加載設置成功，共', dbSettings.length, '個設置');
+      console.log('✅ 最終設置映射:', settingsMap);
       return res.json({
         success: true,
         data: settingsMap,
@@ -85,9 +86,7 @@ router.get('/:key', async (req, res) => {
     const { key } = req.params;
     console.log('📋 獲取設置:', key);
 
-    // 直接使用默認值，避免數據庫查詢錯誤
-    console.log('📋 使用默認設置值:', key);
-
+    // 預設值
     const defaultSettings = {
       'free_shipping_threshold': '3000',
       'shipping_fee': '60',
@@ -100,11 +99,36 @@ router.get('/:key', async (req, res) => {
       'contact_email': ''
     };
 
-    const setting = {
-      key: key,
-      value: defaultSettings[key] || '',
-      type: 'text'
-    };
+    let setting;
+    
+    try {
+      // 先嘗試從資料庫讀取
+      const dbSetting = await Database.get('SELECT setting_key, setting_value FROM system_settings WHERE setting_key = ?', [key]);
+      
+      if (dbSetting) {
+        setting = {
+          key: key,
+          value: dbSetting.setting_value,
+          type: 'text'
+        };
+        console.log('✅ 從資料庫讀取設置:', key, '=', dbSetting.setting_value);
+      } else {
+        // 如果資料庫沒有，使用預設值
+        setting = {
+          key: key,
+          value: defaultSettings[key] || '',
+          type: 'text'
+        };
+        console.log('📋 使用預設設置值:', key, '=', defaultSettings[key]);
+      }
+    } catch (dbError) {
+      console.log('⚠️ 資料庫查詢失敗，使用預設值:', dbError.message);
+      setting = {
+        key: key,
+        value: defaultSettings[key] || '',
+        type: 'text'
+      };
+    }
 
     if (!setting.value && !defaultSettings[key]) {
       return res.status(404).json({
