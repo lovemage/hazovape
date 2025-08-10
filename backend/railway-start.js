@@ -196,9 +196,51 @@ async function initializeDatabase() {
     await updateVapeFlavorCategories();
     console.log('✅ 電子煙規格分類更新完成');
     
+    // 初始化門市數據
+    console.log('🔄 檢查門市數據...');
+    await initializeStores();
+    console.log('✅ 門市數據檢查完成');
+    
   } catch (error) {
     console.error('❌ 遷移失敗:', error.message);
     console.log('⚠️  遷移失敗，但繼續啟動服務器...');
+  }
+}
+
+// 初始化門市數據
+async function initializeStores() {
+  try {
+    console.log('🏪 檢查門市數據...');
+    
+    const Database = require('./config/database');
+    
+    // 檢查stores表是否存在且有數據
+    try {
+      const storeCount = await Database.get('SELECT COUNT(*) as count FROM stores');
+      if (storeCount.count === 0) {
+        console.log('📦 門市數據為空，開始導入...');
+        if (fs.existsSync('./scripts/import-711-stores.js')) {
+          const { import711Stores } = require('./scripts/import-711-stores.js');
+          await import711Stores();
+          console.log('✅ 門市數據導入完成');
+        } else {
+          console.log('⚠️ 門市導入腳本不存在');
+        }
+      } else {
+        console.log(`✅ 門市數據已存在，共 ${storeCount.count} 個門市`);
+      }
+    } catch (tableError) {
+      console.log('📋 stores表不存在，創建並導入數據...');
+      if (fs.existsSync('./scripts/import-711-stores.js')) {
+        const { import711Stores } = require('./scripts/import-711-stores.js');
+        await import711Stores();
+        console.log('✅ 門市數據導入完成');
+      } else {
+        console.log('⚠️ 門市導入腳本不存在');
+      }
+    }
+  } catch (error) {
+    console.error('❌ 門市數據初始化失敗:', error);
   }
 }
 
