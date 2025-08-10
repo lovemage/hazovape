@@ -61,3 +61,17 @@ backend/uploads/upsell/*
 # Backup files
 backend/data/backups/*
 backend/exports/*
+# Database temporary files
+*.db-shm
+*.db-wal
+
+# CVS temp data (keep only essential files)
+backend/temp-cvs-data/*
+!backend/temp-cvs-data/README.md
+!backend/temp-cvs-data/src/
+backend/temp-cvs-data/src/*
+!backend/temp-cvs-data/src/assets/
+backend/temp-cvs-data/src/assets/*
+!backend/temp-cvs-data/src/assets/json/
+backend/temp-cvs-data/src/assets/json/*
+!backend/temp-cvs-data/src/assets/json/s_data.json
