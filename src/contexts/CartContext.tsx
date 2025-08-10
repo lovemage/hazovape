@@ -70,7 +70,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
             if (action.payload.variantId && item.variants) {
               // 更新特定規格的數量
               const updatedVariants = item.variants.map(variant =>
-                variant.id === action.payload.variantId
+                variant.id.toString() === action.payload.variantId
                   ? { ...variant, quantity: action.payload.quantity }
                   : variant
               );
