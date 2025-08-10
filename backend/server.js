@@ -150,6 +150,7 @@ app.use('/api/settings', require('./routes/settings'));
 app.use('/api/coupons', require('./routes/coupons'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/upsell-products', require('./routes/upsell-products'));
+app.use('/api/stores', require('./routes/stores'));
 app.use('/api/store-callback', require('./routes/store-callback'));
 
 // 7-11 門市選擇回調處理

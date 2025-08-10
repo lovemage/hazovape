@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShoppingBag, User, Phone, MapPin, CreditCard, Search, ExternalLink, Copy, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -9,6 +9,7 @@ import { orderAPI, couponAPI } from '../services/api';
 import { CustomerInfo, CouponValidationResult } from '../types';
 import { toast } from 'sonner';
 import { UpsellSection } from '../components/UpsellSection';
+import { StoreSelector } from '../components/StoreSelector';
 import { OrderItem } from '../types';
 
 export const CheckoutPage: React.FC = () => {
@@ -42,6 +43,15 @@ export const CheckoutPage: React.FC = () => {
       console.error('複製失敗:', error);
       toast.error('複製失敗');
     }
+  };
+
+  // 處理門市選擇
+  const handleStoreSelect = (store: { id: string; name: string; tel: string; address: string }) => {
+    setCustomerInfo(prev => ({
+      ...prev,
+      storeNumber: store.id,
+      storeName: store.name
+    }));
   };
 
   // 驗證優惠券
@@ -84,6 +94,49 @@ export const CheckoutPage: React.FC = () => {
     setCouponCode('');
     toast.success('已移除優惠券');
   };
+
+  // 重新驗證已套用的優惠券
+  const revalidateAppliedCoupon = useCallback(async () => {
+    if (!appliedCoupon || !customerInfo.phone) {
+      return;
+    }
+
+    const originalDiscountAmount = appliedCoupon.discountAmount;
+
+    try {
+      const response = await couponAPI.validate({
+        code: appliedCoupon.coupon.code,
+        customerPhone: customerInfo.phone,
+        subtotal: getTotalPrice()
+      });
+
+      if (response.data.success) {
+        const newDiscountAmount = response.data.data.discountAmount;
+        
+        // 更新優惠券折扣金額
+        setAppliedCoupon(response.data.data);
+        
+        // 如果折扣金額發生變化，提醒用戶
+        if (originalDiscountAmount !== newDiscountAmount) {
+          if (newDiscountAmount > originalDiscountAmount) {
+            toast.success(`優惠券折扣已更新：NT$ ${newDiscountAmount.toLocaleString()}（+NT$ ${(newDiscountAmount - originalDiscountAmount).toLocaleString()}）`);
+          } else if (newDiscountAmount < originalDiscountAmount) {
+            toast.warning(`優惠券折扣已更新：NT$ ${newDiscountAmount.toLocaleString()}（-NT$ ${(originalDiscountAmount - newDiscountAmount).toLocaleString()}）`);
+          }
+        }
+        
+        console.log('✅ 優惠券已重新驗證，折扣已更新:', newDiscountAmount);
+      } else {
+        // 優惠券不再有效，移除它
+        setAppliedCoupon(null);
+        setCouponCode('');
+        toast.error(`優惠券已失效：${response.data.message}`);
+      }
+    } catch (error) {
+      console.error('重新驗證優惠券失敗:', error);
+      // 發生錯誤時保持現有優惠券，避免意外移除
+    }
+  }, [appliedCoupon, customerInfo.phone, getTotalPrice]);
 
   // 計算優惠信息
   const getDiscountInfo = () => {
@@ -133,14 +186,31 @@ export const CheckoutPage: React.FC = () => {
     return Math.max(0, subtotal - discount + shipping);
   };
 
-  // 檢查是否符合免運
+  // 檢查是否符合免運（使用與getShippingFee相同的邏輯）
   const isFreeShipping = () => {
-    return getTotalPrice() >= freeShippingThreshold;
+    const subtotal = getTotalPrice();
+    const afterDiscount = subtotal - getCouponDiscount();
+    
+    // 如果有免運優惠券，直接免運
+    if (appliedCoupon && appliedCoupon.freeShipping) {
+      return true;
+    }
+    
+    // 否則檢查折扣後是否達到免運門檻
+    return afterDiscount >= freeShippingThreshold;
   };
 
-  // 計算距離免運還差多少
+  // 計算距離免運還差多少（基於折扣後金額）
   const getAmountToFreeShipping = () => {
-    const remaining = freeShippingThreshold - getTotalPrice();
+    const subtotal = getTotalPrice();
+    const afterDiscount = subtotal - getCouponDiscount();
+    
+    // 如果有免運優惠券，已經免運
+    if (appliedCoupon && appliedCoupon.freeShipping) {
+      return 0;
+    }
+    
+    const remaining = freeShippingThreshold - afterDiscount;
     return remaining > 0 ? remaining : 0;
   };
 
@@ -175,6 +245,14 @@ export const CheckoutPage: React.FC = () => {
 
     loadShippingSettings();
   }, []);
+
+  // 監聽購物車變動，自動重新驗證優惠券
+  useEffect(() => {
+    if (appliedCoupon && customerInfo.phone && items.length > 0) {
+      console.log('🛒 購物車變動，重新驗證優惠券...');
+      revalidateAppliedCoupon();
+    }
+  }, [items, customerInfo.phone]); // 監聽購物車商品和客戶電話變化
 
   useEffect(() => {
     const handleStoreCallback = () => {
@@ -536,116 +614,51 @@ export const CheckoutPage: React.FC = () => {
                     7-11取貨門市 *
                   </Label>
 
-                  {/* 門市選擇按鈕 */}
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleStoreSearch}
-                      className="flex items-center gap-2 px-3 whitespace-nowrap"
-                      title="手動查詢店號"
-                    >
-                      <Search className="w-4 h-4" />
-                      查詢門市
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="default"
-                      onClick={openStoreSelector}
-                      className="flex items-center gap-2 px-4 whitespace-nowrap"
-                    >
-                      <MapPin className="w-4 h-4" />
-                      選擇門市(Beta)
-                      <span className="text-xs text-gray-400 ml-1">測試中</span>
-                    </Button>
-                  </div>
+                  {/* 本地門市選擇器 */}
+                  <StoreSelector
+                    onStoreSelect={handleStoreSelect}
+                    selectedStore={customerInfo.storeNumber ? {
+                      id: customerInfo.storeNumber,
+                      name: customerInfo.storeName,
+                      tel: '',
+                      address: ''
+                    } : null}
+                  />
 
-                  {/* 已選擇的門市信息 */}
-                  {customerInfo.storeName && (
-                    <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <p className="font-medium text-green-700">{customerInfo.storeName}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <p className="text-sm text-gray-600">門市編號: {customerInfo.storeNumber}</p>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleCopyStoreNumber(customerInfo.storeNumber)}
-                              className="h-6 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-100"
-                              title="複製店號"
-                            >
-                              <Copy className="w-3 h-3 mr-1" />
-                              複製
-                            </Button>
-                          </div>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setCustomerInfo(prev => ({ ...prev, storeName: '', storeNumber: '' }))}
-                          className="h-6 w-6 p-0 text-gray-500 hover:text-red-600 hover:bg-red-100"
-                          title="清除選擇"
-                        >
-                          <X className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    </div>
+                  {errors.storeNumber && (
+                    <p className="text-red-500 text-sm mt-1">{errors.storeNumber}</p>
                   )}
 
-                  {/* 手動輸入門市資訊 */}
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-medium text-gray-700">或手動輸入門市資訊（二選一）</h4>
-
-                    <div>
-                      <Label htmlFor="storeNumber" className="text-sm text-gray-600">
-                        取件店號
-                      </Label>
-                      <Input
-                        id="storeNumber"
-                        type="text"
-                        value={customerInfo.storeNumber}
-                        onChange={(e) => handleInputChange('storeNumber', e.target.value)}
-                        placeholder="請輸入6位數店號（例：123456）"
-                        maxLength={6}
-                        className={errors.storeNumber ? 'border-red-500' : ''}
-                      />
-                    </div>
-
-                    <div className="text-center text-gray-500 text-sm">或</div>
-
-                    <div>
-                      <Label htmlFor="storeName" className="text-sm text-gray-600">
-                        取件店名
-                      </Label>
-                      <Input
-                        id="storeName"
-                        type="text"
-                        value={customerInfo.storeName}
-                        onChange={(e) => handleInputChange('storeName', e.target.value)}
-                        placeholder="請輸入門市名稱（例：7-ELEVEN 波卡門市3店）"
-                        className={errors.storeNumber ? 'border-red-500' : ''}
-                      />
-                    </div>
-
-                    {errors.storeNumber && (
-                      <p className="text-red-500 text-sm mt-1">{errors.storeNumber}</p>
-                    )}
-                  </div>
-
-                  {/* 使用說明 */}
-                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <div className="flex items-start gap-2">
-                      <MapPin className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <div className="text-xs text-blue-700">
-                        <p className="font-medium mb-1">門市選擇方式：</p>
-                        <ul className="space-y-1 text-blue-600">
-                          <li>• <strong>推薦</strong>：點擊「查詢門市」→ 查詢店號 → 關閉視窗 → 輸入店號</li>
-                          <li>• 或點擊「選擇門市(Beta)」在地圖上直接選擇（測試功能）</li>
-                          <li>• 店號格式：6位數字（例：123456）</li>
-                        </ul>
+                  {/* 手動輸入備選方案 */}
+                  <div className="pt-4 border-t">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">或手動輸入門市資訊</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="storeNumber" className="text-sm text-gray-600">
+                          取件店號
+                        </Label>
+                        <Input
+                          id="storeNumber"
+                          type="text"
+                          value={customerInfo.storeNumber}
+                          onChange={(e) => handleInputChange('storeNumber', e.target.value)}
+                          placeholder="請輸入6位數店號"
+                          maxLength={6}
+                          className={errors.storeNumber ? 'border-red-500' : ''}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="storeName" className="text-sm text-gray-600">
+                          取件店名
+                        </Label>
+                        <Input
+                          id="storeName"
+                          type="text"
+                          value={customerInfo.storeName}
+                          onChange={(e) => handleInputChange('storeName', e.target.value)}
+                          placeholder="請輸入門市名稱"
+                          className={errors.storeNumber ? 'border-red-500' : ''}
+                        />
                       </div>
                     </div>
                   </div>
