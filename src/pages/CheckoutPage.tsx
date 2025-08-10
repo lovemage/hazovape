@@ -698,33 +698,44 @@ export const CheckoutPage: React.FC = () => {
               {/* 商品列表 */}
               <div className="space-y-4 mb-6">
                   {items.map((item) => (
-                    <div key={item.id} className="flex justify-between py-2 border-b border-gray-200 last:border-b-0">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900 text-sm">{item.productName}</h4>
-                        <p className="text-xs text-gray-500">數量: {item.quantity}</p>
-                        
-                        {/* 規格顯示 */}
-                        {item.variants && item.variants.length > 0 && (
-                          <div className="mt-1">
-                            <p className="text-xs text-gray-500">規格:</p>
-                            <div className="flex flex-wrap gap-1 mt-1">
+                    <div key={item.id} className="border-b border-gray-200 last:border-b-0 pb-3 mb-3">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900 text-sm">{item.productName}</h4>
+                          {!item.variants || item.variants.length === 0 ? (
+                            <div className="flex justify-between items-center mt-1">
+                              <div>
+                                <p className="text-xs text-gray-500">數量: {item.quantity}</p>
+                                <p className="text-xs text-blue-600 font-medium">NT$ {item.productPrice} × {item.quantity}</p>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="mt-2 space-y-1">
+                              <p className="text-xs text-gray-500">規格明細:</p>
                               {item.variants.map((variant, index) => (
-                                <span 
-                                  key={variant.id} 
-                                  className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
-                                >
-                                  {variant.name}
-                                </span>
+                                <div key={variant.id} className="flex justify-between items-center bg-gray-50 px-2 py-1 rounded text-xs">
+                                  <div className="flex items-center gap-2">
+                                    <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                                      {variant.name}
+                                    </span>
+                                    <span className="text-blue-600 font-medium">NT$ {variant.price}</span>
+                                    <span className="text-gray-500">× {variant.quantity || 1}</span>
+                                  </div>
+                                  <span className="font-medium text-gray-900">
+                                    NT$ {(variant.price * (variant.quantity || 1)).toLocaleString()}
+                                  </span>
+                                </div>
                               ))}
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                       
-                      <div className="text-right">
-                        <p className="font-medium text-gray-900 text-sm">
+                      <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
+                        <span className="text-xs text-gray-500">商品小計:</span>
+                        <span className="font-medium text-gray-900 text-sm">
                           NT$ {item.subtotal.toLocaleString()}
-                        </p>
+                        </span>
                       </div>
                     </div>
                   ))}

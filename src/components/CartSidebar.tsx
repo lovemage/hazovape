@@ -48,10 +48,14 @@ export const CartSidebar: React.FC = () => {
                 <div className="space-y-4">
                   {items.map((item) => (
                     <div key={item.id} className="border rounded-lg p-3">
-                      <div className="flex items-start justify-between">
+                      <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
                           <h3 className="font-medium text-gray-900">{item.productName}</h3>
-                          <p className="text-sm text-blue-600 font-medium">NT$ {item.productPrice}</p>
+                          {!item.variants || item.variants.length === 0 ? (
+                            <p className="text-sm text-blue-600 font-medium">NT$ {item.productPrice}</p>
+                          ) : (
+                            <p className="text-xs text-gray-500">多規格商品</p>
+                          )}
                         </div>
                         <Button
                           variant="ghost"
@@ -63,56 +67,97 @@ export const CartSidebar: React.FC = () => {
                         </Button>
                       </div>
 
-                      {/* 規格顯示 */}
-                      {item.variants && item.variants.length > 0 && (
-                        <div className="mt-2">
-                          <p className="text-xs text-gray-500 mb-1">規格:</p>
-                          <div className="flex flex-wrap gap-1">
-                            {item.variants.map((variant, index) => (
-                              <Badge 
-                                key={variant.id} 
-                                variant="outline" 
-                                className="text-xs"
-                              >
-                                {variant.name}
-                              </Badge>
-                            ))}
+                      {/* 規格顯示 - 分別列出每個規格的價格和數量 */}
+                      {item.variants && item.variants.length > 0 ? (
+                        <div className="space-y-2">
+                          {item.variants.map((variant, index) => (
+                            <div key={variant.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="outline" className="text-xs">
+                                    {variant.name}
+                                  </Badge>
+                                  <span className="text-sm text-blue-600 font-medium">
+                                    NT$ {variant.price}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => updateQuantity(item.id, Math.max(1, (variant.quantity || 1) - 1), variant.id)}
+                                    disabled={(variant.quantity || 1) <= 1}
+                                    className="h-6 w-6 p-0"
+                                  >
+                                    <Minus className="h-2 w-2" />
+                                  </Button>
+                                  <span className="text-xs font-medium w-6 text-center">
+                                    {variant.quantity || 1}
+                                  </span>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => updateQuantity(item.id, (variant.quantity || 1) + 1, variant.id)}
+                                    className="h-6 w-6 p-0"
+                                  >
+                                    <Plus className="h-2 w-2" />
+                                  </Button>
+                                </div>
+                                <span className="text-xs font-medium text-gray-900 ml-2">
+                                  NT$ {(variant.price * (variant.quantity || 1)).toLocaleString()}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        /* 無規格商品的數量調整 */
+                        <div className="mt-3 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              disabled={item.quantity <= 1}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </Button>
+                            <span className="text-sm font-medium w-8 text-center">
+                              {item.quantity}
+                            </span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </Button>
+                          </div>
+
+                          {/* 小計 */}
+                          <div className="text-right">
+                            <p className="text-sm font-medium text-gray-900">
+                              NT$ {item.subtotal.toLocaleString()}
+                            </p>
                           </div>
                         </div>
                       )}
 
-                      {/* 數量調整 */}
-                      <div className="mt-3 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            disabled={item.quantity <= 1}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <span className="text-sm font-medium w-8 text-center">
-                            {item.quantity}
-                          </span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
+                      {/* 有規格商品的總小計 */}
+                      {item.variants && item.variants.length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-gray-200">
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-gray-500">商品小計:</span>
+                            <span className="text-sm font-medium text-gray-900">
+                              NT$ {item.subtotal.toLocaleString()}
+                            </span>
+                          </div>
                         </div>
-
-                        {/* 小計 */}
-                        <div className="text-right">
-                          <p className="text-sm font-medium text-gray-900">
-                            NT$ {item.subtotal.toLocaleString()}
-                          </p>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   ))}
                 </div>

@@ -21,7 +21,7 @@ interface CartContextType {
   items: CartItem[];
   addToCart: (product: Product, quantity?: number, selectedFlavors?: ProductVariant[]) => void;
   removeFromCart: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  updateQuantity: (id: string, quantity: number, variantId?: string) => void;
   clearCart: () => void;
   isOpen: boolean;
   openCart: () => void;
@@ -40,7 +40,7 @@ interface CartContextType {
 type CartAction =
   | { type: 'ADD_ITEM'; payload: Omit<CartItem, 'id'> }
   | { type: 'REMOVE_ITEM'; payload: { id: string } }
-  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
+  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number; variantId?: string } }
   | { type: 'CLEAR_CART' }
   | { type: 'TOGGLE_CART' }
   | { type: 'CLOSE_CART' };
@@ -65,15 +65,34 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     case 'UPDATE_QUANTITY':
       return {
         ...state,
-        items: state.items.map(item =>
-          item.id === action.payload.id
-            ? { 
-                ...item, 
+        items: state.items.map(item => {
+          if (item.id === action.payload.id) {
+            if (action.payload.variantId && item.variants) {
+              // 更新特定規格的數量
+              const updatedVariants = item.variants.map(variant =>
+                variant.id === action.payload.variantId
+                  ? { ...variant, quantity: action.payload.quantity }
+                  : variant
+              );
+              const newSubtotal = updatedVariants.reduce((sum, variant) => 
+                sum + (variant.price * (variant.quantity || 1)), 0
+              );
+              return {
+                ...item,
+                variants: updatedVariants,
+                subtotal: newSubtotal
+              };
+            } else {
+              // 更新整個商品的數量（無規格商品）
+              return {
+                ...item,
                 quantity: action.payload.quantity,
                 subtotal: item.productPrice * action.payload.quantity
-              }
-            : item
-        )
+              };
+            }
+          }
+          return item;
+        })
       };
     case 'CLEAR_CART':
       return {
@@ -148,13 +167,13 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     removeFromCart(id);
   };
 
-  const updateQuantity = (id: string, quantity: number) => {
+  const updateQuantity = (id: string, quantity: number, variantId?: string) => {
     if (quantity <= 0) {
       removeFromCart(id);
     } else {
       dispatch({
         type: 'UPDATE_QUANTITY',
-        payload: { id, quantity }
+        payload: { id, quantity, variantId }
       });
     }
   };
