@@ -91,11 +91,21 @@ async function initializeDatabase() {
   const dbExists = fs.existsSync(dbPath);
   
   if (!dbExists) {
-    console.log('📋 首次部署，需要初始化數據庫...');
+    console.log('⚠️  數據庫文件不存在於路徑:', dbPath);
+    console.log('🔍 這可能是首次部署，或者是數據庫路徑變更');
+    
+    // 在生產環境中更謹慎的處理
+    if (isRailwayEnvironment) {
+      console.log('🚨 生產環境檢測到數據庫文件不存在！');
+      console.log('💡 如果這是意外情況，請立即檢查數據庫備份');
+      
+      // 等待一下讓用戶看到警告
+      await new Promise(resolve => setTimeout(resolve, 3000));
+    }
     
     try {
       // 運行完整的數據庫初始化
-      console.log('🚀 運行完整數據庫初始化...');
+      console.log('🚀 運行數據庫初始化（保留現有數據）...');
       const completeInit = require('./scripts/complete-init');
       await completeInit();
       console.log('✅ 數據庫初始化完成');
@@ -136,7 +146,16 @@ async function initializeDatabase() {
       }
     }
   } else {
-    console.log('📋 數據庫文件已存在，跳過初始化');
+    console.log('✅ 數據庫文件已存在，跳過初始化');
+    console.log('📁 數據庫路徑:', dbPath);
+    
+    // 檢查數據庫文件大小
+    try {
+      const stats = fs.statSync(dbPath);
+      console.log('📊 數據庫文件大小:', Math.round(stats.size / 1024), 'KB');
+    } catch (error) {
+      console.log('⚠️  無法獲取數據庫文件資訊');
+    }
   }
   
   // 運行遷移（表結構應該已經存在）

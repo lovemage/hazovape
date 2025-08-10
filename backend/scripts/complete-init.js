@@ -62,29 +62,31 @@ async function completeInit() {
       console.error('❌ 創建 admin_users 表失敗:', error);
     }
 
-    // 刪除現有管理員用戶（如果存在）
+    // 檢查是否已有管理員用戶
     try {
-      await Database.run('DELETE FROM admin_users WHERE username = ?', ['admin']);
-      console.log('🗑️  清除現有管理員用戶');
-    } catch (error) {
-      console.log('ℹ️  沒有現有管理員用戶需要清除');
-    }
+      const existingAdmin = await Database.get('SELECT id, username FROM admin_users WHERE username = ?', ['admin']);
+      
+      if (existingAdmin) {
+        console.log('✅ 管理員用戶已存在，跳過創建');
+        console.log('📝 現有管理員用戶 ID:', existingAdmin.id, '用戶名:', existingAdmin.username);
+      } else {
+        // 只有在沒有管理員時才創建預設管理員
+        console.log('📝 沒有找到管理員用戶，創建預設管理員');
+        
+        const adminPassword = await bcrypt.hash('admin123', 12);
+        console.log('🔐 生成密碼哈希:', adminPassword.substring(0, 20) + '...');
 
-    // 創建新的管理員用戶
-    const adminPassword = await bcrypt.hash('admin123', 12);
-    console.log('🔐 生成密碼哈希:', adminPassword.substring(0, 20) + '...');
-
-    try {
-      const result = await Database.run(
-        'INSERT INTO admin_users (username, password_hash, is_active) VALUES (?, ?, ?)',
-        ['admin', adminPassword, 1]
-      );
-      console.log('✅ 管理員用戶創建成功 (ID:', result.lastID, ')');
-      console.log('🔑 用戶名: admin');
-      console.log('🔑 密碼: admin123');
+        const result = await Database.run(
+          'INSERT INTO admin_users (username, password_hash, is_active) VALUES (?, ?, ?)',
+          ['admin', adminPassword, 1]
+        );
+        console.log('✅ 預設管理員用戶創建成功 (ID:', result.lastID, ')');
+        console.log('🔑 用戶名: admin');
+        console.log('🔑 密碼: admin123');
+      }
     } catch (error) {
-      console.error('❌ 創建管理員用戶失敗:', error);
-      throw error;
+      console.error('❌ 管理員用戶處理失敗:', error);
+      // 不拋出錯誤，允許系統繼續運行
     }
     
     // 3. 創建口味類別
