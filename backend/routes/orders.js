@@ -285,59 +285,34 @@ router.post('/', async (req, res) => {
           }
         }
 
-        // 計算價格
-        let subtotal = product.price * quantity;
+        // 計算價格 - 改為以規格為計價單位
+        let subtotal = 0;
         let unitPrice = product.price;
 
-        if (!is_upsell) {
-          // 只對一般商品應用多件優惠
-          const multiDiscount = product.multi_discount ? JSON.parse(product.multi_discount) : {};
-
-          // 分別處理數量折扣和單件減額
-          const quantityDiscounts = {};
-          const itemDiscounts = {};
-
-          Object.entries(multiDiscount).forEach(([key, value]) => {
-            if (key.startsWith('item_')) {
-              const qty = parseInt(key.replace('item_', ''));
-              itemDiscounts[qty] = value;
-            } else {
-              quantityDiscounts[parseInt(key)] = value;
-            }
-          });
-
-          // 先檢查數量折扣
-          const applicableQuantityDiscounts = Object.keys(quantityDiscounts)
-            .map(Number)
-            .filter(minQty => quantity >= minQty)
-            .sort((a, b) => b - a);
-
-          if (applicableQuantityDiscounts.length > 0) {
-            // 有數量折扣，使用數量折扣
-            const bestDiscount = quantityDiscounts[applicableQuantityDiscounts[0]];
-            unitPrice = Math.round(product.price * bestDiscount);
-            subtotal = Math.round(unitPrice * quantity);
-          } else {
-            // 沒有數量折扣，檢查單件減額
-            const applicableItemDiscounts = Object.keys(itemDiscounts)
-              .map(Number)
-              .filter(startQty => quantity >= startQty)
-              .sort((a, b) => a - b);
-
-            if (applicableItemDiscounts.length > 0) {
-              const startQty = applicableItemDiscounts[0];
-              const discountAmount = itemDiscounts[startQty];
-              const discountedItems = quantity - startQty + 1;
-              subtotal -= discountAmount * discountedItems;
-              // 計算平均單價
-              unitPrice = Math.round(subtotal / quantity);
-            } else {
-              // 沒有任何優惠，使用原價
-              unitPrice = product.price;
-            }
-
-            subtotal = Math.round(Math.max(0, subtotal));
-          }
+        if (!is_upsell && processedFlavors.length > 0) {
+          // 一般商品：每個規格單獨計價（現在前端已拆分為單個規格）
+          console.log(`💰 規格計價: 商品 ${product.name}, 規格: ${processedFlavors[0]}, 數量: ${quantity}`);
+          
+          const flavorName = processedFlavors[0]; // 現在每個訂單項目只有一個規格
+          
+          // 獲取規格資訊，檢查是否有獨立價格
+          const flavor = await Database.get(
+            'SELECT price FROM flavors WHERE name = ? AND product_id = ? AND is_active = 1',
+            [flavorName, product_id]
+          );
+          
+          // 使用規格價格（如果有），否則使用產品價格
+          const flavorPrice = flavor?.price || product.price;
+          subtotal = Math.round(flavorPrice * quantity);
+          unitPrice = flavorPrice;
+          
+          console.log(`💰 規格 "${flavorName}": 價格=${flavorPrice}, 數量=${quantity}, 小計=${subtotal}`);
+        } else {
+          // 加購商品或無規格商品：使用原有邏輯
+          subtotal = Math.round(product.price * quantity);
+          unitPrice = product.price;
+          
+          console.log(`💰 商品計價: 單價=${unitPrice}, 數量=${quantity}, 小計=${subtotal}`);
         }
 
         totalAmount += subtotal;

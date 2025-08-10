@@ -344,15 +344,31 @@ export const CheckoutPage: React.FC = () => {
   const orderItems: OrderItem[] = [];
 
   items.forEach(item => {
-    orderItems.push({
-      product_id: item.productId,
-      productName: item.productName,
-      product_price: item.productPrice,
-      quantity: item.quantity,
-      flavors: item.variants ? item.variants.map(variant => variant.name) : [],
-      subtotal: item.subtotal,
-      is_upsell: item.productName.startsWith('[加購]')
-    });
+    if (item.variants && item.variants.length > 0) {
+      // 對於有規格的商品，每個規格作為單獨的訂單項目
+      item.variants.forEach(variant => {
+        orderItems.push({
+          product_id: item.productId,
+          productName: item.productName,
+          product_price: variant.price, // 使用規格的價格
+          quantity: variant.quantity || 1, // 每個規格的數量，通常是1
+          flavors: [variant.name], // 單個規格名稱
+          subtotal: variant.price * (variant.quantity || 1),
+          is_upsell: item.productName.startsWith('[加購]')
+        });
+      });
+    } else {
+      // 對於無規格的商品，使用原有邏輯
+      orderItems.push({
+        product_id: item.productId,
+        productName: item.productName,
+        product_price: item.productPrice,
+        quantity: item.quantity,
+        flavors: [],
+        subtotal: item.subtotal,
+        is_upsell: item.productName.startsWith('[加購]')
+      });
+    }
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
