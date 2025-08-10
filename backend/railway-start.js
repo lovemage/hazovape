@@ -219,24 +219,39 @@ async function initializeStores() {
       const storeCount = await Database.get('SELECT COUNT(*) as count FROM stores');
       if (storeCount.count === 0) {
         console.log('📦 門市數據為空，開始導入...');
-        if (fs.existsSync('./scripts/import-711-stores.js')) {
-          const { import711Stores } = require('./scripts/import-711-stores.js');
-          await import711Stores();
-          console.log('✅ 門市數據導入完成');
+        const importScriptPath = path.join(__dirname, 'scripts', 'import-711-stores.js');
+        console.log('🔍 檢查導入腳本路徑:', importScriptPath);
+        if (fs.existsSync(importScriptPath)) {
+          try {
+            const { import711Stores } = require(importScriptPath);
+            await import711Stores();
+            console.log('✅ 門市數據導入完成');
+          } catch (importError) {
+            console.error('❌ 門市數據導入失敗:', importError.message);
+            console.log('⚠️ 系統將繼續運行，但門市選擇功能可能無法正常使用');
+          }
         } else {
-          console.log('⚠️ 門市導入腳本不存在');
+          console.log('⚠️ 門市導入腳本不存在於路徑:', importScriptPath);
         }
       } else {
         console.log(`✅ 門市數據已存在，共 ${storeCount.count} 個門市`);
       }
     } catch (tableError) {
       console.log('📋 stores表不存在，創建並導入數據...');
-      if (fs.existsSync('./scripts/import-711-stores.js')) {
-        const { import711Stores } = require('./scripts/import-711-stores.js');
-        await import711Stores();
-        console.log('✅ 門市數據導入完成');
+      console.log('❌ SQL 查詢失敗:', tableError.message);
+      const importScriptPath = path.join(__dirname, 'scripts', 'import-711-stores.js');
+      console.log('🔍 檢查導入腳本路徑:', importScriptPath);
+      if (fs.existsSync(importScriptPath)) {
+        try {
+          const { import711Stores } = require(importScriptPath);
+          await import711Stores();
+          console.log('✅ 門市數據導入完成');
+        } catch (importError) {
+          console.error('❌ 門市數據導入失敗:', importError.message);
+          console.log('⚠️ 系統將繼續運行，但門市選擇功能可能無法正常使用');
+        }
       } else {
-        console.log('⚠️ 門市導入腳本不存在');
+        console.log('⚠️ 門市導入腳本不存在於路徑:', importScriptPath);
       }
     }
   } catch (error) {

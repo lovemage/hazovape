@@ -84,16 +84,61 @@ async function import711Stores() {
       
     } catch (fileError) {
       if (fileError.code === 'ENOENT') {
-        console.error('❌ 找不到門市資料檔案，請先執行 git clone https://github.com/Minato1123/taiwan-cvs-map.git temp-cvs-data');
+        console.error('❌ 找不到門市資料檔案:', dataPath);
+        
+        // 先創建空的stores表，避免API錯誤
+        await Database.run(`
+          CREATE TABLE IF NOT EXISTS stores (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            tel TEXT,
+            address TEXT NOT NULL,
+            lat REAL NOT NULL,
+            lng REAL NOT NULL,
+            city TEXT NOT NULL,
+            area TEXT NOT NULL,
+            service TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+        console.log('✅ 已創建空的stores表，門市功能將無法使用但不會影響系統運行');
+        
+        console.log('💡 如需門市功能，請聯繫系統管理員補充門市資料');
       } else {
         console.error('❌ 讀取門市資料檔案時發生錯誤:', fileError.message);
       }
-      throw fileError;
+      // 不再拋出錯誤，允許系統繼續運行
+      console.log('⚠️ 門市資料導入失敗，但系統將繼續運行');
     }
     
   } catch (error) {
     console.error('❌ 導入門市資料時發生錯誤:', error.message);
-    throw error;
+    
+    // 確保stores表至少存在，即使沒有資料
+    try {
+      await Database.run(`
+        CREATE TABLE IF NOT EXISTS stores (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          tel TEXT,
+          address TEXT NOT NULL,
+          lat REAL NOT NULL,
+          lng REAL NOT NULL,
+          city TEXT NOT NULL,
+          area TEXT NOT NULL,
+          service TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      console.log('✅ 已確保stores表存在');
+    } catch (tableError) {
+      console.error('❌ 無法創建stores表:', tableError.message);
+    }
+    
+    // 不再拋出錯誤，允許系統繼續運行
+    console.log('⚠️ 門市功能初始化失敗，但系統將繼續運行');
   }
 }
 

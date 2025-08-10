@@ -101,6 +101,19 @@ router.get('/search', async (req, res) => {
 
   } catch (error) {
     console.error('❌ 搜尋門市失敗:', error);
+    
+    // 如果是表不存在的錯誤，返回空結果而不是錯誤
+    if (error.message && error.message.includes('no such table: stores')) {
+      console.log('⚠️ stores表不存在，返回空結果');
+      return res.json({
+        stores: [],
+        total: 0,
+        query: query || '',
+        type,
+        message: '門市資料尚未初始化'
+      });
+    }
+    
     res.status(500).json({
       success: false,
       message: '搜尋門市失敗',
