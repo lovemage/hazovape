@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Coffee, Plus, Edit, Trash2, Eye, EyeOff, ArrowUp, ArrowDown,
   Search, ChevronDown, ChevronRight, Package, Grid3X3, Layers, PlusCircle,
-  FileText, Upload, Download, AlertCircle, CheckCircle, BoxSelect, BarChart3
+  FileText, Upload, Download, AlertCircle, CheckCircle, BoxSelect, BarChart3, ToggleLeft
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -54,6 +54,11 @@ export const AdminFlavors: React.FC = () => {
   const [stockUpdateMode, setStockUpdateMode] = useState<'set' | 'add' | 'subtract'>('set');
   const [updatingStock, setUpdatingStock] = useState(false);
   const [flavorSearchTerm, setFlavorSearchTerm] = useState('');
+
+  // 批量狀態更新相關狀態
+  const [showBatchStatus, setShowBatchStatus] = useState(false);
+  const [selectedStatusFlavors, setSelectedStatusFlavors] = useState<Set<number>>(new Set());
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
     loadProductsWithFlavors();
@@ -291,6 +296,51 @@ export const AdminFlavors: React.FC = () => {
     }
   };
 
+  // 批量狀態更新相關函數
+  const handleBatchStatusUpdate = async (action: 'enable' | 'disable') => {
+    if (selectedStatusFlavors.size === 0) {
+      toast.error('請選擇要操作的規格');
+      return;
+    }
+
+    try {
+      setUpdatingStatus(true);
+      
+      const response = await flavorAPI.batchUpdateStatus({
+        flavorIds: Array.from(selectedStatusFlavors),
+        action
+      });
+      
+      if (response.data.success) {
+        const actionText = action === 'enable' ? '啟用' : '停用';
+        toast.success(`成功${actionText} ${selectedStatusFlavors.size} 個規格`);
+        loadProductsWithFlavors(); // 重新載入數據
+        resetBatchStatus();
+      } else {
+        toast.error(response.data.message || '批量更新狀態失敗');
+      }
+    } catch (error) {
+      console.error('批量更新狀態失敗:', error);
+      toast.error('批量更新狀態失敗');
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
+
+  const resetBatchStatus = () => {
+    setSelectedStatusFlavors(new Set());
+    setShowBatchStatus(false);
+  };
+
+  const toggleSelectAllStatusFlavors = () => {
+    const allFlavors = products.flatMap(product => product.flavors.map(flavor => flavor.id));
+    if (selectedStatusFlavors.size === allFlavors.length) {
+      setSelectedStatusFlavors(new Set());
+    } else {
+      setSelectedStatusFlavors(new Set(allFlavors));
+    }
+  };
+
   if (loading) {
     return (
       <AdminLayout>
@@ -363,6 +413,14 @@ export const AdminFlavors: React.FC = () => {
             >
               <BarChart3 className="w-4 h-4" />
               <span>批量修改庫存</span>
+            </Button>
+            <Button
+              onClick={() => setShowBatchStatus(true)}
+              variant="outline"
+              className="flex items-center space-x-2"
+            >
+              <ToggleLeft className="w-4 h-4" />
+              <span>批量啟用/停用</span>
             </Button>
             <Button
               onClick={() => setShowBatchForm(true)}
@@ -986,6 +1044,233 @@ export const AdminFlavors: React.FC = () => {
                     確認修改
                   </>
                 )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 批量啟用/停用對話框 */}
+      <Dialog open={showBatchStatus} onOpenChange={resetBatchStatus}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ToggleLeft className="w-5 h-5" />
+              批量啟用/停用規格
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {/* 選擇統計和操作 */}
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm text-blue-700">
+                  已選擇 {selectedStatusFlavors.size} 個規格
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedStatusFlavors(new Set())}
+                    className="text-xs"
+                    disabled={selectedStatusFlavors.size === 0}
+                  >
+                    清除選擇
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      // 只選擇啟用的規格
+                      const activeFlavors = products.flatMap(p => p.flavors.filter(f => f.is_active).map(f => f.id));
+                      setSelectedStatusFlavors(new Set(activeFlavors));
+                    }}
+                    className="text-xs"
+                  >
+                    選擇啟用規格
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      // 只選擇停用的規格
+                      const inactiveFlavors = products.flatMap(p => p.flavors.filter(f => !f.is_active).map(f => f.id));
+                      setSelectedStatusFlavors(new Set(inactiveFlavors));
+                    }}
+                    className="text-xs"
+                  >
+                    選擇停用規格
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={toggleSelectAllStatusFlavors}
+                    className="text-xs"
+                  >
+                    {selectedStatusFlavors.size === products.flatMap(p => p.flavors).length ? '取消全選' : '全選'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* 規格選擇區域 */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-sm font-medium text-gray-700">
+                    選擇要操作的規格
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    💡 可以選擇不同商品的規格進行批量啟用或停用操作
+                  </p>
+                </div>
+                <div className="flex-1 max-w-sm ml-4">
+                  <Input
+                    placeholder="搜索商品或規格..."
+                    value={flavorSearchTerm}
+                    onChange={(e) => setFlavorSearchTerm(e.target.value)}
+                    className="text-sm"
+                  />
+                </div>
+              </div>
+              <div className="border rounded-lg max-h-64 overflow-y-auto">
+                {products.filter(product => {
+                  if (!flavorSearchTerm) return true;
+                  const searchLower = flavorSearchTerm.toLowerCase();
+                  return product.name.toLowerCase().includes(searchLower) ||
+                         product.flavors.some(flavor => flavor.name.toLowerCase().includes(searchLower));
+                }).map(product => {
+                  const filteredFlavors = product.flavors.filter(flavor => {
+                    if (!flavorSearchTerm) return true;
+                    const searchLower = flavorSearchTerm.toLowerCase();
+                    return product.name.toLowerCase().includes(searchLower) ||
+                           flavor.name.toLowerCase().includes(searchLower);
+                  });
+                  
+                  if (filteredFlavors.length === 0) return null;
+                  
+                  return (
+                  <div key={product.id} className="border-b last:border-b-0">
+                    <div 
+                      className="p-2 bg-gray-50 cursor-pointer hover:bg-gray-100 flex items-center justify-between"
+                      onClick={() => {
+                        const expanded = new Set(expandedProducts);
+                        if (expanded.has(product.id)) {
+                          expanded.delete(product.id);
+                        } else {
+                          expanded.add(product.id);
+                        }
+                        setExpandedProducts(expanded);
+                      }}
+                    >
+                      <span className="font-medium text-sm">{product.name}</span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // 選擇/取消選擇該商品的所有規格
+                            const productFlavorIds = filteredFlavors.map(f => f.id);
+                            const allSelected = productFlavorIds.every(id => selectedStatusFlavors.has(id));
+                            const newSelected = new Set(selectedStatusFlavors);
+                            
+                            if (allSelected) {
+                              // 取消選擇該商品所有規格
+                              productFlavorIds.forEach(id => newSelected.delete(id));
+                            } else {
+                              // 選擇該商品所有規格
+                              productFlavorIds.forEach(id => newSelected.add(id));
+                            }
+                            setSelectedStatusFlavors(newSelected);
+                          }}
+                          className="text-xs px-2 py-1 h-6"
+                        >
+                          {filteredFlavors.every(f => selectedStatusFlavors.has(f.id)) ? '取消全選' : '全選此商品'}
+                        </Button>
+                        <span className="text-xs text-gray-500">
+                          {filteredFlavors.length} 個規格
+                        </span>
+                        {expandedProducts.has(product.id) ? 
+                          <ChevronDown className="w-4 h-4" /> : 
+                          <ChevronRight className="w-4 h-4" />
+                        }
+                      </div>
+                    </div>
+                    
+                    {expandedProducts.has(product.id) && (
+                      <div className="p-1 space-y-0.5">
+                        {filteredFlavors.map(flavor => (
+                          <div key={flavor.id} className="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded text-sm">
+                            <Checkbox
+                              checked={selectedStatusFlavors.has(flavor.id)}
+                              onCheckedChange={(checked) => {
+                                const newSelected = new Set(selectedStatusFlavors);
+                                if (checked) {
+                                  newSelected.add(flavor.id);
+                                } else {
+                                  newSelected.delete(flavor.id);
+                                }
+                                setSelectedStatusFlavors(newSelected);
+                              }}
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium">{flavor.name}</span>
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                  <Badge 
+                                    variant={flavor.is_active ? "default" : "secondary"}
+                                    className="text-xs py-0 px-1 h-4"
+                                  >
+                                    {flavor.is_active ? '啟用' : '停用'}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 預覽效果 */}
+            {selectedStatusFlavors.size > 0 && (
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="text-sm text-gray-600 mb-2">
+                  已選擇 {selectedStatusFlavors.size} 個規格，可執行以下操作：
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => handleBatchStatusUpdate('enable')}
+                    disabled={updatingStatus}
+                    className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1"
+                  >
+                    {updatingStatus ? '處理中...' : '批量啟用'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => handleBatchStatusUpdate('disable')}
+                    disabled={updatingStatus}
+                    className="bg-orange-600 hover:bg-orange-700 text-white text-xs px-3 py-1"
+                  >
+                    {updatingStatus ? '處理中...' : '批量停用'}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* 操作按鈕 */}
+            <div className="flex justify-end gap-3">
+              <Button
+                onClick={resetBatchStatus}
+                variant="outline"
+              >
+                取消
               </Button>
             </div>
           </div>

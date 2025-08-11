@@ -977,6 +977,90 @@ router.put('/admin/batch-update-stock', authenticateAdmin, async (req, res) => {
   }
 });
 
+// 批量更新規格狀態（管理員）
+router.put('/admin/batch-update-status', authenticateAdmin, async (req, res) => {
+  try {
+    const { flavorIds, action } = req.body;
+
+    console.log('📦 批量更新規格狀態請求:', { 
+      規格數量: flavorIds?.length, 
+      操作: action 
+    });
+
+    // 驗證輸入
+    if (!Array.isArray(flavorIds) || flavorIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: '請提供要更新的規格ID列表'
+      });
+    }
+
+    if (!['enable', 'disable'].includes(action)) {
+      return res.status(400).json({
+        success: false,
+        message: '無效的操作類型，只能是 enable 或 disable'
+      });
+    }
+
+    // 開始事務
+    await Database.beginTransaction();
+
+    try {
+      let successCount = 0;
+      const errors = [];
+
+      // 根據操作類型決定SQL和日誌
+      const isActive = action === 'enable';
+      const updateQuery = 'UPDATE flavors SET is_active = ? WHERE id = ?';
+
+      // 批量更新每個規格的狀態
+      for (const flavorId of flavorIds) {
+        try {
+          const result = await Database.run(updateQuery, [isActive ? 1 : 0, flavorId]);
+          if (result.changes > 0) {
+            successCount++;
+          } else {
+            errors.push(`規格 ID ${flavorId} 更新失敗：規格不存在`);
+          }
+        } catch (error) {
+          console.error(`更新規格 ${flavorId} 狀態失敗:`, error);
+          errors.push(`規格 ID ${flavorId} 更新失敗：${error.message}`);
+        }
+      }
+
+      // 提交事務
+      await Database.commit();
+
+      const actionText = action === 'enable' ? '啟用' : '停用';
+      console.log(`✅ 批量${actionText}規格完成:`, { 
+        成功: successCount, 
+        錯誤: errors.length 
+      });
+
+      res.json({
+        success: true,
+        message: `成功${actionText} ${successCount} 個規格`,
+        data: {
+          successCount,
+          errorCount: errors.length,
+          errors: errors.length > 0 ? errors : undefined
+        }
+      });
+
+    } catch (error) {
+      await Database.rollback();
+      throw error;
+    }
+
+  } catch (error) {
+    console.error('❌ 批量更新規格狀態錯誤:', error);
+    res.status(500).json({
+      success: false,
+      message: '批量更新規格狀態失敗: ' + error.message
+    });
+  }
+});
+
 // 更新規格（管理員）
 router.put('/admin/:id', authenticateAdmin, async (req, res) => {
   try {

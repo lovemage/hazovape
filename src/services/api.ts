@@ -226,6 +226,10 @@ export const flavorAPI = {
     console.log('📤 flavorAPI.batchUpdateStock 調用', data);
     return api.put('/flavors/admin/batch-update-stock', data);
   },
+  batchUpdateStatus: (data: { flavorIds: number[]; action: 'enable' | 'disable' }) => {
+    console.log('📤 flavorAPI.batchUpdateStatus 調用', data);
+    return api.put('/flavors/admin/batch-update-status', data);
+  },
 };
 
 // 優惠券相關 API
