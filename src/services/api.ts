@@ -28,7 +28,7 @@ console.log('- 最終 API_BASE_URL:', API_BASE_URL);
 // 創建 axios 實例
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 60000, // 統一設定為 60 秒，解決生產環境數據量大的問題
   headers: {
     'Content-Type': 'application/json',
   },

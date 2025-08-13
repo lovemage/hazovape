@@ -518,7 +518,21 @@ router.get('/admin/all', authenticateAdmin, async (req, res) => {
     const hasPriceField = await checkFlavorPriceColumn();
     const hasImageField = await checkFlavorImageColumn();
     
-    let query;
+    // 分頁參數
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 1000; // 預設1000條，可調整
+    const offset = (page - 1) * limit;
+    
+    let countQuery, query;
+    
+    // 計算總數的查詢
+    countQuery = `
+      SELECT COUNT(*) as total
+      FROM flavors f
+      LEFT JOIN products p ON f.product_id = p.id
+      LEFT JOIN flavor_categories fc ON f.category_id = fc.id
+    `;
+    
     if (hasPriceField && hasImageField) {
       // 有price和image欄位的完整查詢
       query = `
@@ -531,6 +545,7 @@ router.get('/admin/all', authenticateAdmin, async (req, res) => {
         LEFT JOIN products p ON f.product_id = p.id
         LEFT JOIN flavor_categories fc ON f.category_id = fc.id
         ORDER BY p.name, fc.sort_order, f.sort_order, f.id
+        LIMIT ${limit} OFFSET ${offset}
       `;
     } else if (hasPriceField) {
       // 有price欄位的查詢
@@ -544,6 +559,7 @@ router.get('/admin/all', authenticateAdmin, async (req, res) => {
         LEFT JOIN products p ON f.product_id = p.id
         LEFT JOIN flavor_categories fc ON f.category_id = fc.id
         ORDER BY p.name, fc.sort_order, f.sort_order, f.id
+        LIMIT ${limit} OFFSET ${offset}
       `;
     } else if (hasImageField) {
       // 有image欄位的查詢
@@ -557,6 +573,7 @@ router.get('/admin/all', authenticateAdmin, async (req, res) => {
         LEFT JOIN products p ON f.product_id = p.id
         LEFT JOIN flavor_categories fc ON f.category_id = fc.id
         ORDER BY p.name, fc.sort_order, f.sort_order, f.id
+        LIMIT ${limit} OFFSET ${offset}
       `;
     } else {
       // 沒有price和image欄位的兼容查詢
@@ -570,10 +587,15 @@ router.get('/admin/all', authenticateAdmin, async (req, res) => {
         LEFT JOIN products p ON f.product_id = p.id
         LEFT JOIN flavor_categories fc ON f.category_id = fc.id
         ORDER BY p.name, fc.sort_order, f.sort_order, f.id
+        LIMIT ${limit} OFFSET ${offset}
       `;
     }
 
-    const flavors = await Database.all(query);
+    // 執行查詢
+    const [totalResult, flavors] = await Promise.all([
+      Database.get(countQuery),
+      Database.all(query)
+    ]);
 
     // 調試：檢查返回的數據中是否包含image字段
     if (flavors.length > 0) {
@@ -582,9 +604,19 @@ router.get('/admin/all', authenticateAdmin, async (req, res) => {
       console.log('📷 範例規格的image值:', sampleFlavor.image);
     }
 
+    const total = totalResult.total;
+    const totalPages = Math.ceil(total / limit);
+
     res.json({
       success: true,
-      data: flavors
+      data: flavors,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasMore: page < totalPages
+      }
     });
   } catch (error) {
     console.error('獲取規格列表錯誤:', error);
