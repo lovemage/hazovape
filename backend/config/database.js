@@ -16,7 +16,13 @@ if (process.env.DATABASE_URL) {
       try {
         let convertedSql = sql;
         let paramIndex = 1;
+        
+        // 轉換參數佔位符
         convertedSql = sql.replace(/\?/g, () => `$${paramIndex++}`);
+        
+        // 修復 PostgreSQL 布林值比較問題
+        convertedSql = convertedSql.replace(/is_active\s*=\s*1/gi, 'is_active = true');
+        convertedSql = convertedSql.replace(/is_active\s*=\s*0/gi, 'is_active = false');
         
         const result = await pool.query(convertedSql, params);
         
@@ -34,7 +40,13 @@ if (process.env.DATABASE_URL) {
       try {
         let convertedSql = sql;
         let paramIndex = 1;
+        
+        // 轉換參數佔位符
         convertedSql = sql.replace(/\?/g, () => `$${paramIndex++}`);
+        
+        // 修復 PostgreSQL 布林值比較問題
+        convertedSql = convertedSql.replace(/is_active\s*=\s*1/gi, 'is_active = true');
+        convertedSql = convertedSql.replace(/is_active\s*=\s*0/gi, 'is_active = false');
         
         const result = await pool.query(convertedSql, params);
         return result.rows[0] || null;
@@ -48,7 +60,13 @@ if (process.env.DATABASE_URL) {
       try {
         let convertedSql = sql;
         let paramIndex = 1;
+        
+        // 轉換參數佔位符
         convertedSql = sql.replace(/\?/g, () => `$${paramIndex++}`);
+        
+        // 修復 PostgreSQL 布林值比較問題
+        convertedSql = convertedSql.replace(/is_active\s*=\s*1/gi, 'is_active = true');
+        convertedSql = convertedSql.replace(/is_active\s*=\s*0/gi, 'is_active = false');
         
         const result = await pool.query(convertedSql, params);
         return result.rows;
