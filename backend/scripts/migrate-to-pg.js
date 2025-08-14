@@ -289,30 +289,38 @@ async function initializePostgreSQL() {
       ON CONFLICT DO NOTHING
     `);
 
-    // 插入範例產品
-    const sampleProducts = [
-      ['精選茶葉禮盒', 'Premium tea collection', 299.00, '茶葉系列', '{"2": 0.9, "3": 0.8}', '["product1_1.jpg", "product1_2.jpg"]'],
-      ['經典咖啡豆', 'Classic coffee beans', 199.00, '咖啡系列', '{"2": 0.95}', '["product2_1.jpg"]'],
-      ['手工餅乾組合', 'Handmade cookies set', 149.00, '點心系列', '{"3": 0.85, "5": 0.75}', '["product3_1.jpg", "product3_2.jpg", "product3_3.jpg"]']
-    ];
+    // 檢查是否已有產品，如果有則跳過插入範例產品
+    const existingProducts = await pool.query('SELECT COUNT(*) as count FROM products');
+    const productCount = parseInt(existingProducts.rows[0].count);
+    
+    if (productCount === 0) {
+      console.log('📦 插入範例產品...');
+      
+      // 插入範例產品
+      const sampleProducts = [
+        ['精選茶葉禮盒', 'Premium tea collection', 299.00, '茶葉系列', '{"2": 0.9, "3": 0.8}', '["product1_1.jpg", "product1_2.jpg"]'],
+        ['經典咖啡豆', 'Classic coffee beans', 199.00, '咖啡系列', '{"2": 0.95}', '["product2_1.jpg"]'],
+        ['手工餅乾組合', 'Handmade cookies set', 149.00, '點心系列', '{"3": 0.85, "5": 0.75}', '["product3_1.jpg", "product3_2.jpg", "product3_3.jpg"]']
+      ];
 
-    for (const [name, description, price, category, multiDiscount, images] of sampleProducts) {
-      const result = await pool.query(`
-        INSERT INTO products (name, description, price, category, multi_discount, images, is_active)
-        VALUES ($1, $2, $3, $4, $5, $6, true)
-        ON CONFLICT DO NOTHING
-        RETURNING id
-      `, [name, description, price, category, multiDiscount, images]);
+      for (const [name, description, price, category, multiDiscount, images] of sampleProducts) {
+        const result = await pool.query(`
+          INSERT INTO products (name, description, price, category, multi_discount, images, is_active)
+          VALUES ($1, $2, $3, $4, $5, $6, true)
+          RETURNING id
+        `, [name, description, price, category, multiDiscount, images]);
 
-      if (result.rows.length > 0) {
         const productId = result.rows[0].id;
         // 為每個產品添加一些基本規格
         await pool.query(`
           INSERT INTO flavors (name, product_id, category_id, stock, sort_order, is_active)
           VALUES ($1, $2, 1, 100, 1, true)
-          ON CONFLICT DO NOTHING
         `, [`${name} - 經典款`, productId]);
       }
+      
+      console.log('✅ 範例產品插入完成');
+    } else {
+      console.log(`⏭️  跳過範例產品插入，已存在 ${productCount} 個產品`);
     }
 
     // 插入範例公告
