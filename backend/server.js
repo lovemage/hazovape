@@ -550,46 +550,77 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Mist Mall 後端服務器運行於端口 ${PORT}`);
-  console.log(`訪問地址: http://localhost:${PORT}`);
+// 初始化數據庫連接
+async function startServer() {
+  try {
+    // 初始化數據庫（自動檢測 PostgreSQL 或 SQLite）
+    if (process.env.DATABASE_URL) {
+      console.log('🗄️  檢測到 DATABASE_URL，初始化 PostgreSQL...');
+      const { initializePostgreSQL } = require('./scripts/migrate-to-pg');
+      await initializePostgreSQL();
+    } else {
+      console.log('🗄️  使用本地 SQLite 數據庫');
+    }
 
-  // Railway 健康檢查
-  if (process.env.NODE_ENV === 'production') {
-    console.log('✅ Railway 生產環境啟動成功');
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      console.log(`MeelFul 後端服務器運行於端口 ${PORT}`);
+      console.log(`訪問地址: http://localhost:${PORT}`);
 
-    // 運行數據庫維護操作（異步，不阻塞服務器）
-    setTimeout(async () => {
-      try {
-        console.log('🔧 開始數據庫維護檢查...');
-        
-        // 確保靜態文件目錄存在
-        const ensureStaticFiles = require('./scripts/ensure-static-files');
-        await ensureStaticFiles();
-        console.log('✅ 靜態文件檢查完成');
-        
-        console.log('✅ 數據庫維護完成');
-      } catch (error) {
-        console.error('⚠️ 數據庫維護失敗:', error.message);
-        // 不要讓錯誤影響服務器運行
+      // Heroku 生產環境檢查
+      if (process.env.NODE_ENV === 'production') {
+        console.log('✅ Heroku 生產環境啟動成功');
+
+        // 運行維護操作（異步，不阻塞服務器）
+        setTimeout(async () => {
+          try {
+            console.log('🔧 開始維護檢查...');
+            
+            // 確保靜態文件目錄存在
+            try {
+              const ensureStaticFiles = require('./scripts/ensure-static-files');
+              await ensureStaticFiles();
+              console.log('✅ 靜態文件檢查完成');
+            } catch (e) {
+              console.log('⚠️  靜態文件檢查腳本不存在，跳過');
+            }
+            
+            console.log('✅ 維護檢查完成');
+          } catch (error) {
+            console.error('⚠️ 維護檢查失敗:', error.message);
+            // 不要讓錯誤影響服務器運行
+          }
+        }, 5000); // 5秒後運行，確保服務器已完全啟動
       }
-    }, 5000); // 5秒後運行，確保服務器已完全啟動
+    });
+
+    return server;
+  } catch (error) {
+    console.error('❌ 服務器啟動失敗:', error);
+    process.exit(1);
   }
-});
+}
 
-// 優雅關閉處理
-process.on('SIGTERM', () => {
-  console.log('🔄 收到 SIGTERM，正在優雅關閉...');
-  server.close(() => {
-    console.log('✅ 服務器已關閉');
-    process.exit(0);
-  });
-});
+// 啟動服務器
+startServer().then((server) => {
+  console.log('🚀 服務器啟動完成');
 
-process.on('SIGINT', () => {
-  console.log('🔄 收到 SIGINT，正在優雅關閉...');
-  server.close(() => {
-    console.log('✅ 服務器已關閉');
-    process.exit(0);
+  // 優雅關閉處理
+  process.on('SIGTERM', () => {
+    console.log('🔄 收到 SIGTERM，正在優雅關閉...');
+    server.close(() => {
+      console.log('✅ 服務器已關閉');
+      process.exit(0);
+    });
   });
+
+  process.on('SIGINT', () => {
+    console.log('🔄 收到 SIGINT，正在優雅關閉...');
+    server.close(() => {
+      console.log('✅ 服務器已關閉');
+      process.exit(0);
+    });
+  });
+}).catch((error) => {
+  console.error('❌ 服務器啟動失敗:', error);
+  process.exit(1);
 });

@@ -1,6 +1,93 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-const fs = require('fs');
+// 檢查是否有 DATABASE_URL（PostgreSQL）
+if (process.env.DATABASE_URL) {
+  console.log('🗄️  檢測到 DATABASE_URL，使用 PostgreSQL');
+  
+  const { Pool } = require('pg');
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? {
+      rejectUnauthorized: false
+    } : false
+  });
+
+  // PostgreSQL 數據庫操作封裝
+  const Database = {
+    async run(sql, params = []) {
+      try {
+        let convertedSql = sql;
+        let paramIndex = 1;
+        convertedSql = sql.replace(/\?/g, () => `$${paramIndex++}`);
+        
+        const result = await pool.query(convertedSql, params);
+        
+        return {
+          id: result.rows.length > 0 && result.rows[0].id ? result.rows[0].id : null,
+          changes: result.rowCount
+        };
+      } catch (error) {
+        console.error('❌ PostgreSQL 執行失敗:', error.message, 'SQL:', sql);
+        throw error;
+      }
+    },
+
+    async get(sql, params = []) {
+      try {
+        let convertedSql = sql;
+        let paramIndex = 1;
+        convertedSql = sql.replace(/\?/g, () => `$${paramIndex++}`);
+        
+        const result = await pool.query(convertedSql, params);
+        return result.rows[0] || null;
+      } catch (error) {
+        console.error('❌ PostgreSQL 查詢失敗:', error.message, 'SQL:', sql);
+        throw error;
+      }
+    },
+
+    async all(sql, params = []) {
+      try {
+        let convertedSql = sql;
+        let paramIndex = 1;
+        convertedSql = sql.replace(/\?/g, () => `$${paramIndex++}`);
+        
+        const result = await pool.query(convertedSql, params);
+        return result.rows;
+      } catch (error) {
+        console.error('❌ PostgreSQL 查詢失敗:', error.message, 'SQL:', sql);
+        throw error;
+      }
+    },
+
+    async beginTransaction() {
+      const client = await pool.connect();
+      await client.query('BEGIN');
+      return client;
+    },
+
+    async commit(client) {
+      await client.query('COMMIT');
+      client.release();
+    },
+
+    async rollback(client) {
+      await client.query('ROLLBACK');
+      client.release();
+    },
+
+    async close() {
+      if (pool) {
+        await pool.end();
+      }
+    }
+  };
+
+  module.exports = Database;
+} else {
+  console.log('🗄️  未檢測到 DATABASE_URL，使用 SQLite');
+  
+  const sqlite3 = require('sqlite3').verbose();
+  const path = require('path');
+  const fs = require('fs');
 
 // 動態數據庫路徑配置 - Heroku 環境適配
 const isProduction = process.env.NODE_ENV === 'production';
@@ -211,3 +298,4 @@ const Database = {
 };
 
 module.exports = Database;
+}
