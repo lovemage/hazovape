@@ -74,7 +74,8 @@ async function initializePostgreSQL() {
       -- 規格分類表
       CREATE TABLE IF NOT EXISTS flavor_categories (
         id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
+        name VARCHAR(100) NOT NULL UNIQUE,
+        description TEXT,
         sort_order INTEGER DEFAULT 0,
         is_active BOOLEAN DEFAULT true,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
