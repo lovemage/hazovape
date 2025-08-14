@@ -6,6 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const runProductionMigrations = require('../scripts/production-migrate');
+const cleanupOldImages = require('../scripts/cleanup-old-images');
 const { uploadBufferToCloudinary, deleteFromCloudinary, extractPublicIdFromUrl } = require('../config/cloudinary');
 
 const router = express.Router();
@@ -684,6 +685,26 @@ router.post('/migrate', authenticateAdmin, async (req, res) => {
     res.status(500).json({
       success: false,
       message: '數據庫遷移失敗: ' + error.message
+    });
+  }
+});
+
+// 管理員：清理舊圖片路徑
+router.post('/cleanup-images', authenticateAdmin, async (req, res) => {
+  try {
+    console.log('🧹 管理員請求清理舊圖片路徑...');
+    
+    await cleanupOldImages();
+    
+    res.json({
+      success: true,
+      message: '舊圖片路徑清理完成！無效的圖片引用已移除。'
+    });
+  } catch (error) {
+    console.error('❌ 清理舊圖片路徑失敗:', error);
+    res.status(500).json({
+      success: false,
+      message: '清理失敗: ' + error.message
     });
   }
 });
