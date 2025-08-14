@@ -77,9 +77,9 @@ export const AdminLoginPage: React.FC = () => {
           <div className="text-center mb-8">
             <div className="flex items-center justify-center mb-6">
               <img 
-                src="/images/logo/vj-logo.png" 
-                alt="VJ Vape Logo" 
-                className="w-16 h-16"
+                src="/images/logo/logo.jpg" 
+                alt="MeelFul Logo" 
+                className="w-16 h-16 rounded-lg object-cover"
               />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">管理員登入</h1>

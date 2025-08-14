@@ -65,9 +65,10 @@ module.exports = {
 				},
 			},
 			fontFamily: {
-				'sans': ['Inter', 'Noto Sans TC', 'system-ui', 'sans-serif'],
-				'display': ['Inter', 'Noto Sans TC', 'system-ui', 'sans-serif'],
-				'body': ['Inter', 'Noto Sans TC', 'system-ui', 'sans-serif'],
+				'sans': ['Source Han Serif TC', 'Source Han Serif', 'Noto Serif TC', 'Times New Roman', 'serif'],
+				'serif': ['Source Han Serif TC', 'Source Han Serif', 'Noto Serif TC', 'Times New Roman', 'serif'],
+				'display': ['Source Han Serif TC', 'Source Han Serif', 'Noto Serif TC', 'Times New Roman', 'serif'],
+				'body': ['Source Han Serif TC', 'Source Han Serif', 'Noto Serif TC', 'Times New Roman', 'serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

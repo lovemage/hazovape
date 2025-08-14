@@ -164,12 +164,12 @@ const OrderQueryPage: React.FC = () => {
               onClick={() => navigate('/')}
             >
               <img 
-                src="/images/logo/vj-logo.png" 
-                alt="VJ Vape Logo" 
-                className="w-10 h-10 mr-3 group-hover:scale-105 transition-transform"
+                src="/images/logo/logo.jpg" 
+                alt="MeelFul Logo" 
+                className="w-10 h-10 mr-3 group-hover:scale-105 transition-transform rounded-md object-cover"
               />
-              <h1 className="text-xl font-bold bg-gradient-to-r from-vape-purple to-vape-cyan bg-clip-text text-transparent">
-                VJ Vape
+              <h1 className="text-xl font-bold bg-gradient-to-r from-meelful-primary to-meelful-secondary bg-clip-text text-transparent">
+                MeelFul
               </h1>
             </div>
 

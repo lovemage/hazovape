@@ -4,11 +4,13 @@
 
 @layer base {
   * {
-    font-family: 'Inter', 'Noto Sans TC', system-ui, sans-serif;
+    font-family: 'Source Han Serif TC', 'Source Han Serif', 'Noto Serif TC', 'Times New Roman', serif;
+    font-weight: 300;
   }
   
   body {
-    font-family: 'Inter', 'Noto Sans TC', system-ui, sans-serif;
+    font-family: 'Source Han Serif TC', 'Source Han Serif', 'Noto Serif TC', 'Times New Roman', serif;
+    font-weight: 300;
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
   
