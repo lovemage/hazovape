@@ -7,11 +7,16 @@ const { authenticateAdmin } = require('./auth');
 
 const router = express.Router();
 
-// 創建上傳目錄 - 支持 Railway Volume
+// 創建上傳目錄 - 支持 Railway Volume 和 Heroku
 const getUploadDir = () => {
+  // 優先使用環境變數 UPLOADS_PATH（用於 Railway Volume）
+  if (process.env.UPLOADS_PATH) {
+    return path.join(process.env.UPLOADS_PATH, 'upsell');
+  }
+  
   if (process.env.NODE_ENV === 'production') {
-    // Railway 生產環境：使用 Volume 路徑
-    return '/app/data/uploads/upsell';
+    // Heroku 生產環境：使用 dist 目錄中的 uploads
+    return path.join(__dirname, '../../dist/uploads/upsell');
   } else {
     // 本地開發環境：使用相對路徑
     return path.join(__dirname, '../uploads/upsell');

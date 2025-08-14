@@ -9,12 +9,17 @@ const router = express.Router();
 
 // 獲取正確的上傳路徑（與server.js保持一致）
 const getUploadsPath = () => {
+  // 優先使用環境變數 UPLOADS_PATH（用於 Railway Volume）
+  if (process.env.UPLOADS_PATH) {
+    return process.env.UPLOADS_PATH;
+  }
+  
   if (process.env.NODE_ENV === 'production') {
-    // Railway 生產環境：使用 Volume 路徑
-    return '/app/data/uploads';
+    // Heroku 生產環境：使用 dist 目錄中的 uploads
+    return path.join(__dirname, '../../dist/uploads');
   } else {
     // 本地開發環境：使用相對路徑
-    return path.join(__dirname, 'uploads');
+    return path.join(__dirname, '../uploads');
   }
 };
 
