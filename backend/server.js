@@ -537,6 +537,12 @@ if (process.env.NODE_ENV === 'production') {
         message: '找不到請求的資源'
       });
     }
+    
+    // 如果是靜態資源（CSS、JS、圖片等），讓 express.static 處理
+    if (req.path.match(/\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|map)$/i)) {
+      return res.status(404).send('Static resource not found');
+    }
+    
     // 否則返回前端 index.html
     res.sendFile(path.join(__dirname, '../dist/index.html'));
   });

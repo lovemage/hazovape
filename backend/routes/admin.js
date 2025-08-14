@@ -9,11 +9,16 @@ const runProductionMigrations = require('../scripts/production-migrate');
 
 const router = express.Router();
 
-// 取得靜態檔案上傳目錄 - 支持 Railway Volume
+// 取得靜態檔案上傳目錄 - 支持 Railway Volume 和 Heroku
 const getStaticUploadDir = () => {
+  // 優先使用環境變數 UPLOADS_PATH（用於 Railway Volume）
+  if (process.env.UPLOADS_PATH) {
+    return path.join(process.env.UPLOADS_PATH, 'static');
+  }
+  
   if (process.env.NODE_ENV === 'production') {
-    // Railway 生產環境：使用 Volume 路徑
-    return '/app/data/uploads/static';
+    // Heroku 生產環境：使用 dist 目錄中的 uploads
+    return path.join(__dirname, '../dist/uploads/static');
   } else {
     // 本地開發環境：使用相對路徑
     return path.join(__dirname, '../uploads/static');
@@ -631,7 +636,19 @@ router.delete('/delete-image', authenticateAdmin, async (req, res) => {
     } else if (imagePath.startsWith('/uploads/')) {
       // 路徑格式：/uploads/其他子目錄/filename.jpg
       const relativePath = imagePath.replace('/uploads/', '');
-      const uploadsRoot = process.env.NODE_ENV === 'production' ? '/app/data/uploads' : path.join(__dirname, '../uploads');
+      
+      let uploadsRoot;
+      if (process.env.UPLOADS_PATH) {
+        // Railway Volume 環境
+        uploadsRoot = process.env.UPLOADS_PATH;
+      } else if (process.env.NODE_ENV === 'production') {
+        // Heroku 生產環境
+        uploadsRoot = path.join(__dirname, '../dist/uploads');
+      } else {
+        // 本地開發環境
+        uploadsRoot = path.join(__dirname, '../uploads');
+      }
+      
       fullPath = path.join(uploadsRoot, relativePath);
     } else {
       // 假設是相對於 staticUploadDir 的文件名
