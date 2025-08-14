@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const Database = require('../config/database');
 const { authenticateAdmin } = require('./auth');
+const { uploadBufferToCloudinary, deleteFromCloudinary, extractPublicIdFromUrl } = require('../config/cloudinary');
 
 const router = express.Router();
 
@@ -32,19 +33,9 @@ if (!fs.existsSync(uploadDir)) {
   console.log('✅ 創建加購商品上傳目錄:', uploadDir);
 }
 
-// 配置圖片上傳
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'upsell-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
+// 配置 multer 使用內存存儲（用於 Cloudinary 上傳）
 const upload = multer({
-  storage: storage,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB
   },
@@ -188,7 +179,7 @@ router.put('/admin/:id', authenticateAdmin, async (req, res) => {
   }
 });
 
-// 管理員 API：上傳加購商品圖片
+// 管理員 API：上傳加購商品圖片（使用 Cloudinary）
 router.post('/admin/:id/upload', authenticateAdmin, upload.array('images', 5), async (req, res) => {
   try {
     const { id } = req.params;
@@ -209,9 +200,21 @@ router.post('/admin/:id/upload', authenticateAdmin, upload.array('images', 5), a
       });
     }
 
+    console.log('☁️ 開始上傳加購商品圖片到 Cloudinary...', req.files.length, '張圖片');
+
+    // 上傳圖片到 Cloudinary
+    const uploadPromises = req.files.map(async (file, index) => {
+      const result = await uploadBufferToCloudinary(file.buffer, {
+        folder: 'meelfull/upsell',
+        public_id: `upsell_${id}_${Date.now()}_${index}`
+      });
+      return result.secure_url;
+    });
+
+    const newImageUrls = await Promise.all(uploadPromises);
+
     const currentImages = JSON.parse(product.images || '[]');
-    const newImages = req.files.map(file => file.filename);
-    const allImages = [...currentImages, ...newImages];
+    const allImages = [...currentImages, ...newImageUrls];
 
     // 更新數據庫
     await Database.run(
@@ -219,10 +222,12 @@ router.post('/admin/:id/upload', authenticateAdmin, upload.array('images', 5), a
       [JSON.stringify(allImages), id]
     );
 
+    console.log('✅ 加購商品圖片上傳成功:', newImageUrls);
+
     res.json({
       success: true,
       data: {
-        uploaded_images: newImages,
+        uploaded_images: newImageUrls,
         all_images: allImages
       },
       message: '圖片上傳成功'
@@ -231,12 +236,12 @@ router.post('/admin/:id/upload', authenticateAdmin, upload.array('images', 5), a
     console.error('上傳圖片失敗:', error);
     res.status(500).json({
       success: false,
-      message: '上傳圖片失敗'
+      message: '上傳圖片失敗: ' + error.message
     });
   }
 });
 
-// 管理員 API：刪除加購商品圖片
+// 管理員 API：刪除加購商品圖片（支持 Cloudinary URL）
 router.delete('/admin/:id/images/:imageName', authenticateAdmin, async (req, res) => {
   try {
     const { id, imageName } = req.params;
@@ -251,12 +256,36 @@ router.delete('/admin/:id/images/:imageName', authenticateAdmin, async (req, res
     }
 
     const currentImages = JSON.parse(product.images || '[]');
-    const updatedImages = currentImages.filter(img => img !== imageName);
+    
+    // 找到要刪除的圖片
+    const imageToDelete = currentImages.find(img => img.includes(imageName));
+    if (!imageToDelete) {
+      return res.status(404).json({
+        success: false,
+        message: '圖片不存在'
+      });
+    }
 
-    // 刪除圖片文件
-    const imagePath = path.join(uploadDir, imageName);
-    if (fs.existsSync(imagePath)) {
-      fs.unlinkSync(imagePath);
+    const updatedImages = currentImages.filter(img => img !== imageToDelete);
+
+    // 如果是 Cloudinary URL，從 Cloudinary 刪除
+    if (imageToDelete.includes('cloudinary.com')) {
+      try {
+        const publicId = extractPublicIdFromUrl(imageToDelete);
+        if (publicId) {
+          await deleteFromCloudinary(publicId);
+          console.log('✅ 從 Cloudinary 刪除圖片成功:', publicId);
+        }
+      } catch (cloudinaryError) {
+        console.error('❌ Cloudinary 刪除失敗:', cloudinaryError.message);
+        // 繼續執行，不中斷流程
+      }
+    } else {
+      // 如果是本地文件，從本地刪除
+      const imagePath = path.join(uploadDir, imageName);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
     }
 
     // 更新數據庫
@@ -303,12 +332,26 @@ router.delete('/admin/batch', authenticateAdmin, async (req, res) => {
           const product = await Database.get('SELECT images FROM upsell_products WHERE id = ?', [id]);
           if (product) {
             const images = JSON.parse(product.images || '[]');
-            images.forEach((imagePath) => {
-              const fullPath = path.join(uploadDir, imagePath);
-              if (fs.existsSync(fullPath)) {
-                try { fs.unlinkSync(fullPath); } catch (e) { /* 忽略單張刪除錯誤 */ }
+            for (const imagePath of images) {
+              try {
+                if (imagePath.includes('cloudinary.com')) {
+                  // Cloudinary 圖片
+                  const publicId = extractPublicIdFromUrl(imagePath);
+                  if (publicId) {
+                    await deleteFromCloudinary(publicId);
+                  }
+                } else {
+                  // 本地圖片
+                  const fullPath = path.join(uploadDir, imagePath);
+                  if (fs.existsSync(fullPath)) {
+                    fs.unlinkSync(fullPath);
+                  }
+                }
+              } catch (e) {
+                console.error('刪除圖片錯誤:', e.message);
+                // 忽略單張刪除錯誤，繼續處理
               }
-            });
+            }
           }
 
           // 刪除資料
@@ -354,12 +397,25 @@ router.delete('/admin/:id', authenticateAdmin, async (req, res) => {
     if (product) {
       const images = JSON.parse(product.images || '[]');
       // 刪除圖片文件
-      images.forEach(imagePath => {
-        const fullPath = path.join(uploadDir, imagePath);
-        if (fs.existsSync(fullPath)) {
-          fs.unlinkSync(fullPath);
+      for (const imagePath of images) {
+        try {
+          if (imagePath.includes('cloudinary.com')) {
+            // Cloudinary 圖片
+            const publicId = extractPublicIdFromUrl(imagePath);
+            if (publicId) {
+              await deleteFromCloudinary(publicId);
+            }
+          } else {
+            // 本地圖片
+            const fullPath = path.join(uploadDir, imagePath);
+            if (fs.existsSync(fullPath)) {
+              fs.unlinkSync(fullPath);
+            }
+          }
+        } catch (e) {
+          console.error('刪除圖片錯誤:', e.message);
         }
-      });
+      }
     }
 
     await Database.run('DELETE FROM upsell_products WHERE id = ?', [id]);

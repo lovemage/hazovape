@@ -1,8 +1,8 @@
 const cloudinary = require('cloudinary').v2;
 
-// 配置 Cloudinary - 根據API Key推導cloud_name
+// 配置 Cloudinary
 cloudinary.config({
-  cloud_name: 'dj9qhzgd8', // 正確的cloud_name
+  cloud_name: 'dnps7z7p8',
   api_key: '578484754187146',
   api_secret: 'iztUxmCQHI89uaLeKNvXL8tqCkg',
   secure: true
