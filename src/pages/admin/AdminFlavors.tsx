@@ -144,6 +144,11 @@ export const AdminFlavors: React.FC = () => {
   };
 
   const handleDeleteFlavor = async (flavor: Flavor) => {
+    if (flavor.is_active) {
+      toast.error('請先停用規格，再進行刪除操作');
+      return;
+    }
+
     if (!confirm(`⚠️ 危險操作：確定要永久刪除規格「${flavor.name}」嗎？\n\n此操作將從數據庫中完全移除此規格，無法恢復！\n\n如果只是暫時不需要，建議使用"停用"功能。`)) {
       return;
     }
@@ -589,17 +594,15 @@ export const AdminFlavors: React.FC = () => {
                                 <Eye className="w-4 h-4" />
                               )}
                             </Button>
-                            {!flavor.is_active && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleDeleteFlavor(flavor)}
-                                title="永久刪除規格（僅限已停用的規格）"
-                                className="text-red-600 hover:text-red-700"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            )}
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDeleteFlavor(flavor)}
+                              title={flavor.is_active ? "永久刪除規格（需要先停用）" : "永久刪除規格"}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
                       ))}
