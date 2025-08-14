@@ -14,25 +14,70 @@
   
   :root {
     --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%
+    
+    /* MeelFul Color Scheme */
+    --primary: 211 29% 55%; /* #6c8bac */
+    --primary-foreground: 0 0% 100%; /* white text on primary */
+    --secondary: 194 18% 77%; /* #b9ced4 */
+    --secondary-foreground: 211 29% 25%; /* dark text on secondary */
+    --accent: 22 100% 64%; /* #ff9040 */
+    --accent-foreground: 0 0% 100%; /* white text on accent */
+    --background: 215 29% 80%; /* #b8c8e0 */
+    --foreground: 211 29% 15%; /* dark text */
+    --muted: 228 7% 78%; /* #bcbcd4 */
+    --muted-foreground: 211 29% 35%; /* muted text */
+    --border: 228 7% 70%; /* border color */
+    --input: 228 7% 75%; /* input background */
+    --ring: 211 29% 55%; /* focus ring */
+    --destructive: 0 84% 60%; /* error color */
+    --destructive-foreground: 0 0% 100%; /* white text on error */
+    --card: 215 29% 85%; /* card background */
+    --card-foreground: 211 29% 15%; /* card text */
+    --popover: 215 29% 85%; /* popover background */
+    --popover-foreground: 211 29% 15%; /* popover text */
+    
+    /* Sidebar colors based on MeelFul scheme */
+    --sidebar-background: 215 29% 85%; /* #b8c8e0 lighter */
+    --sidebar-foreground: 211 29% 15%; /* dark text */
+    --sidebar-primary: 211 29% 55%; /* #6c8bac */
+    --sidebar-primary-foreground: 0 0% 100%; /* white */
+    --sidebar-accent: 194 18% 82%; /* #b9ced4 lighter */
+    --sidebar-accent-foreground: 211 29% 15%; /* dark text */
+    --sidebar-border: 228 7% 70%; /* border */
+    --sidebar-ring: 211 29% 55%; /* #6c8bac */
   }
 
   .dark {
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%
+    /* MeelFul Dark Mode Color Scheme */
+    --primary: 211 29% 65%; /* lighter primary for dark mode */
+    --primary-foreground: 211 29% 10%; /* dark text on primary */
+    --secondary: 194 18% 25%; /* darker secondary */
+    --secondary-foreground: 0 0% 90%; /* light text on secondary */
+    --accent: 22 100% 64%; /* same accent color */
+    --accent-foreground: 0 0% 100%; /* white text on accent */
+    --background: 211 29% 8%; /* very dark background */
+    --foreground: 0 0% 95%; /* light text */
+    --muted: 228 7% 20%; /* dark muted */
+    --muted-foreground: 0 0% 70%; /* muted text */
+    --border: 228 7% 25%; /* dark border */
+    --input: 228 7% 15%; /* dark input background */
+    --ring: 211 29% 65%; /* focus ring */
+    --destructive: 0 84% 60%; /* same error color */
+    --destructive-foreground: 0 0% 100%; /* white text on error */
+    --card: 211 29% 12%; /* dark card background */
+    --card-foreground: 0 0% 95%; /* light card text */
+    --popover: 211 29% 12%; /* dark popover background */
+    --popover-foreground: 0 0% 95%; /* light popover text */
+    
+    /* Dark sidebar colors */
+    --sidebar-background: 211 29% 10%; /* dark sidebar */
+    --sidebar-foreground: 0 0% 95%; /* light text */
+    --sidebar-primary: 211 29% 65%; /* lighter primary */
+    --sidebar-primary-foreground: 211 29% 10%; /* dark text */
+    --sidebar-accent: 194 18% 20%; /* dark accent */
+    --sidebar-accent-foreground: 0 0% 90%; /* light text */
+    --sidebar-border: 228 7% 25%; /* dark border */
+    --sidebar-ring: 211 29% 65%; /* lighter ring */
   }
 }
 
@@ -85,7 +130,35 @@ img {
     0 6px 10px rgba(0,0,0,0.1);
 }
 
-/* Green variant for LINE */
+/* MeelFul Primary variant */
+.pixel-button-primary {
+  background: linear-gradient(135deg, #6c8bac 0%, #5a7390 100%);
+  color: white;
+}
+
+.pixel-button-primary:hover {
+  background: linear-gradient(135deg, #7a96b8 0%, #6c8bac 100%);
+}
+
+.pixel-button-primary:active {
+  background: linear-gradient(135deg, #5a7390 0%, #4a6178 100%);
+}
+
+/* MeelFul Accent variant */
+.pixel-button-accent {
+  background: linear-gradient(135deg, #ff9040 0%, #e67d2a 100%);
+  color: white;
+}
+
+.pixel-button-accent:hover {
+  background: linear-gradient(135deg, #ffa355 0%, #ff9040 100%);
+}
+
+.pixel-button-accent:active {
+  background: linear-gradient(135deg, #e67d2a 0%, #cc6b1a 100%);
+}
+
+/* Green variant for LINE (updated to complement MeelFul) */
 .pixel-button-green {
   background: linear-gradient(135deg, #06c755 0%, #05a346 100%);
   color: white;
@@ -99,16 +172,16 @@ img {
   background: linear-gradient(135deg, #05a346 0%, #04923c 100%);
 }
 
-/* Blue variant for Telegram */
-.pixel-button-blue {
-  background: linear-gradient(135deg, #0088cc 0%, #0066aa 100%);
-  color: white;
+/* Secondary variant using MeelFul secondary color */
+.pixel-button-secondary {
+  background: linear-gradient(135deg, #b9ced4 0%, #a5bcc3 100%);
+  color: #2a3441;
 }
 
-.pixel-button-blue:hover {
-  background: linear-gradient(135deg, #0099dd 0%, #0077bb 100%);
+.pixel-button-secondary:hover {
+  background: linear-gradient(135deg, #c7d8dd 0%, #b9ced4 100%);
 }
 
-.pixel-button-blue:active {
-  background: linear-gradient(135deg, #0066aa 0%, #005588 100%);
+.pixel-button-secondary:active {
+  background: linear-gradient(135deg, #a5bcc3 0%, #91aab2 100%);
 }

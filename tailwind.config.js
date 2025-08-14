@@ -23,29 +23,30 @@ module.exports = {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#8B5CF6', // 電子紫
+					DEFAULT: 'hsl(var(--primary))', // MeelFul primary #6c8bac
 					foreground: 'hsl(var(--primary-foreground))',
 				},
 				secondary: {
-					DEFAULT: '#06B6D4', // 電子青
+					DEFAULT: 'hsl(var(--secondary))', // MeelFul secondary #b9ced4
 					foreground: 'hsl(var(--secondary-foreground))',
 				},
 				accent: {
-					DEFAULT: '#F471B5', // 霓虹粉
+					DEFAULT: 'hsl(var(--accent))', // MeelFul accent #ff9040
 					foreground: 'hsl(var(--accent-foreground))',
 				},
-				'vape-purple': '#8B5CF6',
-				'vape-cyan': '#06B6D4',
-				'vape-pink': '#F471B5',
-				'vape-green': '#10B981',
-				'vape-dark': '#0F172A',
-				'vape-darker': '#020617',
-				// 復古風格配色
-				'vintage-green': '#5F796A',
-				'vintage-brown': '#9B8D78',
-				'vintage-pink': '#F4D6D6',
-				'vintage-gray': '#4F4F4F',
-				'vintage-light': '#EFEFEF',
+				// MeelFul Brand Colors
+				'meelful-primary': '#6c8bac', // 主色：按鈕、鏈接、標題
+				'meelful-secondary': '#b9ced4', // 輔助色：次級元素、邊框
+				'meelful-accent': '#ff9040', // 強調色：CTA 按鈕、提示
+				'meelful-neutral': '#bcbcd4', // 中性色：文字、細節
+				'meelful-background': '#b8c8e0', // 背景色：主體背景
+				// Legacy compatibility (can be removed later)
+				'vape-purple': '#6c8bac', // mapped to primary
+				'vape-cyan': '#b9ced4', // mapped to secondary
+				'vape-pink': '#ff9040', // mapped to accent
+				'vape-green': '#bcbcd4', // mapped to neutral
+				'vape-dark': '#2a3441', // darker version of primary
+				'vape-darker': '#1a2229', // even darker
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))',
