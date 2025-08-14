@@ -60,13 +60,11 @@ async function initializePostgreSQL() {
         name VARCHAR(200) NOT NULL,
         description TEXT,
         price DECIMAL(10,2) NOT NULL,
+        category VARCHAR(100) DEFAULT '其他產品',
         multi_discount TEXT DEFAULT '{}',
         images TEXT DEFAULT '[]',
-        category_id INTEGER REFERENCES product_categories(id),
-        image_url VARCHAR(500),
         is_active BOOLEAN DEFAULT true,
         sort_order INTEGER DEFAULT 0,
-        stock_quantity INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
@@ -211,8 +209,8 @@ async function initializePostgreSQL() {
       END $$;
 
       -- 創建索引（只在實際表上創建，不在視圖上創建）
-      CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
       CREATE INDEX IF NOT EXISTS idx_products_active ON products(is_active);
+      CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
       CREATE INDEX IF NOT EXISTS idx_flavors_category ON flavors(category_id);
       CREATE INDEX IF NOT EXISTS idx_flavors_active ON flavors(is_active);
       CREATE INDEX IF NOT EXISTS idx_orders_number ON orders(order_number);
@@ -281,18 +279,18 @@ async function initializePostgreSQL() {
 
     // 插入範例產品
     const sampleProducts = [
-      ['精選茶葉禮盒', 299.00, '{"2": 0.9, "3": 0.8}', '["product1_1.jpg", "product1_2.jpg"]', 1],
-      ['經典咖啡豆', 199.00, '{"2": 0.95}', '["product2_1.jpg"]', 2],
-      ['手工餅乾組合', 149.00, '{"3": 0.85, "5": 0.75}', '["product3_1.jpg", "product3_2.jpg", "product3_3.jpg"]', 3]
+      ['精選茶葉禮盒', 'Premium tea collection', 299.00, '茶葉系列', '{"2": 0.9, "3": 0.8}', '["product1_1.jpg", "product1_2.jpg"]'],
+      ['經典咖啡豆', 'Classic coffee beans', 199.00, '咖啡系列', '{"2": 0.95}', '["product2_1.jpg"]'],
+      ['手工餅乾組合', 'Handmade cookies set', 149.00, '點心系列', '{"3": 0.85, "5": 0.75}', '["product3_1.jpg", "product3_2.jpg", "product3_3.jpg"]']
     ];
 
-    for (const [name, price, multiDiscount, images, categoryId] of sampleProducts) {
+    for (const [name, description, price, category, multiDiscount, images] of sampleProducts) {
       const result = await pool.query(`
-        INSERT INTO products (name, price, multi_discount, images, category_id, is_active)
-        VALUES ($1, $2, $3, $4, $5, true)
+        INSERT INTO products (name, description, price, category, multi_discount, images, is_active)
+        VALUES ($1, $2, $3, $4, $5, $6, true)
         ON CONFLICT DO NOTHING
         RETURNING id
-      `, [name, price, multiDiscount, images, categoryId]);
+      `, [name, description, price, category, multiDiscount, images]);
 
       if (result.rows.length > 0) {
         const productId = result.rows[0].id;
