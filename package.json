@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "vite",
-    "build": "pnpm tsc -b && pnpm vite build",
+    "build": "npx tsc -b && npx vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "NODE_PATH=/app/node_modules node backend/server.js"
@@ -78,7 +78,6 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "packageManager": "pnpm@9.12.3",
   "devDependencies": {
     "@eslint/js": "^9.15.0",
     "@types/node": "^22.10.7",
