@@ -23,8 +23,8 @@ router.get('/', async (req, res) => {
     };
 
     try {
-      // 從 system_settings 表讀取設置
-      const dbSettings = await Database.all('SELECT setting_key, setting_value FROM system_settings');
+      // 從 site_settings 表讀取設置
+      const dbSettings = await Database.all('SELECT setting_key, setting_value FROM site_settings');
       
       // 合併數據庫設置和默認設置
       const settingsMap = { ...defaultSettingsMap };
@@ -103,7 +103,7 @@ router.get('/:key', async (req, res) => {
     
     try {
       // 先嘗試從資料庫讀取
-      const dbSetting = await Database.get('SELECT setting_key, setting_value FROM system_settings WHERE setting_key = ?', [key]);
+      const dbSetting = await Database.get('SELECT setting_key, setting_value FROM site_settings WHERE setting_key = ?', [key]);
       
       if (dbSetting) {
         setting = {
@@ -242,20 +242,20 @@ router.put('/', async (req, res) => {
       for (const [key, value] of Object.entries(settings)) {
         // 檢查設置是否存在
         const existing = await Database.get(
-          'SELECT id FROM system_settings WHERE setting_key = ?',
+          'SELECT id FROM site_settings WHERE setting_key = ?',
           [key]
         );
 
         if (existing) {
           // 更新現有設置
           await Database.run(
-            'UPDATE system_settings SET setting_value = ?, updated_at = CURRENT_TIMESTAMP WHERE setting_key = ?',
+            'UPDATE site_settings SET setting_value = ?, updated_at = CURRENT_TIMESTAMP WHERE setting_key = ?',
             [String(value), key]
           );
         } else {
           // 插入新設置
           await Database.run(
-            'INSERT INTO system_settings (setting_key, setting_value, description, updated_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)',
+            'INSERT INTO site_settings (setting_key, setting_value, description, updated_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)',
             [key, String(value), '']
           );
         }

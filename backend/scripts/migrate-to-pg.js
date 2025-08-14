@@ -186,8 +186,8 @@ async function initializePostgreSQL() {
         title VARCHAR(200) NOT NULL,
         content TEXT NOT NULL,
         type VARCHAR(20) DEFAULT 'info' CHECK (type IN ('info', 'warning', 'success', 'error')),
+        priority INTEGER DEFAULT 0,
         is_active BOOLEAN DEFAULT true,
-        sort_order INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );

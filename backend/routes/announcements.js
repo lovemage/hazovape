@@ -57,13 +57,13 @@ router.post('/admin', authenticateAdmin, async (req, res) => {
     }
 
     const result = await Database.run(
-      'INSERT INTO announcements (title, content, priority) VALUES (?, ?, ?)',
+      'INSERT INTO announcements (title, content, priority) VALUES (?, ?, ?) RETURNING id',
       [title, content, parseInt(priority) || 0]
     );
 
     res.json({
       success: true,
-      message: '公告創建成功',
+      message: '公告創庺成功',
       data: { id: result.id }
     });
   } catch (error) {
@@ -132,7 +132,7 @@ router.delete('/admin/:id', authenticateAdmin, async (req, res) => {
 
     // 軟刪除（設為不活躍）
     await Database.run(
-      'UPDATE announcements SET is_active = 0 WHERE id = ?',
+      'UPDATE announcements SET is_active = false WHERE id = ?',
       [id]
     );
 
@@ -155,7 +155,7 @@ router.put('/admin/:id/restore', authenticateAdmin, async (req, res) => {
     const { id } = req.params;
 
     const result = await Database.run(
-      'UPDATE announcements SET is_active = 1 WHERE id = ?',
+      'UPDATE announcements SET is_active = true WHERE id = ?',
       [id]
     );
 
