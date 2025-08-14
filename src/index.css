@@ -174,6 +174,20 @@ img {
   background: linear-gradient(135deg, #05a346 0%, #04923c 100%);
 }
 
+/* Blue variant for Telegram */
+.pixel-button-blue {
+  background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
+  color: white;
+}
+
+.pixel-button-blue:hover {
+  background: linear-gradient(135deg, #0099dd 0%, #0088cc 100%);
+}
+
+.pixel-button-blue:active {
+  background: linear-gradient(135deg, #006699 0%, #005580 100%);
+}
+
 /* Secondary variant using MeelFull secondary color */
 .pixel-button-secondary {
   background: linear-gradient(135deg, #b9ced4 0%, #a5bcc3 100%);

@@ -273,6 +273,12 @@ export const AdminWebsiteSettings: React.FC = () => {
           description: 'Telegram 聯絡連結，用於首頁和結帳彈窗',
           placeholder: '例：https://t.me/username',
           rows: 1
+        },
+        {
+          key: 'floating_buttons_enabled',
+          label: '啟用懸浮聯繫按鈕',
+          description: '是否在首頁右下角顯示 LINE 和 Telegram 懸浮按鈕',
+          type: 'checkbox'
         }
       ]
     },
