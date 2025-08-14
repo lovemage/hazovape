@@ -11,7 +11,9 @@ async function import711StoresToPostgres() {
     // 連接到 PostgreSQL
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl: process.env.DATABASE_URL?.includes('postgresql') ? { rejectUnauthorized: false } : false
+      ssl: {
+        rejectUnauthorized: false
+      }
     });
     
     // 讀取門市資料
