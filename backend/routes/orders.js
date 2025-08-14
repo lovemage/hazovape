@@ -188,10 +188,20 @@ router.post('/', async (req, res) => {
     // 驗證商品庫存和計算總金額
     let totalAmount = 0;
     const validatedItems = [];
+    
+    // 檢查數據庫類型並正確處理事務
+    const isPostgreSQL = !!process.env.DATABASE_URL;
+    let client = null;
     let transactionStarted = false;
 
     try {
-      await Database.beginTransaction();
+      if (isPostgreSQL) {
+        // PostgreSQL 事務處理
+        client = await Database.beginTransaction();
+      } else {
+        // SQLite 事務處理
+        await Database.beginTransaction();
+      }
       transactionStarted = true;
       for (const [index, item] of items.entries()) {
         console.log(`🔍 驗證商品 ${index + 1}:`, item);
@@ -441,7 +451,11 @@ router.post('/', async (req, res) => {
         console.log('✅ 優惠券使用記錄完成');
       }
 
-      await Database.commit();
+      if (isPostgreSQL) {
+        await Database.commit(client);
+      } else {
+        await Database.commit();
+      }
 
       // 獲取完整訂單信息
       const order = await Database.get('SELECT * FROM orders WHERE id = ?', [orderResult.id]);
@@ -474,7 +488,11 @@ router.post('/', async (req, res) => {
     } catch (error) {
       if (transactionStarted) {
         try {
-          await Database.rollback();
+          if (isPostgreSQL && client) {
+            await Database.rollback(client);
+          } else if (!isPostgreSQL) {
+            await Database.rollback();
+          }
         } catch (rollbackError) {
           console.warn('回滾事務失敗:', rollbackError.message);
         }
@@ -1107,10 +1125,18 @@ router.delete('/admin/batch', authenticateAdmin, async (req, res) => {
 
     console.log('🗑️  批量刪除訂單請求，IDs:', order_ids);
 
-    // 開始事務
-    await Database.beginTransaction();
+    // 檢查數據庫類型並正確處理事務
+    const isPostgreSQL = !!process.env.DATABASE_URL;
+    let client = null;
 
     try {
+      if (isPostgreSQL) {
+        // PostgreSQL 事務處理
+        client = await Database.beginTransaction();
+      } else {
+        // SQLite 事務處理
+        await Database.beginTransaction();
+      }
       let deletedCount = 0;
 
       for (const orderId of order_ids) {
@@ -1126,14 +1152,25 @@ router.delete('/admin/batch', authenticateAdmin, async (req, res) => {
         }
       }
 
-      await Database.commit();
+      if (isPostgreSQL) {
+        await Database.commit(client);
+      } else {
+        await Database.commit();
+      }
 
       res.json({
         success: true,
         message: `成功刪除 ${deletedCount} 個訂單`
       });
     } catch (error) {
-      await Database.rollback();
+      console.error('❌ 事務執行失敗:', error);
+      
+      if (isPostgreSQL && client) {
+        await Database.rollback(client);
+      } else if (!isPostgreSQL) {
+        await Database.rollback();
+      }
+      
       throw error;
     }
   } catch (error) {
@@ -1163,10 +1200,18 @@ router.delete('/admin/:id', authenticateAdmin, async (req, res) => {
 
     console.log('✅ 找到訂單:', order.order_number);
 
-    // 開始事務
-    await Database.beginTransaction();
+    // 檢查數據庫類型並正確處理事務
+    const isPostgreSQL = !!process.env.DATABASE_URL;
+    let client = null;
 
     try {
+      if (isPostgreSQL) {
+        // PostgreSQL 事務處理
+        client = await Database.beginTransaction();
+      } else {
+        // SQLite 事務處理
+        await Database.beginTransaction();
+      }
       // 先刪除訂單項目
       await Database.run('DELETE FROM order_items WHERE order_id = ?', [id]);
       console.log('📝 已刪除訂單項目');
@@ -1175,14 +1220,25 @@ router.delete('/admin/:id', authenticateAdmin, async (req, res) => {
       const result = await Database.run('DELETE FROM orders WHERE id = ?', [id]);
       console.log('📝 刪除結果:', result);
 
-      await Database.commit();
+      if (isPostgreSQL) {
+        await Database.commit(client);
+      } else {
+        await Database.commit();
+      }
 
       res.json({
         success: true,
         message: '訂單已刪除'
       });
     } catch (error) {
-      await Database.rollback();
+      console.error('❌ 事務執行失敗:', error);
+      
+      if (isPostgreSQL && client) {
+        await Database.rollback(client);
+      } else if (!isPostgreSQL) {
+        await Database.rollback();
+      }
+      
       throw error;
     }
   } catch (error) {
