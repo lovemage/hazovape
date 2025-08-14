@@ -210,7 +210,7 @@ async function initializePostgreSQL() {
         END IF;
       END $$;
 
-      -- 創建索引
+      -- 創建索引（只在實際表上創建，不在視圖上創建）
       CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
       CREATE INDEX IF NOT EXISTS idx_products_active ON products(is_active);
       CREATE INDEX IF NOT EXISTS idx_flavors_category ON flavors(category_id);
@@ -219,7 +219,7 @@ async function initializePostgreSQL() {
       CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
       CREATE INDEX IF NOT EXISTS idx_orders_created ON orders(created_at);
       CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id);
-      CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key);
+      CREATE INDEX IF NOT EXISTS idx_site_settings_key ON site_settings(setting_key);
     `;
 
     // 執行創建表格
