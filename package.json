@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "pnpm tsc -b && pnpm vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "node backend/server.js"
