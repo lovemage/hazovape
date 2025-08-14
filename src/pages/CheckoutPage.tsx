@@ -9,6 +9,7 @@ import { orderAPI, couponAPI } from '../services/api';
 import { CustomerInfo, CouponValidationResult } from '../types';
 import { toast } from 'sonner';
 import { UpsellSection } from '../components/UpsellSection';
+import { FloatingContactButtons } from '../components/FloatingContactButtons';
 import { StoreSelector } from '../components/StoreSelector';
 import { OrderItem } from '../types';
 
@@ -664,25 +665,6 @@ export const CheckoutPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* 提交按鈕 */}
-                <Button
-                  type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                  size="lg"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      處理中...
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="w-4 h-4" />
-                      提交訂單
-                    </div>
-                  )}
-                </Button>
               </form>
             </div>
           </div>
@@ -889,7 +871,35 @@ export const CheckoutPage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* 移動端提交按鈕 - 固定在底部 */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-50">
+          <Button
+            onClick={handleSubmit}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            size="lg"
+            disabled={loading}
+          >
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                處理中...
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <CreditCard className="w-4 h-4" />
+                提交訂單
+              </div>
+            )}
+          </Button>
+        </div>
+
+        {/* 移動端底部佔位空間 */}
+        <div className="lg:hidden h-20" />
       </main>
+      
+      {/* 懸浮聯繫按鈕 */}
+      <FloatingContactButtons />
     </div>
   );
 };

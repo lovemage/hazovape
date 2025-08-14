@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge';
 import { orderAPI, settingsAPI } from '../services/api';
 import { toast } from 'sonner';
+import { FloatingContactButtons } from '../components/FloatingContactButtons';
 import { useCart } from '../contexts/CartContext';
 
 interface OrderItem {
@@ -454,6 +455,9 @@ const OrderQueryPage: React.FC = () => {
         )}
         </div>
       </div>
+      
+      {/* 懸浮聯繫按鈕 */}
+      <FloatingContactButtons />
       
       {/* 移動端底部導航的佔位空間 */}
       <div className="h-16 md:hidden" />

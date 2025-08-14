@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button';
 import { useCart } from '../contexts/CartContext';
 import { flavorAPI } from '../services/api';
 import { getImageUrl } from '../utils/imageUtils';
+import { FloatingContactButtons } from '../components/FloatingContactButtons';
 import { Product, Flavor } from '../types';
 import { toast } from 'sonner';
 import { ProductVariant } from '../types';
@@ -681,6 +682,9 @@ export const FlavorsPage: React.FC = () => {
           )}
         </div>
       </div>
+      
+      {/* 懸浮聯繫按鈕 */}
+      <FloatingContactButtons />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button';
 import { Order, CustomerInfo } from '../types';
 import { toast } from 'sonner';
 import api, { settingsAPI } from '../services/api';
+import { FloatingContactButtons } from '../components/FloatingContactButtons';
 
 export const OrderConfirmationPage: React.FC = () => {
   const navigate = useNavigate();
@@ -477,6 +478,9 @@ export const OrderConfirmationPage: React.FC = () => {
           </div>
         </div>
       </main>
+      
+      {/* 懸浮聯繫按鈕 */}
+      <FloatingContactButtons />
     </div>
   );
 };

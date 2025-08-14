@@ -8,6 +8,7 @@ import { useCart } from '../contexts/CartContext';
 import { productAPI, productCategoryAPI } from '../services/api';
 import { getProductImageUrl } from '../utils/imageUtils';
 import { Product } from '../types';
+import { FloatingContactButtons } from '../components/FloatingContactButtons';
 
 interface ProductCategory {
   id: number;
@@ -361,6 +362,9 @@ export const ProductsPage: React.FC = () => {
           )}
         </div>
       </main>
+      
+      {/* 懸浮聯繫按鈕 */}
+      <FloatingContactButtons />
       
       {/* 移動端底部導航的佔位空間 */}
       <div className="h-16 md:hidden" />
