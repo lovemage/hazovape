@@ -235,10 +235,19 @@ router.put('/', async (req, res) => {
 
     console.log('📝 批量更新設置:', Object.keys(settings).length, '個項目');
 
-    // 使用 system_settings 表
-    await Database.beginTransaction();
+    // 檢查數據庫類型並正確處理事務
+    const isPostgreSQL = !!process.env.DATABASE_URL;
+    let client = null;
 
     try {
+      if (isPostgreSQL) {
+        // PostgreSQL 事務處理
+        client = await Database.beginTransaction();
+      } else {
+        // SQLite 事務處理
+        await Database.beginTransaction();
+      }
+
       for (const [key, value] of Object.entries(settings)) {
         // 檢查設置是否存在
         const existing = await Database.get(
@@ -261,7 +270,11 @@ router.put('/', async (req, res) => {
         }
       }
 
-      await Database.commit();
+      if (isPostgreSQL) {
+        await Database.commit(client);
+      } else {
+        await Database.commit();
+      }
 
       console.log('✅ 批量設置更新成功');
       res.json({
@@ -270,7 +283,14 @@ router.put('/', async (req, res) => {
       });
 
     } catch (error) {
-      await Database.rollback();
+      console.error('❌ 事務執行失敗:', error);
+      
+      if (isPostgreSQL && client) {
+        await Database.rollback(client);
+      } else if (!isPostgreSQL) {
+        await Database.rollback();
+      }
+      
       throw error;
     }
 
