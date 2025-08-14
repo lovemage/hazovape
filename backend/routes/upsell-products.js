@@ -140,7 +140,8 @@ router.post('/admin', authenticateAdmin, async (req, res) => {
 
     const result = await Database.run(`
       INSERT INTO upsell_products (name, price, stock, description, is_active)
-      VALUES (?, ?, ?, ?, 1)
+      VALUES (?, ?, ?, ?, true)
+      RETURNING id
     `, [name, parseFloat(price), parseInt(stock), description || '']);
 
     res.json({
@@ -167,7 +168,7 @@ router.put('/admin/:id', authenticateAdmin, async (req, res) => {
       UPDATE upsell_products
       SET name = ?, price = ?, stock = ?, description = ?, is_active = ?
       WHERE id = ?
-    `, [name, parseFloat(price), parseInt(stock), description || '', is_active ? 1 : 0, id]);
+    `, [name, parseFloat(price), parseInt(stock), description || '', is_active ? true : false, id]);
 
     res.json({
       success: true,

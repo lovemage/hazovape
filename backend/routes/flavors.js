@@ -669,8 +669,9 @@ router.post('/admin', authenticateAdmin, async (req, res) => {
 
     // 插入新規格
     const result = await Database.run(`
-      INSERT INTO flavors (name, product_id, category_id, stock, sort_order, price, is_active, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, 1, datetime('now'))
+      INSERT INTO flavors (name, product_id, category_id, stock, sort_order, price, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, true)
+      RETURNING id
     `, [
       name,
       product_id,
@@ -680,7 +681,7 @@ router.post('/admin', authenticateAdmin, async (req, res) => {
       flavorPrice
     ]);
 
-    console.log('✅ 規格創建成功:', result.lastID);
+    console.log('✅ 規格創建成功:', result.id);
 
     // 返回創建的規格信息
     const newFlavor = await Database.get(`
@@ -690,7 +691,7 @@ router.post('/admin', authenticateAdmin, async (req, res) => {
       LEFT JOIN flavor_categories fc ON f.category_id = fc.id
       LEFT JOIN products p ON f.product_id = p.id
       WHERE f.id = ?
-    `, [result.lastID]);
+    `, [result.id]);
 
     res.json({
       success: true,
@@ -785,8 +786,9 @@ router.post('/admin/with-image', authenticateAdmin, flavorImageUpload.single('im
     let insertQuery, insertParams;
     if (hasImageField) {
       insertQuery = `
-        INSERT INTO flavors (name, product_id, category_id, stock, sort_order, price, image, is_active, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 1, datetime('now'))
+        INSERT INTO flavors (name, product_id, category_id, stock, sort_order, price, image, is_active)
+        VALUES (?, ?, ?, ?, ?, ?, ?, true)
+        RETURNING id
       `;
       insertParams = [
         name,
@@ -799,8 +801,9 @@ router.post('/admin/with-image', authenticateAdmin, flavorImageUpload.single('im
       ];
     } else {
       insertQuery = `
-        INSERT INTO flavors (name, product_id, category_id, stock, sort_order, price, is_active, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, 1, datetime('now'))
+        INSERT INTO flavors (name, product_id, category_id, stock, sort_order, price, is_active)
+        VALUES (?, ?, ?, ?, ?, ?, true)
+        RETURNING id
       `;
       insertParams = [
         name,
@@ -814,7 +817,7 @@ router.post('/admin/with-image', authenticateAdmin, flavorImageUpload.single('im
 
     const result = await Database.run(insertQuery, insertParams);
 
-    console.log('✅ 帶圖片規格創建成功:', result.lastID);
+    console.log('✅ 帶圖片規格創建成功:', result.id);
     console.log('📁 創建的圖片路徑:', imagePath);
 
     // 返回創建的規格信息
@@ -839,7 +842,7 @@ router.post('/admin/with-image', authenticateAdmin, flavorImageUpload.single('im
       `;
     }
 
-    const newFlavor = await Database.get(selectQuery, [result.lastID]);
+    const newFlavor = await Database.get(selectQuery, [result.id]);
 
     res.json({
       success: true,
@@ -1295,7 +1298,7 @@ router.put('/admin/:id/with-image', authenticateAdmin, flavorImageUpload.single(
         category_id,
         stock !== undefined ? parseInt(stock) : undefined,
         sort_order !== undefined ? parseInt(sort_order) : undefined,
-        is_active !== undefined ? (is_active ? 1 : 0) : undefined,
+        is_active !== undefined ? (is_active ? true : false) : undefined,
         flavorPrice,
         imagePath,
         id
@@ -1316,7 +1319,7 @@ router.put('/admin/:id/with-image', authenticateAdmin, flavorImageUpload.single(
         category_id,
         stock !== undefined ? parseInt(stock) : undefined,
         sort_order !== undefined ? parseInt(sort_order) : undefined,
-        is_active !== undefined ? (is_active ? 1 : 0) : undefined,
+        is_active !== undefined ? (is_active ? true : false) : undefined,
         flavorPrice,
         id
       ];

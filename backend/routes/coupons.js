@@ -227,6 +227,7 @@ router.post('/admin', authenticateAdmin, async (req, res) => {
         code, name, description, type, value, min_order_amount,
         max_discount, usage_limit, per_user_limit, valid_from, valid_until
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      RETURNING id
     `, [
       code.toUpperCase(), name, description || '', type, value, min_order_amount || 0,
       max_discount, usage_limit, per_user_limit || 1, valid_from, valid_until
@@ -237,7 +238,7 @@ router.post('/admin', authenticateAdmin, async (req, res) => {
     res.json({
       success: true,
       message: '優惠券創建成功',
-      data: { id: result.lastID }
+      data: { id: result.id }
     });
 
   } catch (error) {

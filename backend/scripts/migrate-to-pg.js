@@ -110,7 +110,8 @@ async function initializePostgreSQL() {
         name VARCHAR(200) NOT NULL,
         description TEXT,
         price DECIMAL(10,2) NOT NULL,
-        image_url VARCHAR(500),
+        stock INTEGER DEFAULT 0,
+        images TEXT DEFAULT '[]',
         is_active BOOLEAN DEFAULT true,
         sort_order INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -123,17 +124,28 @@ async function initializePostgreSQL() {
         code VARCHAR(50) UNIQUE NOT NULL,
         name VARCHAR(100) NOT NULL,
         description TEXT,
-        discount_type VARCHAR(20) NOT NULL CHECK (discount_type IN ('percentage', 'fixed')),
-        discount_value DECIMAL(10,2) NOT NULL,
+        type VARCHAR(20) NOT NULL CHECK (type IN ('percentage', 'fixed_amount', 'free_shipping')),
+        value DECIMAL(10,2) NOT NULL,
         min_order_amount DECIMAL(10,2) DEFAULT 0,
-        max_discount_amount DECIMAL(10,2),
+        max_discount DECIMAL(10,2),
         usage_limit INTEGER,
+        per_user_limit INTEGER DEFAULT 1,
         used_count INTEGER DEFAULT 0,
-        start_date TIMESTAMP,
-        end_date TIMESTAMP,
+        valid_from TIMESTAMP,
+        valid_until TIMESTAMP,
         is_active BOOLEAN DEFAULT true,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- 優惠券使用記錄表
+      CREATE TABLE IF NOT EXISTS coupon_usages (
+        id SERIAL PRIMARY KEY,
+        coupon_id INTEGER REFERENCES coupons(id) ON DELETE CASCADE,
+        order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
+        customer_phone VARCHAR(20) NOT NULL,
+        discount_amount DECIMAL(10,2) NOT NULL,
+        used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
       -- 訂單表

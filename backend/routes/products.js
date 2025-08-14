@@ -298,45 +298,24 @@ router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, 
       }
     }
 
-    // 檢查是否有 sort_order 字段
-    const tableInfo = await Database.all("PRAGMA table_info(products)");
-    const hasSortOrder = tableInfo.some(col => col.name === 'sort_order');
+    // 獲取下一個排序順序
+    const lastProduct = await Database.get('SELECT MAX(sort_order) as max_sort FROM products');
+    const nextSortOrder = (lastProduct?.max_sort || 0) + 1;
 
-    let result;
-    if (hasSortOrder) {
-      // 獲取下一個排序順序
-      const lastProduct = await Database.get('SELECT MAX(sort_order) as max_sort FROM products');
-      const nextSortOrder = (lastProduct?.max_sort || 0) + 1;
-
-      // 插入產品數據（包含排序）
-      result = await Database.run(
-        'INSERT INTO products (name, description, price, category, multi_discount, images, is_active, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [
-          name,
-          description || '',
-          price,
-          category || '其他產品',
-          JSON.stringify(parsedMultiDiscount),
-          JSON.stringify(allImages),
-          1,
-          nextSortOrder
-        ]
-      );
-    } else {
-      // 插入產品數據（不包含排序）
-      result = await Database.run(
-        'INSERT INTO products (name, description, price, category, multi_discount, images, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [
-          name,
-          description || '',
-          price,
-          category || '其他產品',
-          JSON.stringify(parsedMultiDiscount),
-          JSON.stringify(allImages),
-          1
-        ]
-      );
-    }
+    // 插入產品數據
+    const result = await Database.run(
+      'INSERT INTO products (name, description, price, category, multi_discount, images, is_active, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id',
+      [
+        name,
+        description || '',
+        price,
+        category || '其他產品',
+        JSON.stringify(parsedMultiDiscount),
+        JSON.stringify(allImages),
+        true,
+        nextSortOrder
+      ]
+    );
 
     console.log('✅ 產品創建成功，ID:', result.id);
     console.log('💾 保存的圖片數據:', JSON.stringify(allImages));
@@ -369,16 +348,6 @@ router.put('/admin/update-sort-order', authenticateAdmin, async (req, res) => {
       });
     }
 
-    // 檢查是否有 sort_order 字段
-    const tableInfo = await Database.all("PRAGMA table_info(products)");
-    const hasSortOrder = tableInfo.some(col => col.name === 'sort_order');
-
-    if (!hasSortOrder) {
-      return res.status(400).json({
-        success: false,
-        message: '數據庫尚未支持產品排序功能，請聯繫管理員進行數據庫升級'
-      });
-    }
 
     // 開始事務
     await Database.beginTransaction();
@@ -519,9 +488,9 @@ router.delete('/admin/:id', authenticateAdmin, async (req, res) => {
 
     console.log('✅ 找到產品:', product.name);
 
-    // 軟刪除（設為不活躍）- 暫時不使用 updated_at 字段
+    // 軟刪除（設為不活躍）
     const result = await Database.run(
-      'UPDATE products SET is_active = 0 WHERE id = ?',
+      'UPDATE products SET is_active = false WHERE id = ?',
       [id]
     );
 
@@ -546,7 +515,7 @@ router.put('/admin/:id/restore', authenticateAdmin, async (req, res) => {
     const { id } = req.params;
 
     const result = await Database.run(
-      'UPDATE products SET is_active = 1 WHERE id = ?',
+      'UPDATE products SET is_active = true WHERE id = ?',
       [id]
     );
 
@@ -804,15 +773,15 @@ async function batchInsertProducts(products) {
 
       // 插入產品
       await Database.run(`
-        INSERT INTO products (name, price, category, description, multi_discount, is_active, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+        INSERT INTO products (name, price, category, description, multi_discount, is_active)
+        VALUES (?, ?, ?, ?, ?, ?)
       `, [
         product.name,
         product.price,
         product.category,
         product.description,
         JSON.stringify(product.multi_discount),
-        product.is_active ? 1 : 0
+        product.is_active ? true : false
       ]);
 
       console.log(`✅ 成功添加產品: ${product.name}`);
