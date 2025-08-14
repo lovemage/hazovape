@@ -299,7 +299,7 @@ export const AdminCoupons: React.FC = () => {
       case 'free_shipping':
         return '免運費';
       default:
-        return coupon.value.toString();
+        return coupon.value?.toString() || '0';
     }
   };
 

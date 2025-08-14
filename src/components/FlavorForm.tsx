@@ -221,11 +221,11 @@ export const FlavorForm: React.FC<FlavorFormProps> = ({
       
       // 添加基本數據
       formDataObj.append('name', formData.name);
-      formDataObj.append('product_id', formData.product_id.toString());
-      formDataObj.append('category_id', formData.category_id.toString());
-      formDataObj.append('stock', formData.stock.toString());
-      formDataObj.append('sort_order', formData.sort_order.toString());
-      formDataObj.append('is_active', formData.is_active.toString());
+      formDataObj.append('product_id', formData.product_id?.toString() || '0');
+      formDataObj.append('category_id', formData.category_id?.toString() || '0');
+      formDataObj.append('stock', formData.stock?.toString() || '0');
+      formDataObj.append('sort_order', formData.sort_order?.toString() || '0');
+      formDataObj.append('is_active', formData.is_active?.toString() || 'true');
       
       if (formData.price) {
         formDataObj.append('price', formData.price);
@@ -298,7 +298,7 @@ export const FlavorForm: React.FC<FlavorFormProps> = ({
                   <div>
                     <Label htmlFor="product">所屬商品 *</Label>
                     <Select
-                      value={formData.product_id.toString()}
+                      value={formData.product_id?.toString() || ''}
                       onValueChange={(value) => handleInputChange('product_id', parseInt(value))}
                     >
                       <SelectTrigger>
@@ -306,7 +306,7 @@ export const FlavorForm: React.FC<FlavorFormProps> = ({
                       </SelectTrigger>
                       <SelectContent>
                         {products.map((product) => (
-                          <SelectItem key={product.id} value={product.id.toString()}>
+                          <SelectItem key={product.id} value={product.id?.toString() || ''}>
                             {product.name}
                           </SelectItem>
                         ))}
@@ -317,7 +317,7 @@ export const FlavorForm: React.FC<FlavorFormProps> = ({
                   <div>
                     <Label htmlFor="category">規格分類</Label>
                     <Select
-                      value={formData.category_id.toString()}
+                      value={formData.category_id?.toString() || ''}
                       onValueChange={(value) => handleInputChange('category_id', parseInt(value))}
                     >
                       <SelectTrigger>
@@ -325,7 +325,7 @@ export const FlavorForm: React.FC<FlavorFormProps> = ({
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map((category) => (
-                          <SelectItem key={category.id} value={category.id.toString()}>
+                          <SelectItem key={category.id} value={category.id?.toString() || ''}>
                             {category.name}
                           </SelectItem>
                         ))}

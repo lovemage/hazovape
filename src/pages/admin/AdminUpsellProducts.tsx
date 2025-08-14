@@ -120,8 +120,8 @@ const AdminUpsellProducts: React.FC = () => {
     setEditingProduct(product);
     setFormData({
       name: product.name,
-      price: product.price.toString(),
-      stock: product.stock.toString(),
+      price: product.price?.toString() || '0',
+      stock: product.stock?.toString() || '0',
       description: product.description || ''
     });
     setShowForm(true);

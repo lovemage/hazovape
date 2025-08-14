@@ -87,7 +87,7 @@ export const CartSidebar: React.FC = () => {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => updateQuantity(item.id, Math.max(1, (variant.quantity || 1) - 1), variant.id.toString())}
+                                    onClick={() => updateQuantity(item.id, Math.max(1, (variant.quantity || 1) - 1), variant.id?.toString() || '')}
                                     disabled={(variant.quantity || 1) <= 1}
                                     className="h-6 w-6 p-0"
                                   >
@@ -99,7 +99,7 @@ export const CartSidebar: React.FC = () => {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => updateQuantity(item.id, (variant.quantity || 1) + 1, variant.id.toString())}
+                                    onClick={() => updateQuantity(item.id, (variant.quantity || 1) + 1, variant.id?.toString() || '')}
                                     className="h-6 w-6 p-0"
                                   >
                                     <Plus className="h-2 w-2" />

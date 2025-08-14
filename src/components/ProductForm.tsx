@@ -237,11 +237,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     try {
       const submitData = new FormData();
       submitData.append('name', formData.name);
-      submitData.append('price', formData.price.toString());
-      submitData.append('stock', formData.stock.toString());
+      submitData.append('price', formData.price?.toString() || '0');
+      submitData.append('stock', formData.stock?.toString() || '0');
       submitData.append('description', formData.description);
       submitData.append('category', formData.category);
-      submitData.append('is_active', formData.is_active.toString());
+      submitData.append('is_active', formData.is_active?.toString() || 'true');
       submitData.append('multi_discount', JSON.stringify(formData.multi_discount));
       
       console.log('🖼️  現有圖片:', existingImages);

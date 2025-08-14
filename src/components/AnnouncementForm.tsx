@@ -135,7 +135,7 @@ export const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
             <div>
               <Label htmlFor="priority">優先級</Label>
               <Select 
-                value={formData.priority.toString()} 
+                value={formData.priority?.toString() || '0'} 
                 onValueChange={(value) => handleInputChange('priority', parseInt(value))}
               >
                 <SelectTrigger>
