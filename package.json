@@ -7,7 +7,7 @@
     "build": "pnpm tsc -b && pnpm vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node backend/server.js"
+    "start": "NODE_PATH=node_modules node backend/server.js"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
