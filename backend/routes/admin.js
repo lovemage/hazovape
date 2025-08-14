@@ -6,6 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const runProductionMigrations = require('../scripts/production-migrate');
+const { uploadBufferToCloudinary, deleteFromCloudinary, extractPublicIdFromUrl } = require('../config/cloudinary');
 
 const router = express.Router();
 
@@ -34,19 +35,9 @@ if (!fs.existsSync(staticUploadDir)) {
   console.log('✅ 創建靜態檔案目錄:', staticUploadDir);
 }
 
-// 配置 multer 用於圖片上傳
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, staticUploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `popup-${uuidv4()}-${Date.now()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  }
-});
-
+// 配置 multer 使用內存存儲（用於 Cloudinary 上傳）
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB
   },
@@ -556,7 +547,7 @@ router.post('/import-data', authenticateAdmin, async (req, res) => {
   }
 });
 
-// 管理員：上傳廣告彈窗圖片
+// 管理員：上傳廣告彈窗圖片（使用 Cloudinary）
 router.post('/upload-image', authenticateAdmin, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
@@ -566,38 +557,32 @@ router.post('/upload-image', authenticateAdmin, upload.single('image'), async (r
       });
     }
 
-    // 刪除舊的彈窗圖片（如果有的話）
+    console.log('☁️ 開始上傳圖片到 Cloudinary...', req.file.originalname);
+
+    // 上傳圖片到 Cloudinary
     try {
-      const oldImageSetting = await Database.get(
-        'SELECT setting_value FROM site_settings WHERE setting_key = ?',
-        ['popup_image']
-      );
-      
-      if (oldImageSetting && oldImageSetting.setting_value) {
-        const oldImagePath = path.join(staticUploadDir, path.basename(oldImageSetting.setting_value));
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-          console.log('🗑️ 刪除舊圖片:', oldImagePath);
+      const result = await uploadBufferToCloudinary(req.file.buffer, {
+        folder: 'meelfull/static',
+        public_id: `popup_${Date.now()}`
+      });
+
+      console.log('✅ Cloudinary 上傳成功:', result.secure_url);
+
+      res.json({
+        success: true,
+        message: '圖片上傳成功',
+        data: {
+          path: result.secure_url,
+          filename: result.public_id,
+          size: req.file.size,
+          cloudinary_url: result.secure_url
         }
-      }
-    } catch (error) {
-      console.error('刪除舊圖片失敗:', error);
+      });
+
+    } catch (cloudinaryError) {
+      console.error('❌ Cloudinary 上傳失敗:', cloudinaryError.message);
+      throw new Error('圖片上傳到雲端失敗: ' + cloudinaryError.message);
     }
-
-    // 生成相對路徑
-    const imagePath = `/uploads/static/${req.file.filename}`;
-    
-    console.log('✅ 圖片上傳成功:', imagePath);
-
-    res.json({
-      success: true,
-      message: '圖片上傳成功',
-      data: {
-        path: imagePath,
-        filename: req.file.filename,
-        size: req.file.size
-      }
-    });
 
   } catch (error) {
     console.error('❌ 上傳圖片失敗:', error);

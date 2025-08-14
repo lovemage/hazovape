@@ -5,46 +5,13 @@ const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const Database = require('../config/database');
 const { authenticateAdmin } = require('./auth');
+const { uploadBufferToCloudinary, deleteFromCloudinary, extractPublicIdFromUrl } = require('../config/cloudinary');
 
 const router = express.Router();
 
-// 創建上傳目錄 - 支持 Railway Volume 和 Heroku
-const getUploadDir = () => {
-  // 優先使用環境變數 UPLOADS_PATH（用於 Railway Volume）
-  if (process.env.UPLOADS_PATH) {
-    return path.join(process.env.UPLOADS_PATH, 'products');
-  }
-  
-  if (process.env.NODE_ENV === 'production') {
-    // Heroku 生產環境：使用 dist 目錄中的 uploads
-    return path.join(__dirname, '../../dist/uploads/products');
-  } else {
-    // 本地開發環境：使用相對路徑
-    return path.join(__dirname, '../uploads/products');
-  }
-};
-
-const uploadDir = getUploadDir();
-console.log('📁 圖片上傳目錄:', uploadDir);
-
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-  console.log('✅ 創建上傳目錄:', uploadDir);
-}
-
-// 配置 multer 用於圖片上傳
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${uuidv4()}-${Date.now()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  }
-});
-
+// 配置 multer 使用內存存儲（用於 Cloudinary 上傳）
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB
     files: 5 // 最多5個文件
@@ -262,7 +229,7 @@ router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, 
       });
     }
 
-    // 處理圖片 - 支持文件上傳和 URL
+    // 處理圖片 - 支持文件上傳和 URL（使用 Cloudinary）
     let allImages = [];
 
     // 處理現有圖片（URL）
@@ -277,14 +244,34 @@ router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, 
       }
     }
 
-    // 處理上傳的圖片文件
+    // 處理上傳的圖片文件 - 上傳到 Cloudinary
     if (req.files && req.files.length > 0) {
-      const uploadedImages = req.files.map(file => {
-        console.log('📤 處理上傳文件:', file.originalname, '→', file.filename);
-        return `products/${file.filename}`;
+      console.log('☁️ 開始上傳圖片到 Cloudinary...');
+      const uploadPromises = req.files.map(async (file, index) => {
+        try {
+          console.log(`📤 上傳文件 ${index + 1}:`, file.originalname);
+          const result = await uploadBufferToCloudinary(file.buffer, {
+            folder: 'meelfull/products',
+            public_id: `product_${Date.now()}_${index}`
+          });
+          console.log(`✅ Cloudinary 上傳成功:`, result.secure_url);
+          return result.secure_url;
+        } catch (error) {
+          console.error(`❌ Cloudinary 上傳失敗:`, error.message);
+          throw error;
+        }
       });
-      allImages = [...allImages, ...uploadedImages];
-      console.log('📤 新上傳圖片:', uploadedImages);
+
+      try {
+        const uploadedUrls = await Promise.all(uploadPromises);
+        allImages = [...allImages, ...uploadedUrls];
+        console.log('📤 新上傳圖片 URLs:', uploadedUrls);
+      } catch (error) {
+        return res.status(500).json({
+          success: false,
+          message: '圖片上傳失敗: ' + error.message
+        });
+      }
     }
 
     // 限制最多5張圖片
@@ -409,7 +396,7 @@ router.put('/admin/:id', authenticateAdmin, upload.array('images', 5), async (re
       });
     }
 
-    // 處理圖片 - 支持文件上傳和 URL
+    // 處理圖片 - 支持文件上傳和 URL（使用 Cloudinary）
     let currentImages = [];
 
     // 保留現有圖片（包括文件路徑和 URL）
@@ -424,11 +411,34 @@ router.put('/admin/:id', authenticateAdmin, upload.array('images', 5), async (re
       }
     }
 
-    // 添加新上傳的圖片文件
+    // 添加新上傳的圖片文件 - 上傳到 Cloudinary
     if (req.files && req.files.length > 0) {
-      const newImages = req.files.map(file => `products/${file.filename}`);
-      currentImages = [...currentImages, ...newImages];
-      console.log('📤 添加新上傳圖片:', newImages);
+      console.log('☁️ 開始上傳新圖片到 Cloudinary...');
+      const uploadPromises = req.files.map(async (file, index) => {
+        try {
+          console.log(`📤 上傳文件 ${index + 1}:`, file.originalname);
+          const result = await uploadBufferToCloudinary(file.buffer, {
+            folder: 'meelfull/products',
+            public_id: `product_${id}_${Date.now()}_${index}`
+          });
+          console.log(`✅ Cloudinary 上傳成功:`, result.secure_url);
+          return result.secure_url;
+        } catch (error) {
+          console.error(`❌ Cloudinary 上傳失敗:`, error.message);
+          throw error;
+        }
+      });
+
+      try {
+        const uploadedUrls = await Promise.all(uploadPromises);
+        currentImages = [...currentImages, ...uploadedUrls];
+        console.log('📤 添加新上傳圖片 URLs:', uploadedUrls);
+      } catch (error) {
+        return res.status(500).json({
+          success: false,
+          message: '圖片上傳失敗: ' + error.message
+        });
+      }
     }
 
     // 限制最多5張圖片
