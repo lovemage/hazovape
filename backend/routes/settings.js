@@ -13,11 +13,14 @@ router.get('/', async (req, res) => {
       'shipping_fee': '60',
       'site_title': 'Mist Mall',
       'site_subtitle': '精選優質茶葉、咖啡豆與手工餅乾，為您帶來最美好的味覺體驗',
-      'contact_telegram': 't.me/whalesale',
+      'contact_line': 'https://line.me/ti/p/@590shgcm',
+      'contact_telegram': 'https://t.me/whalesale',
+      'contact_phone': '',
+      'contact_email': '',
       'homepage_subtitle': '精選優質茶葉、咖啡豆與手工餅乾，為您帶來最美好的味覺體驗',
-      'popup_image': '',
+      'popup_image': '/uploads/static/unlock-popup.png',
       'popup_enabled': 'true',
-      'order_complete_popup_image': '',
+      'order_complete_popup_image': '/uploads/static/unlock-popup.png',
       'order_complete_popup_enabled': 'true',
       'hero_background_image': '/images/seep-vape-hero.png',
       'floating_buttons_enabled': 'true'
@@ -93,11 +96,16 @@ router.get('/:key', async (req, res) => {
       'shipping_fee': '60',
       'site_title': 'Mist Mall',
       'site_subtitle': '精選優質茶葉、咖啡豆與手工餅乾，為您帶來最美好的味覺體驗',
-      'contact_telegram': 't.me/whalesale',
+      'contact_line': 'https://line.me/ti/p/@590shgcm',
+      'contact_telegram': 'https://t.me/whalesale',
       'homepage_subtitle': '精選優質茶葉、咖啡豆與手工餅乾，為您帶來最美好的味覺體驗',
       'site_description': '優質商品購物平台',
       'contact_phone': '',
-      'contact_email': ''
+      'contact_email': '',
+      'popup_image': '/uploads/static/unlock-popup.png',
+      'order_complete_popup_image': '/uploads/static/unlock-popup.png',
+      'hero_background_image': '/images/seep-vape-hero.png',
+      'floating_buttons_enabled': 'true'
     };
 
     let setting;
