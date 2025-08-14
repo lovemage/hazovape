@@ -17,7 +17,7 @@
   :root {
     --radius: 0.5rem;
     
-    /* MeelFul Color Scheme */
+    /* MeelFull Color Scheme */
     --primary: 211 29% 55%; /* #6c8bac */
     --primary-foreground: 0 0% 100%; /* white text on primary */
     --secondary: 194 18% 77%; /* #b9ced4 */
@@ -38,7 +38,7 @@
     --popover: 215 29% 85%; /* popover background */
     --popover-foreground: 211 29% 15%; /* popover text */
     
-    /* Sidebar colors based on MeelFul scheme */
+    /* Sidebar colors based on MeelFull scheme */
     --sidebar-background: 215 29% 85%; /* #b8c8e0 lighter */
     --sidebar-foreground: 211 29% 15%; /* dark text */
     --sidebar-primary: 211 29% 55%; /* #6c8bac */
@@ -50,7 +50,7 @@
   }
 
   .dark {
-    /* MeelFul Dark Mode Color Scheme */
+    /* MeelFull Dark Mode Color Scheme */
     --primary: 211 29% 65%; /* lighter primary for dark mode */
     --primary-foreground: 211 29% 10%; /* dark text on primary */
     --secondary: 194 18% 25%; /* darker secondary */
@@ -132,7 +132,7 @@ img {
     0 6px 10px rgba(0,0,0,0.1);
 }
 
-/* MeelFul Primary variant */
+/* MeelFull Primary variant */
 .pixel-button-primary {
   background: linear-gradient(135deg, #6c8bac 0%, #5a7390 100%);
   color: white;
@@ -146,7 +146,7 @@ img {
   background: linear-gradient(135deg, #5a7390 0%, #4a6178 100%);
 }
 
-/* MeelFul Accent variant */
+/* MeelFull Accent variant */
 .pixel-button-accent {
   background: linear-gradient(135deg, #ff9040 0%, #e67d2a 100%);
   color: white;
@@ -160,7 +160,7 @@ img {
   background: linear-gradient(135deg, #e67d2a 0%, #cc6b1a 100%);
 }
 
-/* Green variant for LINE (updated to complement MeelFul) */
+/* Green variant for LINE (updated to complement MeelFull) */
 .pixel-button-green {
   background: linear-gradient(135deg, #06c755 0%, #05a346 100%);
   color: white;
@@ -174,7 +174,7 @@ img {
   background: linear-gradient(135deg, #05a346 0%, #04923c 100%);
 }
 
-/* Secondary variant using MeelFul secondary color */
+/* Secondary variant using MeelFull secondary color */
 .pixel-button-secondary {
   background: linear-gradient(135deg, #b9ced4 0%, #a5bcc3 100%);
   color: #2a3441;

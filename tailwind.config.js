@@ -23,18 +23,18 @@ module.exports = {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))', // MeelFul primary #6c8bac
+					DEFAULT: 'hsl(var(--primary))', // MeelFull primary #6c8bac
 					foreground: 'hsl(var(--primary-foreground))',
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))', // MeelFul secondary #b9ced4
+					DEFAULT: 'hsl(var(--secondary))', // MeelFull secondary #b9ced4
 					foreground: 'hsl(var(--secondary-foreground))',
 				},
 				accent: {
-					DEFAULT: 'hsl(var(--accent))', // MeelFul accent #ff9040
+					DEFAULT: 'hsl(var(--accent))', // MeelFull accent #ff9040
 					foreground: 'hsl(var(--accent-foreground))',
 				},
-				// MeelFul Brand Colors
+				// MeelFull Brand Colors
 				'meelful-primary': '#6c8bac', // 主色：按鈕、鏈接、標題
 				'meelful-secondary': '#b9ced4', // 輔助色：次級元素、邊框
 				'meelful-accent': '#ff9040', // 強調色：CTA 按鈕、提示

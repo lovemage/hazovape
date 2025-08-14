@@ -237,11 +237,11 @@ export const HomePage: React.FC = () => {
             >
               <img 
                 src="/images/logo/logo.jpg" 
-                alt="MeelFul Logo" 
+                alt="MeelFull Logo" 
                 className="w-10 h-10 mr-3 group-hover:scale-105 transition-transform rounded-md object-cover"
               />
               <h1 className="text-xl font-bold text-meelful-primary">
-                MeelFul
+                MeelFull
               </h1>
             </div>
 
@@ -311,7 +311,7 @@ export const HomePage: React.FC = () => {
             <div className="w-full">
               <img
                 src={popupImage}
-                alt="MeelFul Unlock 廣告"
+                alt="MeelFull Unlock 廣告"
                 className="w-full h-auto max-w-md mx-auto rounded-lg shadow-lg"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;

@@ -563,7 +563,7 @@ async function startServer() {
     }
 
     const server = app.listen(PORT, '0.0.0.0', () => {
-      console.log(`MeelFul 後端服務器運行於端口 ${PORT}`);
+      console.log(`MeelFull 後端服務器運行於端口 ${PORT}`);
       console.log(`訪問地址: http://localhost:${PORT}`);
 
       // Heroku 生產環境檢查

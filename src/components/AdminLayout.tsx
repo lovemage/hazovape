@@ -164,7 +164,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <div className="relative flex items-center justify-center h-16 px-4 border-b border-gray-200">
             <img 
               src="/images/logo/logo.jpg" 
-              alt="MeelFul Logo" 
+              alt="MeelFull Logo" 
               className="w-10 h-10 rounded-md object-cover"
             />
             <Button

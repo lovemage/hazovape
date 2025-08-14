@@ -142,7 +142,7 @@ export const AdminWebsiteSettings: React.FC = () => {
           key: 'homepage_title',
           label: 'Hero 區域主標題',
           description: '顯示在首頁 Hero 區域的主要標題（需先啟用 Hero 標題）',
-          placeholder: '例：MeelFul',
+          placeholder: '例：MeelFull',
           rows: 1
         },
         {
@@ -220,14 +220,14 @@ export const AdminWebsiteSettings: React.FC = () => {
           key: 'site_title',
           label: '網站標題',
           description: '網站標題，將顯示在瀏覽器標籤和搜尋結果中',
-          placeholder: 'MeelFul',
+          placeholder: 'MeelFull',
           rows: 1
         },
         {
           key: 'site_description',
           label: '網站描述',
           description: '網站描述，將顯示在搜尋結果和社交媒體分享中',
-          placeholder: 'MeelFul - 優質產品專賣店，為您提供最佳的購物體驗',
+          placeholder: 'MeelFull - 優質產品專賣店，為您提供最佳的購物體驗',
           rows: 2
         }
       ]
@@ -447,7 +447,7 @@ export const AdminWebsiteSettings: React.FC = () => {
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
                 歡迎來到{' '}
                 <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  {settings.site_title || 'MeelFul'}
+                  {settings.site_title || 'MeelFull'}
                 </span>
               </h2>
               {settings.homepage_subtitle && (

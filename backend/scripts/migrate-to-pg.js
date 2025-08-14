@@ -257,8 +257,8 @@ async function initializePostgreSQL() {
 
     // 插入一些基本設置
     const defaultSettings = [
-      ['site_title', 'MeelFul', 'text', '網站標題', 'general'],
-      ['site_description', 'MeelFul - 優質產品專賣店，為您提供最佳的購物體驗', 'text', '網站描述', 'general'],
+      ['site_title', 'MeelFull', 'text', '網站標題', 'general'],
+      ['site_description', 'MeelFull - 優質產品專賣店，為您提供最佳的購物體驗', 'text', '網站描述', 'general'],
       ['homepage_subtitle', '精選優質產品，為您帶來最美好的體驗', 'text', '首頁副標題', 'homepage'],
       ['free_shipping_threshold', '3000', 'number', '免運門檻', 'shipping'],
       ['shipping_fee', '60', 'number', '運費金額', 'shipping'],
@@ -267,7 +267,7 @@ async function initializePostgreSQL() {
       ['contact_line', 'https://line.me/ti/p/@590shgcm', 'text', 'LINE 官方帳號', 'contact'],
       ['contact_telegram', 'https://t.me/whalesale', 'text', 'Telegram 聯絡方式', 'contact'],
       ['homepage_hero_enabled', 'true', 'boolean', '啟用 Hero 區域標題', 'homepage'],
-      ['homepage_title', 'MeelFul', 'text', 'Hero 區域主標題', 'homepage'],
+      ['homepage_title', 'MeelFull', 'text', 'Hero 區域主標題', 'homepage'],
       ['popup_enabled', 'false', 'boolean', '啟用首頁彈窗', 'popup'],
       ['order_complete_popup_enabled', 'true', 'boolean', '啟用訂單完成彈窗', 'popup']
     ];
@@ -319,7 +319,7 @@ async function initializePostgreSQL() {
     await pool.query(`
       INSERT INTO announcements (title, content, type, is_active, sort_order)
       VALUES 
-        ('歡迎來到 MeelFul', '我們提供最優質的產品，感謝您的支持！', 'info', true, 10),
+        ('歡迎來到 MeelFull', '我們提供最優質的產品，感謝您的支持！', 'info', true, 10),
         ('新品上架通知', '精選茶葉禮盒現已上架，限時優惠中！', 'success', true, 5)
       ON CONFLICT DO NOTHING
     `);

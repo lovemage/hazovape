@@ -165,11 +165,11 @@ const OrderQueryPage: React.FC = () => {
             >
               <img 
                 src="/images/logo/logo.jpg" 
-                alt="MeelFul Logo" 
+                alt="MeelFull Logo" 
                 className="w-10 h-10 mr-3 group-hover:scale-105 transition-transform rounded-md object-cover"
               />
               <h1 className="text-xl font-bold bg-gradient-to-r from-meelful-primary to-meelful-secondary bg-clip-text text-transparent">
-                MeelFul
+                MeelFull
               </h1>
             </div>
 
