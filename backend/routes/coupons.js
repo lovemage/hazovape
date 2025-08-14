@@ -28,7 +28,7 @@ router.post('/validate', async (req, res) => {
     // 查找優惠券
     const coupon = await Database.get(`
       SELECT * FROM coupons 
-      WHERE code = ? AND is_active = 1
+      WHERE code = ? AND is_active = true
     `, [code.trim().toUpperCase()]);
 
     if (!coupon) {
@@ -149,9 +149,9 @@ router.get('/admin/all', authenticateAdmin, async (req, res) => {
     }
 
     if (status === 'active') {
-      whereClause += ' AND is_active = 1';
+      whereClause += ' AND is_active = true';
     } else if (status === 'inactive') {
-      whereClause += ' AND is_active = 0';
+      whereClause += ' AND is_active = false';
     }
 
     const coupons = await Database.all(`
@@ -328,7 +328,7 @@ router.delete('/admin/:id', authenticateAdmin, async (req, res) => {
     
     if (usageCount.count > 0) {
       // 如果有使用記錄，只停用不刪除
-      await Database.run('UPDATE coupons SET is_active = 0 WHERE id = ?', [id]);
+      await Database.run('UPDATE coupons SET is_active = false WHERE id = ?', [id]);
       res.json({
         success: true,
         message: '優惠券已停用（因為有使用記錄）'

@@ -21,7 +21,12 @@ const getUploadsPath = () => {
 // 檢查flavors表是否有price欄位的通用函數
 async function checkFlavorPriceColumn() {
   try {
-    const tableInfo = await Database.all("PRAGMA table_info(flavors)");
+    const tableInfo = await Database.all(`
+      SELECT column_name as name, data_type as type, is_nullable, column_default as dflt_value
+      FROM information_schema.columns 
+      WHERE table_name = 'flavors' 
+      ORDER BY ordinal_position
+    `);
     return tableInfo.some(column => column.name === 'price');
   } catch (error) {
     console.warn('檢查價格欄位失敗:', error);
@@ -32,7 +37,12 @@ async function checkFlavorPriceColumn() {
 // 檢查flavors表是否有image欄位的通用函數
 async function checkFlavorImageColumn() {
   try {
-    const tableInfo = await Database.all("PRAGMA table_info(flavors)");
+    const tableInfo = await Database.all(`
+      SELECT column_name as name, data_type as type, is_nullable, column_default as dflt_value
+      FROM information_schema.columns 
+      WHERE table_name = 'flavors' 
+      ORDER BY ordinal_position
+    `);
     return tableInfo.some(column => column.name === 'image');
   } catch (error) {
     console.warn('檢查圖片欄位失敗:', error);
@@ -378,7 +388,7 @@ router.get('/', async (req, res) => {
         FROM flavors f
         LEFT JOIN products p ON f.product_id = p.id
         LEFT JOIN flavor_categories fc ON f.category_id = fc.id
-        WHERE f.is_active = 1 AND p.is_active = 1
+        WHERE f.is_active = true AND p.is_active = true
         ORDER BY p.name, fc.sort_order, f.sort_order, f.id
       `;
     } else if (hasPriceField) {
@@ -389,7 +399,7 @@ router.get('/', async (req, res) => {
         FROM flavors f
         LEFT JOIN products p ON f.product_id = p.id
         LEFT JOIN flavor_categories fc ON f.category_id = fc.id
-        WHERE f.is_active = 1 AND p.is_active = 1
+        WHERE f.is_active = true AND p.is_active = true
         ORDER BY p.name, fc.sort_order, f.sort_order, f.id
       `;
     } else if (hasImageField) {
@@ -400,7 +410,7 @@ router.get('/', async (req, res) => {
         FROM flavors f
         LEFT JOIN products p ON f.product_id = p.id
         LEFT JOIN flavor_categories fc ON f.category_id = fc.id
-        WHERE f.is_active = 1 AND p.is_active = 1
+        WHERE f.is_active = true AND p.is_active = true
         ORDER BY p.name, fc.sort_order, f.sort_order, f.id
       `;
     } else {
@@ -411,7 +421,7 @@ router.get('/', async (req, res) => {
         FROM flavors f
         LEFT JOIN products p ON f.product_id = p.id
         LEFT JOIN flavor_categories fc ON f.category_id = fc.id
-        WHERE f.is_active = 1 AND p.is_active = 1
+        WHERE f.is_active = true AND p.is_active = true
         ORDER BY p.name, fc.sort_order, f.sort_order, f.id
       `;
     }
@@ -453,7 +463,7 @@ router.get('/product/:productId', async (req, res) => {
         FROM flavors f
         LEFT JOIN flavor_categories fc ON f.category_id = fc.id
         LEFT JOIN products p ON f.product_id = p.id
-        WHERE f.product_id = ? AND f.is_active = 1
+        WHERE f.product_id = ? AND f.is_active = true
         ORDER BY fc.sort_order, f.sort_order, f.id
       `;
     } else if (hasPriceField) {
@@ -464,7 +474,7 @@ router.get('/product/:productId', async (req, res) => {
         FROM flavors f
         LEFT JOIN flavor_categories fc ON f.category_id = fc.id
         LEFT JOIN products p ON f.product_id = p.id
-        WHERE f.product_id = ? AND f.is_active = 1
+        WHERE f.product_id = ? AND f.is_active = true
         ORDER BY fc.sort_order, f.sort_order, f.id
       `;
     } else if (hasImageField) {
@@ -475,7 +485,7 @@ router.get('/product/:productId', async (req, res) => {
         FROM flavors f
         LEFT JOIN flavor_categories fc ON f.category_id = fc.id
         LEFT JOIN products p ON f.product_id = p.id
-        WHERE f.product_id = ? AND f.is_active = 1
+        WHERE f.product_id = ? AND f.is_active = true
         ORDER BY fc.sort_order, f.sort_order, f.id
       `;
     } else {
@@ -486,7 +496,7 @@ router.get('/product/:productId', async (req, res) => {
         FROM flavors f
         LEFT JOIN flavor_categories fc ON f.category_id = fc.id
         LEFT JOIN products p ON f.product_id = p.id
-        WHERE f.product_id = ? AND f.is_active = 1
+        WHERE f.product_id = ? AND f.is_active = true
         ORDER BY fc.sort_order, f.sort_order, f.id
       `;
     }
@@ -1399,7 +1409,7 @@ router.delete('/admin/:id', authenticateAdmin, async (req, res) => {
 
     // 軟刪除（設為不活躍）- 暫時不使用 updated_at 字段
     const result = await Database.run(
-      'UPDATE flavors SET is_active = 0 WHERE id = ?',
+      'UPDATE flavors SET is_active = false WHERE id = ?',
       [id]
     );
 
@@ -1424,7 +1434,7 @@ router.put('/admin/:id/restore', authenticateAdmin, async (req, res) => {
     const { id } = req.params;
 
     const result = await Database.run(
-      'UPDATE flavors SET is_active = 1 WHERE id = ?',
+      'UPDATE flavors SET is_active = true WHERE id = ?',
       [id]
     );
 

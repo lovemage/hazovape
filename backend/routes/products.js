@@ -92,13 +92,13 @@ router.get('/', async (req, res) => {
     let products;
     try {
       products = await Database.all(
-        'SELECT id, name, description, price, category, multi_discount, images, is_active, sort_order FROM products WHERE is_active = 1 ORDER BY sort_order ASC, id ASC'
+        'SELECT id, name, description, price, category, multi_discount, images, is_active, sort_order FROM products WHERE is_active = true ORDER BY sort_order ASC, id ASC'
       );
     } catch (error) {
       if (error.message.includes('no such column: sort_order')) {
         console.log('⚠️  sort_order 字段不存在，使用默認排序');
         products = await Database.all(
-          'SELECT id, name, description, price, category, multi_discount, images, is_active FROM products WHERE is_active = 1 ORDER BY id ASC'
+          'SELECT id, name, description, price, category, multi_discount, images, is_active FROM products WHERE is_active = true ORDER BY id ASC'
         );
         // 為每個產品添加默認 sort_order
         products = products.map((product, index) => ({
@@ -119,7 +119,7 @@ router.get('/', async (req, res) => {
                  fc.name as category_name
           FROM flavors f
           LEFT JOIN flavor_categories fc ON f.category_id = fc.id
-          WHERE f.product_id = ? AND f.is_active = 1
+          WHERE f.product_id = ? AND f.is_active = true
           ORDER BY fc.sort_order, f.sort_order, f.id
         `, [product.id]);
 
@@ -151,7 +151,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     
     const product = await Database.get(
-      'SELECT id, name, description, price, multi_discount, images, is_active, created_at FROM products WHERE id = ? AND is_active = 1',
+      'SELECT id, name, description, price, multi_discount, images, is_active, created_at FROM products WHERE id = ? AND is_active = true',
       [id]
     );
 
@@ -868,7 +868,7 @@ router.get('/category/:category', async (req, res) => {
     console.log('🏷️ 根據分類獲取產品:', category);
     
     const products = await Database.all(
-      'SELECT id, name, description, price, category, multi_discount, images, is_active FROM products WHERE is_active = 1 AND category = ? ORDER BY id',
+      'SELECT id, name, description, price, category, multi_discount, images, is_active FROM products WHERE is_active = true AND category = ? ORDER BY id',
       [category]
     );
 
@@ -881,7 +881,7 @@ router.get('/category/:category', async (req, res) => {
                  fc.name as category_name
           FROM flavors f
           LEFT JOIN flavor_categories fc ON f.category_id = fc.id
-          WHERE f.product_id = ? AND f.is_active = 1
+          WHERE f.product_id = ? AND f.is_active = true
           ORDER BY fc.sort_order, f.sort_order, f.id
         `, [product.id]);
 
@@ -912,7 +912,7 @@ router.get('/category/:category', async (req, res) => {
 router.get('/categories/list', async (req, res) => {
   try {
     const categories = await Database.all(
-      'SELECT DISTINCT category FROM products WHERE is_active = 1 AND category IS NOT NULL ORDER BY category'
+      'SELECT DISTINCT category FROM products WHERE is_active = true AND category IS NOT NULL ORDER BY category'
     );
 
     const categoryList = categories.map(row => row.category);

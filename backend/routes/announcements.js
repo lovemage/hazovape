@@ -8,7 +8,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const announcements = await Database.all(
-      'SELECT id, title, content, priority FROM announcements WHERE is_active = 1 ORDER BY priority DESC, created_at DESC'
+      'SELECT id, title, content, priority FROM announcements WHERE is_active = true ORDER BY priority DESC, created_at DESC'
     );
 
     res.json({

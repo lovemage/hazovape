@@ -62,7 +62,7 @@ router.get('/', async (req, res) => {
     const upsellProducts = await Database.all(`
       SELECT id, name, price, stock, images, description
       FROM upsell_products
-      WHERE is_active = 1 AND stock > 0
+      WHERE is_active = true AND stock > 0
       ORDER BY created_at DESC
     `);
 

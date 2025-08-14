@@ -517,7 +517,7 @@ router.post('/verify', async (req, res) => {
 
     // 更新驗證狀態
     await Database.run(
-      'UPDATE orders SET is_verified = 1 WHERE id = ?',
+      'UPDATE orders SET is_verified = true WHERE id = ?',
       [order.id]
     );
 
@@ -598,7 +598,7 @@ router.post('/query', async (req, res) => {
       quantity: item.quantity,
       flavors: item.flavors ? JSON.parse(item.flavors) : [],
       subtotal: item.subtotal,
-      is_upsell: item.is_upsell === 1
+      is_upsell: item.is_upsell === true
     }));
 
     // 格式化訂單狀態
@@ -621,7 +621,7 @@ router.post('/query', async (req, res) => {
       total_amount: order.total_amount,
       status: order.status,
       status_text: getStatusText(order.status),
-      is_verified: order.is_verified === 1,
+      is_verified: order.is_verified === true,
       tracking_number: order.tracking_number,
       created_at: order.created_at,
       items: formattedItems
@@ -1072,7 +1072,7 @@ router.post('/admin/:id/resend-telegram', authenticateAdmin, async (req, res) =>
     const telegramSent = await sendTelegramNotification(order, orderItems);
     
     if (telegramSent) {
-      await Database.run('UPDATE orders SET telegram_sent = 1 WHERE id = ?', [id]);
+      await Database.run('UPDATE orders SET telegram_sent = true WHERE id = ?', [id]);
       res.json({
         success: true,
         message: 'Telegram 通知發送成功'
