@@ -98,8 +98,8 @@ const getUploadsPath = () => {
   
   // 根據環境判斷
   if (process.env.NODE_ENV === 'production') {
-    // Railway 生產環境：使用 Volume 路徑（備用方案）
-    return '/app/data/uploads';
+    // Heroku 生產環境：使用 dist 目錄中的 uploads
+    return path.join(__dirname, '../dist/uploads');
   } else {
     // 本地開發環境：使用相對路徑
     return path.join(__dirname, 'uploads');
