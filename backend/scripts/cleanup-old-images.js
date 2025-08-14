@@ -5,7 +5,6 @@ async function cleanupOldImages() {
   console.log('🧹 開始清理舊的本地圖片路徑...');
   
   try {
-    await Database.beginTransaction();
 
     // 1. 清理產品圖片 - 移除不存在的本地圖片路徑
     console.log('📦 清理產品圖片...');
@@ -85,13 +84,12 @@ async function cleanupOldImages() {
       console.log('ℹ️ 加購商品表不存在或無資料，跳過...');
     }
 
-    await Database.commit();
     console.log('✅ 舊圖片路徑清理完成！');
     
     // 顯示清理後的統計
     console.log('\n📊 清理後統計：');
     const remainingProducts = await Database.all(
-      'SELECT name, images FROM products WHERE images IS NOT NULL AND images != "[]"'
+      'SELECT name, images FROM products WHERE images IS NOT NULL AND images != \'[]\''
     );
     
     console.log('產品圖片狀況：');
@@ -101,7 +99,6 @@ async function cleanupOldImages() {
     });
 
   } catch (error) {
-    await Database.rollback();
     console.error('❌ 清理失敗:', error);
     throw error;
   }
