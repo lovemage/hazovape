@@ -1,0 +1,32 @@
+{
+  "name": "MeelFul",
+  "description": "MeelFul - 優質產品專賣店",
+  "repository": "https://github.com/lovemage/meelful",
+  "logo": "",
+  "keywords": ["nodejs", "react", "sqlite", "ecommerce"],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "NODE_ENV": {
+      "value": "production"
+    },
+    "JWT_SECRET": {
+      "generator": "secret"
+    },
+    "PORT": {
+      "value": "3001"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "addons": [],
+  "scripts": {
+    "postdeploy": "node backend/scripts/init-db.js"
+  }
+}

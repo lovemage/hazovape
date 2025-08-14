@@ -1,0 +1,82 @@
+{
+  "success": true,
+  "data": {
+    "free_shipping_threshold": "2000",
+    "shipping_fee": "60",
+    "site_title": "vjvape",
+    "site_subtitle": "精選優質茶葉、咖啡豆與手工餅乾，為您帶來最美好的味覺體驗",
+    "contact_telegram": "t.me/whalesale",
+    "homepage_subtitle": "精選優質電子煙，為您帶來最美好的煙霧派對",
+    "popup_image": "/uploads/static/popup-df043dab-16cf-4ac3-9c89-83b39cba82a4-1754410290862.png",
+    "popup_enabled": "false",
+    "order_complete_popup_image": "",
+    "order_complete_popup_enabled": "false",
+    "hero_background_image": "",
+    "telegram_bot_token": "",
+    "telegram_chat_id": "",
+    "telegram_enabled": "false",
+    "settings": "[object Object]"
+  },
+  "raw": [
+    {
+      "setting_key": "telegram_bot_token",
+      "setting_value": ""
+    },
+    {
+      "setting_key": "telegram_chat_id",
+      "setting_value": ""
+    },
+    {
+      "setting_key": "telegram_enabled",
+      "setting_value": "false"
+    },
+    {
+      "setting_key": "free_shipping_threshold",
+      "setting_value": "2000"
+    },
+    {
+      "setting_key": "shipping_fee",
+      "setting_value": "60"
+    },
+    {
+      "setting_key": "site_title",
+      "setting_value": "vjvape"
+    },
+    {
+      "setting_key": "site_subtitle",
+      "setting_value": "精選優質茶葉、咖啡豆與手工餅乾，為您帶來最美好的味覺體驗"
+    },
+    {
+      "setting_key": "contact_telegram",
+      "setting_value": "t.me/whalesale"
+    },
+    {
+      "setting_key": "homepage_subtitle",
+      "setting_value": "精選優質電子煙，為您帶來最美好的煙霧派對"
+    },
+    {
+      "setting_key": "popup_image",
+      "setting_value": "/uploads/static/popup-df043dab-16cf-4ac3-9c89-83b39cba82a4-1754410290862.png"
+    },
+    {
+      "setting_key": "popup_enabled",
+      "setting_value": "false"
+    },
+    {
+      "setting_key": "order_complete_popup_image",
+      "setting_value": ""
+    },
+    {
+      "setting_key": "order_complete_popup_enabled",
+      "setting_value": "false"
+    },
+    {
+      "setting_key": "settings",
+      "setting_value": "[object Object]"
+    },
+    {
+      "setting_key": "hero_background_image",
+      "setting_value": ""
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "name": "mist-mall-frontend",
+  "name": "meelful",
   "private": true,
   "version": "0.0.1",
   "scripts": {
@@ -7,7 +7,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "pnpm build && node backend/railway-start.js"
+    "start": "node backend/server.js"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",

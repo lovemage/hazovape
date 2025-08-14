@@ -26,7 +26,7 @@ try {
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Railway 環境配置：信任代理
+// Heroku 環境配置：信任代理
 if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', true);
   console.log('✅ 已啟用 trust proxy 設置');

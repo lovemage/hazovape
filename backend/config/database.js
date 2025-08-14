@@ -2,12 +2,12 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
 
-// 動態數據庫路徑配置 - 與 railway-start.js 保持一致
-const isRailwayEnvironment = process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_PROJECT_ID;
+// 動態數據庫路徑配置 - Heroku 環境適配
+const isProduction = process.env.NODE_ENV === 'production';
 const dbDir = process.env.DATABASE_PATH
   ? path.dirname(process.env.DATABASE_PATH)
-  : isRailwayEnvironment
-    ? '/app/data'  // Railway 環境
+  : isProduction
+    ? path.join(__dirname, '../data')  // Heroku 生產環境
     : path.join(__dirname, '../data');  // 本地環境
 
 // 確保數據庫目錄存在
@@ -32,22 +32,14 @@ const dbPath = process.env.DATABASE_PATH || path.join(dbDir, 'mistmall.db');
 // 統一的數據庫文件名定義
 const dbFileName = 'mistmall.db';
 
-// Railway 首次部署：從部署包複製初始數據到 Volume
+// Heroku 首次部署：初始化數據庫
 if (process.env.NODE_ENV === 'production') {
-  const volumeDbPath = path.join('/app/data', dbFileName);
-  const sourceDbPath = path.join(__dirname, '../data', dbFileName);
-
-  // 如果 Volume 中沒有數據庫文件，創建一個空的數據庫讓 SQLite 初始化
-  if (!fs.existsSync(volumeDbPath)) {
-    console.log('📋 首次部署，創建新的數據庫文件...');
-    try {
-      // 不創建空文件，讓 SQLite 自動創建和初始化
-      console.log('✅ 將由 SQLite 自動創建數據庫文件');
-    } catch (error) {
-      console.error('❌ 數據庫準備失敗:', error.message);
-    }
+  // 如果數據庫文件不存在，將由 SQLite 自動創建
+  if (!fs.existsSync(dbPath)) {
+    console.log('📋 首次部署，將創建新的數據庫文件...');
+    console.log('✅ 將由 SQLite 自動創建數據庫文件');
   } else {
-    console.log('✅ 數據庫文件已存在於 Volume 中');
+    console.log('✅ 數據庫文件已存在');
   }
 }
 
@@ -58,7 +50,7 @@ console.log('📁 數據庫目錄存在:', fs.existsSync(dbDir));
 console.log('📄 數據庫文件存在:', fs.existsSync(dbPath));
 
 if (process.env.NODE_ENV !== 'production') {
-  console.log('🔧 開發環境：使用獨立的本地數據庫，不影響 Railway 生產數據');
+  console.log('🔧 開發環境：使用本地數據庫');
 }
 
 // 數據庫連接管理
