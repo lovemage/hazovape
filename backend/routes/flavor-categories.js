@@ -7,7 +7,7 @@ const { authenticateAdmin } = require('./auth');
 router.get('/', async (req, res) => {
   try {
     const categories = await Database.all(
-      'SELECT id, name, description, sort_order FROM flavor_categories WHERE is_active = 1 ORDER BY sort_order, id'
+      'SELECT id, name, description, sort_order FROM flavor_categories WHERE is_active = true ORDER BY sort_order, id'
     );
 
     res.json({
@@ -69,14 +69,14 @@ router.post('/admin', authenticateAdmin, async (req, res) => {
     }
 
     const result = await Database.run(
-      'INSERT INTO flavor_categories (name, description, sort_order) VALUES (?, ?, ?)',
+      'INSERT INTO flavor_categories (name, description, sort_order) VALUES (?, ?, ?) RETURNING id',
       [name, description || '', parseInt(sort_order) || 0]
     );
 
     res.json({
       success: true,
       message: '類別創建成功',
-      data: { id: result.lastID }
+      data: { id: result.id }
     });
 
   } catch (error) {
@@ -156,7 +156,7 @@ router.delete('/admin/:id', authenticateAdmin, async (req, res) => {
 
     // 檢查是否有口味使用此類別
     const flavorsCount = await Database.get(
-      'SELECT COUNT(*) as count FROM flavors WHERE category_id = ? AND is_active = 1',
+      'SELECT COUNT(*) as count FROM flavors WHERE category_id = ? AND is_active = true',
       [id]
     );
 
@@ -168,7 +168,7 @@ router.delete('/admin/:id', authenticateAdmin, async (req, res) => {
     }
 
     await Database.run(
-      'UPDATE flavor_categories SET is_active = 0 WHERE id = ?',
+      'UPDATE flavor_categories SET is_active = false WHERE id = ?',
       [id]
     );
 
@@ -192,7 +192,7 @@ router.put('/admin/:id/restore', authenticateAdmin, async (req, res) => {
     const { id } = req.params;
 
     await Database.run(
-      'UPDATE flavor_categories SET is_active = 1 WHERE id = ?',
+      'UPDATE flavor_categories SET is_active = true WHERE id = ?',
       [id]
     );
 

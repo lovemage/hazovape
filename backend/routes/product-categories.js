@@ -7,7 +7,7 @@ const { authenticateAdmin } = require('./auth');
 router.get('/', async (req, res) => {
   try {
     const categories = await Database.all(
-      'SELECT id, name, description, sort_order FROM product_categories WHERE is_active = 1 ORDER BY sort_order, name'
+      'SELECT id, name, description, sort_order FROM product_categories WHERE is_active = true ORDER BY sort_order, name'
     );
 
     res.json({
@@ -69,7 +69,7 @@ router.post('/admin', authenticateAdmin, async (req, res) => {
     }
 
     const result = await Database.run(
-      'INSERT INTO product_categories (name, description, sort_order) VALUES (?, ?, ?)',
+      'INSERT INTO product_categories (name, description, sort_order) VALUES (?, ?, ?) RETURNING id',
       [name, description || '', sort_order || 0]
     );
 

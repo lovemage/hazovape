@@ -9,9 +9,9 @@ router.get('/tables', async (req, res) => {
     
     // 獲取所有表名
     const tables = await Database.all(`
-      SELECT name FROM sqlite_master 
-      WHERE type='table' AND name NOT LIKE 'sqlite_%'
-      ORDER BY name
+      SELECT table_name as name FROM information_schema.tables 
+      WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
+      ORDER BY table_name
     `);
     
     console.log('📋 數據庫中的表:', tables);
@@ -21,7 +21,12 @@ router.get('/tables', async (req, res) => {
     for (const table of tables) {
       try {
         // 獲取表結構
-        const columns = await Database.all(`PRAGMA table_info(${table.name})`);
+        const columns = await Database.all(`
+          SELECT column_name as name, data_type as type, is_nullable, column_default as dflt_value
+          FROM information_schema.columns 
+          WHERE table_name = ? 
+          ORDER BY ordinal_position
+        `, [table.name]);
         tableInfo[table.name] = {
           columns: columns,
           sample: null
@@ -68,8 +73,8 @@ router.get('/table/:tableName', async (req, res) => {
     
     // 檢查表是否存在
     const tableExists = await Database.get(`
-      SELECT name FROM sqlite_master 
-      WHERE type='table' AND name = ?
+      SELECT table_name as name FROM information_schema.tables 
+      WHERE table_schema = 'public' AND table_name = ?
     `, [tableName]);
     
     if (!tableExists) {
@@ -80,7 +85,12 @@ router.get('/table/:tableName', async (req, res) => {
     }
     
     // 獲取表結構
-    const columns = await Database.all(`PRAGMA table_info(${tableName})`);
+    const columns = await Database.all(`
+      SELECT column_name as name, data_type as type, is_nullable, column_default as dflt_value
+      FROM information_schema.columns 
+      WHERE table_name = ? 
+      ORDER BY ordinal_position
+    `, [tableName]);
     
     // 獲取所有數據
     const data = await Database.all(`SELECT * FROM ${tableName}`);
@@ -114,7 +124,12 @@ router.get('/flavors/:id', async (req, res) => {
     console.log('🔍 調試規格ID:', id);
     
     // 檢查表結構
-    const tableInfo = await Database.all("PRAGMA table_info(flavors)");
+    const tableInfo = await Database.all(`
+      SELECT column_name as name, data_type as type, is_nullable, column_default as dflt_value
+      FROM information_schema.columns 
+      WHERE table_name = 'flavors' 
+      ORDER BY ordinal_position
+    `);
     const hasImageField = tableInfo.some(col => col.name === 'image');
     
     // 獲取規格數據
@@ -147,7 +162,12 @@ router.get('/flavors-list', async (req, res) => {
     console.log('🔍 調試規格列表API...');
     
     // 檢查表結構
-    const tableInfo = await Database.all("PRAGMA table_info(flavors)");
+    const tableInfo = await Database.all(`
+      SELECT column_name as name, data_type as type, is_nullable, column_default as dflt_value
+      FROM information_schema.columns 
+      WHERE table_name = 'flavors' 
+      ORDER BY ordinal_position
+    `);
     const hasImageField = tableInfo.some(col => col.name === 'image');
     const hasPriceField = tableInfo.some(col => col.name === 'price');
     
@@ -202,7 +222,12 @@ router.get('/migrate-add-image-field', async (req, res) => {
     console.log('🔄 開始為生產環境添加image字段...');
     
     // 檢查image字段是否已存在
-    const tableInfo = await Database.all("PRAGMA table_info(flavors)");
+    const tableInfo = await Database.all(`
+      SELECT column_name as name, data_type as type, is_nullable, column_default as dflt_value
+      FROM information_schema.columns 
+      WHERE table_name = 'flavors' 
+      ORDER BY ordinal_position
+    `);
     const hasImageField = tableInfo.some(col => col.name === 'image');
     
     if (hasImageField) {
@@ -219,13 +244,18 @@ router.get('/migrate-add-image-field', async (req, res) => {
     // 添加image字段
     await Database.run(`
       ALTER TABLE flavors
-      ADD COLUMN image TEXT NULL
+      ADD COLUMN image TEXT
     `);
     
     console.log('✅ 成功添加image字段');
     
     // 驗證字段已添加
-    const updatedTableInfo = await Database.all("PRAGMA table_info(flavors)");
+    const updatedTableInfo = await Database.all(`
+      SELECT column_name as name, data_type as type, is_nullable, column_default as dflt_value
+      FROM information_schema.columns 
+      WHERE table_name = 'flavors' 
+      ORDER BY ordinal_position
+    `);
     const newHasImageField = updatedTableInfo.some(col => col.name === 'image');
     
     // 檢查現有規格數量

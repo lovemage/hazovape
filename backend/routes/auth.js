@@ -20,7 +20,7 @@ router.post('/admin/login', async (req, res) => {
 
     // 查找管理員
     const admin = await Database.get(
-      'SELECT * FROM admin_users WHERE username = ? AND is_active = 1',
+      'SELECT * FROM admin_users WHERE username = ? AND is_active = true',
       [username]
     );
 
@@ -98,7 +98,7 @@ const authenticateAdmin = async (req, res, next) => {
 
     // 驗證管理員是否仍然有效
     const admin = await Database.get(
-      'SELECT id, username FROM admin_users WHERE id = ? AND is_active = 1',
+      'SELECT id, username FROM admin_users WHERE id = ? AND is_active = true',
       [decoded.id]
     );
 

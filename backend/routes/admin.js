@@ -73,13 +73,13 @@ router.get('/dashboard', authenticateAdmin, async (req, res) => {
       todayOrders
     ] = await Promise.all([
       Database.get('SELECT COUNT(*) as count FROM products'),
-      Database.get('SELECT COUNT(*) as count FROM products WHERE is_active = 1'),
+      Database.get('SELECT COUNT(*) as count FROM products WHERE is_active = true'),
       Database.get('SELECT COUNT(*) as count FROM flavors'),
-      Database.get('SELECT COUNT(*) as count FROM flavors WHERE is_active = 1'),
+      Database.get('SELECT COUNT(*) as count FROM flavors WHERE is_active = true'),
       Database.get('SELECT COUNT(*) as count FROM orders'),
       Database.get('SELECT COUNT(*) as count FROM orders WHERE status = "pending"'),
       Database.get('SELECT SUM(total_amount) as total FROM orders WHERE status != "cancelled"'),
-      Database.get(`SELECT COUNT(*) as count FROM orders WHERE DATE(created_at) = DATE('now')`)
+      Database.get(`SELECT COUNT(*) as count FROM orders WHERE DATE(created_at) = CURRENT_DATE`)
     ]);
 
     // 獲取最近7天的訂單統計
@@ -89,7 +89,7 @@ router.get('/dashboard', authenticateAdmin, async (req, res) => {
         COUNT(*) as count,
         SUM(total_amount) as revenue
       FROM orders 
-      WHERE created_at >= DATE('now', '-7 days')
+      WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'
       GROUP BY DATE(created_at)
       ORDER BY date DESC
     `);
@@ -193,20 +193,17 @@ router.get('/sales-report', authenticateAdmin, async (req, res) => {
   try {
     const { start_date, end_date, group_by = 'day' } = req.query;
 
-    let dateFormat, groupByClause;
+    let groupByClause;
     switch (group_by) {
       case 'month':
-        dateFormat = '%Y-%m';
-        groupByClause = "strftime('%Y-%m', created_at)";
+        groupByClause = "TO_CHAR(created_at, 'YYYY-MM')";
         break;
       case 'week':
-        dateFormat = '%Y-W%W';
-        groupByClause = "strftime('%Y-W%W', created_at)";
+        groupByClause = "TO_CHAR(created_at, 'YYYY-\"W\"WW')";
         break;
       case 'day':
       default:
-        dateFormat = '%Y-%m-%d';
-        groupByClause = "strftime('%Y-%m-%d', created_at)";
+        groupByClause = "TO_CHAR(created_at, 'YYYY-MM-DD')";
         break;
     }
 
@@ -275,7 +272,7 @@ router.get('/sales-report', authenticateAdmin, async (req, res) => {
 // 管理員：獲取系統設置
 router.get('/settings', authenticateAdmin, async (req, res) => {
   try {
-    const settings = await Database.all('SELECT * FROM system_settings ORDER BY setting_key');
+    const settings = await Database.all('SELECT * FROM site_settings ORDER BY setting_key');
 
     // 轉換為對象格式
     const settingsObj = {};
@@ -318,8 +315,11 @@ router.put('/settings', authenticateAdmin, async (req, res) => {
     try {
       for (const [key, value] of Object.entries(settings)) {
         await Database.run(
-          `INSERT OR REPLACE INTO system_settings (setting_key, setting_value, updated_at)
-           VALUES (?, ?, CURRENT_TIMESTAMP)`,
+          `INSERT INTO site_settings (setting_key, setting_value, updated_at)
+           VALUES (?, ?, CURRENT_TIMESTAMP)
+           ON CONFLICT (setting_key) DO UPDATE SET
+           setting_value = EXCLUDED.setting_value,
+           updated_at = EXCLUDED.updated_at`,
           [key, value]
         );
       }
@@ -412,7 +412,7 @@ router.get('/export-data', authenticateAdmin, async (req, res) => {
         orders: await Database.all('SELECT * FROM orders'),
         order_items: await Database.all('SELECT * FROM order_items'),
         announcements: await Database.all('SELECT * FROM announcements'),
-        system_settings: await Database.all('SELECT * FROM system_settings')
+        site_settings: await Database.all('SELECT * FROM site_settings')
       }
     };
 
@@ -473,7 +473,7 @@ router.post('/import-data', authenticateAdmin, async (req, res) => {
       await Database.run('DELETE FROM products');
       await Database.run('DELETE FROM flavor_categories');
       await Database.run('DELETE FROM announcements');
-      await Database.run('DELETE FROM system_settings');
+      await Database.run('DELETE FROM site_settings');
 
       // 導入規格類別
       if (backupData.data.flavor_categories) {
@@ -536,10 +536,11 @@ router.post('/import-data', authenticateAdmin, async (req, res) => {
       }
 
       // 導入系統設置
-      if (backupData.data.system_settings) {
-        for (const setting of backupData.data.system_settings) {
+      if (backupData.data.site_settings || backupData.data.system_settings) {
+        const settings = backupData.data.site_settings || backupData.data.system_settings;
+        for (const setting of settings) {
           await Database.run(
-            'INSERT INTO system_settings (id, setting_key, setting_value, description, updated_at) VALUES (?, ?, ?, ?, ?)',
+            'INSERT INTO site_settings (id, setting_key, setting_value, description, updated_at) VALUES (?, ?, ?, ?, ?)',
             [setting.id, setting.setting_key, setting.setting_value, setting.description, setting.updated_at]
           );
         }
@@ -580,7 +581,7 @@ router.post('/upload-image', authenticateAdmin, upload.single('image'), async (r
     // 刪除舊的彈窗圖片（如果有的話）
     try {
       const oldImageSetting = await Database.get(
-        'SELECT setting_value FROM system_settings WHERE setting_key = ?',
+        'SELECT setting_value FROM site_settings WHERE setting_key = ?',
         ['popup_image']
       );
       

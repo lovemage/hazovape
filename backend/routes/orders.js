@@ -209,7 +209,7 @@ router.post('/', async (req, res) => {
           console.log(`🛒 處理加購商品 ID: ${upsell_product_id}`);
 
           product = await Database.get(
-            'SELECT * FROM upsell_products WHERE id = ? AND is_active = 1',
+            'SELECT * FROM upsell_products WHERE id = ? AND is_active = true',
             [upsell_product_id]
           );
 
@@ -238,7 +238,7 @@ router.post('/', async (req, res) => {
           }
 
           product = await Database.get(
-            'SELECT * FROM products WHERE id = ? AND is_active = 1',
+            'SELECT * FROM products WHERE id = ? AND is_active = true',
             [product_id]
           );
 
@@ -258,7 +258,7 @@ router.post('/', async (req, res) => {
 
             // 使用行鎖檢查庫存，防止併發問題
             const flavor = await Database.get(
-              'SELECT * FROM flavors WHERE name = ? AND product_id = ? AND is_active = 1',
+              'SELECT * FROM flavors WHERE name = ? AND product_id = ? AND is_active = true',
               [flavorName, product_id]
             );
 
@@ -297,7 +297,7 @@ router.post('/', async (req, res) => {
           
           // 獲取規格資訊，檢查是否有獨立價格
           const flavor = await Database.get(
-            'SELECT price FROM flavors WHERE name = ? AND product_id = ? AND is_active = 1',
+            'SELECT price FROM flavors WHERE name = ? AND product_id = ? AND is_active = true',
             [flavorName, product_id]
           );
           
@@ -409,7 +409,7 @@ router.post('/', async (req, res) => {
       // 創建訂單
       const orderResult = await Database.run(
         `INSERT INTO orders (order_number, customer_name, customer_phone, store_number, total_amount, verification_code, coupon_id, coupon_code, discount_amount)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
         [orderNumber, customer_name, customer_phone, store_number, finalTotalAmount, verificationCode, coupon_id || null, coupon_code || null, discount_amount || 0]
       );
 
@@ -450,7 +450,7 @@ router.post('/', async (req, res) => {
       // 發送 Telegram 通知
       const telegramSent = await sendTelegramNotification(order, orderItems);
       if (telegramSent) {
-        await Database.run('UPDATE orders SET telegram_sent = 1 WHERE id = ?', [orderResult.id]);
+        await Database.run('UPDATE orders SET telegram_sent = true WHERE id = ?', [orderResult.id]);
       }
 
       res.json({
