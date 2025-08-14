@@ -8,7 +8,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const announcements = await Database.all(
-      'SELECT id, title, content, priority FROM announcements WHERE is_active = true ORDER BY priority DESC, created_at DESC'
+      'SELECT id, title, content, sort_order as priority FROM announcements WHERE is_active = true ORDER BY sort_order DESC, created_at DESC'
     );
 
     res.json({
@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
 router.get('/admin/all', authenticateAdmin, async (req, res) => {
   try {
     const announcements = await Database.all(
-      'SELECT * FROM announcements ORDER BY priority DESC, created_at DESC'
+      'SELECT * FROM announcements ORDER BY sort_order DESC, created_at DESC'
     );
 
     res.json({
@@ -57,7 +57,7 @@ router.post('/admin', authenticateAdmin, async (req, res) => {
     }
 
     const result = await Database.run(
-      'INSERT INTO announcements (title, content, priority) VALUES (?, ?, ?) RETURNING id',
+      'INSERT INTO announcements (title, content, sort_order) VALUES (?, ?, ?) RETURNING id',
       [title, content, parseInt(priority) || 0]
     );
 
@@ -92,12 +92,12 @@ router.put('/admin/:id', authenticateAdmin, async (req, res) => {
 
     await Database.run(
       `UPDATE announcements
-       SET title = ?, content = ?, priority = ?, is_active = ?
+       SET title = ?, content = ?, sort_order = ?, is_active = ?
        WHERE id = ?`,
       [
         title || announcement.title,
         content || announcement.content,
-        priority !== undefined ? parseInt(priority) : announcement.priority,
+        priority !== undefined ? parseInt(priority) : announcement.sort_order,
         is_active !== undefined ? is_active : announcement.is_active,
         id
       ]

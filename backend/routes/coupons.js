@@ -224,13 +224,13 @@ router.post('/admin', authenticateAdmin, async (req, res) => {
 
     const result = await Database.run(`
       INSERT INTO coupons (
-        code, name, description, type, value, min_order_amount,
-        max_discount, usage_limit, per_user_limit, valid_from, valid_until
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        code, name, description, discount_type, discount_value, min_order_amount,
+        max_discount_amount, usage_limit, start_date, end_date
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       RETURNING id
     `, [
       code.toUpperCase(), name, description || '', type, value, min_order_amount || 0,
-      max_discount, usage_limit, per_user_limit || 1, valid_from, valid_until
+      max_discount, usage_limit, valid_from, valid_until
     ]);
 
     console.log('✅ 優惠券創建成功:', code);
