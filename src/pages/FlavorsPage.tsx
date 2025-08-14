@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, ShoppingBag, Plus, Minus } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -33,8 +33,7 @@ export const FlavorsPage: React.FC = () => {
     }
   }, [location.state, navigate]);
 
-  const getProductImage = (product: Product) => {
-    console.log('🖼️  處理商品圖片:', product.name, '圖片數據:', product.images);
+  const getProductImage = useCallback((product: Product) => {
     let images: string[] = [];
     if (typeof product.images === 'string') {
       try {
@@ -46,23 +45,17 @@ export const FlavorsPage: React.FC = () => {
       images = product.images;
     }
 
-    console.log('📸 解析後的圖片數組:', images);
-
     if (images.length > 0) {
-      const finalPath = getImageUrl(images[0]);
-      console.log('🎯 最終圖片路徑:', finalPath);
-      return finalPath;
+      return getImageUrl(images[0]);
     }
-    console.log('🔄 使用默認圖片');
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
-  };
+  }, []);
 
   // 獲取當前顯示的圖片（規格圖片優先，沒有則使用產品圖片）
-  const getCurrentDisplayImage = (): string => {
+  const currentDisplayImage = useMemo(() => {
     // 如果有選中的規格且該規格有圖片，則使用規格圖片
     if (selectedFlavorForImage?.image) {
       const flavorImage = (selectedFlavorForImage.image as string);
-      console.log('🖼️ 使用規格圖片:', selectedFlavorForImage.name, flavorImage);
       if (flavorImage.startsWith('http')) {
         return flavorImage;
       } else {
@@ -71,10 +64,8 @@ export const FlavorsPage: React.FC = () => {
     }
     
     // 否則使用產品主圖片
-    const productImage = selectedProduct ? getProductImage(selectedProduct) : '';
-    console.log('🖼️ 使用產品主圖片');
-    return productImage;
-  };
+    return selectedProduct ? getProductImage(selectedProduct) : '';
+  }, [selectedFlavorForImage, selectedProduct, getProductImage]);
 
   useEffect(() => {
     if (selectedProduct) {
@@ -360,7 +351,7 @@ export const FlavorsPage: React.FC = () => {
           <div className="hidden md:flex items-center gap-6">
             <div className="w-40 h-40 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
               <img
-                src={getCurrentDisplayImage()}
+                src={currentDisplayImage}
                 alt={selectedFlavorForImage ? `${selectedProduct.name} - ${selectedFlavorForImage.name}` : selectedProduct.name}
                 className="w-full h-full object-contain bg-white"
                 onError={(e) => {
@@ -389,7 +380,7 @@ export const FlavorsPage: React.FC = () => {
             <div className="w-full">
               <div className="w-full h-64 bg-gray-200 rounded-xl overflow-hidden shadow-sm">
                 <img
-                  src={getCurrentDisplayImage()}
+                  src={currentDisplayImage}
                   alt={selectedFlavorForImage ? `${selectedProduct.name} - ${selectedFlavorForImage.name}` : selectedProduct.name}
                   className="w-full h-full object-contain bg-white"
                   onError={(e) => {
