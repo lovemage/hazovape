@@ -615,19 +615,42 @@ router.delete('/delete-image', authenticateAdmin, async (req, res) => {
       });
     }
 
-    // 從路徑中提取檔案名
-    const filename = path.basename(imagePath);
-    const fullPath = path.join(staticUploadDir, filename);
+    console.log('🗑️ 準備刪除圖片，原始路徑:', imagePath);
+
+    // 處理不同的圖片路徑格式
+    let fullPath;
+    
+    if (imagePath.startsWith('/uploads/static/')) {
+      // 路徑格式：/uploads/static/filename.jpg
+      const filename = path.basename(imagePath);
+      fullPath = path.join(staticUploadDir, filename);
+    } else if (imagePath.startsWith('uploads/static/')) {
+      // 路徑格式：uploads/static/filename.jpg  
+      const filename = path.basename(imagePath);
+      fullPath = path.join(staticUploadDir, filename);
+    } else if (imagePath.startsWith('/uploads/')) {
+      // 路徑格式：/uploads/其他子目錄/filename.jpg
+      const relativePath = imagePath.replace('/uploads/', '');
+      const uploadsRoot = process.env.NODE_ENV === 'production' ? '/app/data/uploads' : path.join(__dirname, '../uploads');
+      fullPath = path.join(uploadsRoot, relativePath);
+    } else {
+      // 假設是相對於 staticUploadDir 的文件名
+      fullPath = path.join(staticUploadDir, imagePath);
+    }
+
+    console.log('🔍 計算出的完整路徑:', fullPath);
+    console.log('📂 靜態上傳目錄:', staticUploadDir);
 
     if (fs.existsSync(fullPath)) {
       fs.unlinkSync(fullPath);
-      console.log('🗑️ 圖片刪除成功:', fullPath);
+      console.log('✅ 圖片刪除成功:', fullPath);
 
       res.json({
         success: true,
         message: '圖片刪除成功'
       });
     } else {
+      console.log('❌ 圖片不存在於路徑:', fullPath);
       res.status(404).json({
         success: false,
         message: '圖片不存在'
