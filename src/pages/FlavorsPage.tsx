@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, ShoppingBag, Plus, Minus } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useCart } from '../contexts/CartContext';
 import { flavorAPI } from '../services/api';
@@ -21,6 +21,7 @@ export const FlavorsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedFlavorForImage, setSelectedFlavorForImage] = useState<Flavor | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // 從 location.state 獲取傳遞的產品數據
   useEffect(() => {
@@ -34,7 +35,8 @@ export const FlavorsPage: React.FC = () => {
     }
   }, [location.state, navigate]);
 
-  const getProductImage = useCallback((product: Product) => {
+  // 獲取產品圖片數組
+  const getProductImages = useCallback((product: Product) => {
     let images: string[] = [];
     if (typeof product.images === 'string') {
       try {
@@ -45,12 +47,16 @@ export const FlavorsPage: React.FC = () => {
     } else if (Array.isArray(product.images)) {
       images = product.images;
     }
+    return images.filter(img => img && img.trim()); // 過濾空值
+  }, []);
 
-    if (images.length > 0) {
-      return getImageUrl(images[0]);
+  const getProductImage = useCallback((product: Product, index: number = 0) => {
+    const images = getProductImages(product);
+    if (images.length > index) {
+      return getImageUrl(images[index]);
     }
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
-  }, []);
+  }, [getProductImages]);
 
   // 獲取當前顯示的圖片（規格圖片優先，沒有則使用產品圖片）
   const currentDisplayImage = useMemo(() => {
@@ -64,9 +70,31 @@ export const FlavorsPage: React.FC = () => {
       }
     }
     
-    // 否則使用產品主圖片
-    return selectedProduct ? getProductImage(selectedProduct) : '';
-  }, [selectedFlavorForImage, selectedProduct, getProductImage]);
+    // 否則使用產品圖片（支持多圖片輪播）
+    return selectedProduct ? getProductImage(selectedProduct, currentImageIndex) : '';
+  }, [selectedFlavorForImage, selectedProduct, currentImageIndex, getProductImage]);
+
+  // 產品圖片導航函數
+  const productImages = selectedProduct ? getProductImages(selectedProduct) : [];
+  const hasMultipleImages = productImages.length > 1;
+
+  const goToPreviousImage = () => {
+    if (hasMultipleImages) {
+      setCurrentImageIndex((prev) => (prev === 0 ? productImages.length - 1 : prev - 1));
+    }
+  };
+
+  const goToNextImage = () => {
+    if (hasMultipleImages) {
+      setCurrentImageIndex((prev) => (prev === productImages.length - 1 ? 0 : prev + 1));
+    }
+  };
+
+  // 重置圖片索引當產品改變時
+  useEffect(() => {
+    setCurrentImageIndex(0);
+    setSelectedFlavorForImage(null);
+  }, [selectedProduct]);
 
   useEffect(() => {
     if (selectedProduct) {
@@ -350,16 +378,61 @@ export const FlavorsPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
           {/* 桌面端佈局 */}
           <div className="hidden md:flex items-center gap-6">
-            <div className="w-40 h-40 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+            <div className="relative w-40 h-40 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 group">
               <img
                 src={currentDisplayImage}
                 alt={selectedFlavorForImage ? `${selectedProduct.name} - ${selectedFlavorForImage.name}` : selectedProduct.name}
-                className="w-full h-full object-contain bg-white"
+                className="w-full h-full object-contain bg-white transition-opacity duration-300"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ci8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
                 }}
               />
+              
+              {/* 圖片導航按鈕 */}
+              {hasMultipleImages && !selectedFlavorForImage && (
+                <>
+                  <button
+                    onClick={goToPreviousImage}
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                    title="上一張圖片"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={goToNextImage}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                    title="下一張圖片"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </>
+              )}
+              
+              {/* 圖片指示器 */}
+              {hasMultipleImages && !selectedFlavorForImage && (
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
+                  {productImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                        index === currentImageIndex
+                          ? 'bg-white scale-125 shadow-lg'
+                          : 'bg-white/50 hover:bg-white/80'
+                      }`}
+                      title={`圖片 ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* 規格圖片標識 */}
+              {selectedFlavorForImage && (
+                <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                  {selectedFlavorForImage.name}
+                </div>
+              )}
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-semibold text-gray-900">{selectedProduct.name}</h2>
