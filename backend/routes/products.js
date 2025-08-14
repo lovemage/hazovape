@@ -557,10 +557,19 @@ router.delete('/admin/:id/permanent', authenticateAdmin, async (req, res) => {
 
     console.log('✅ 找到產品:', product.name);
 
-    // 開始事務
-    await Database.beginTransaction();
+    // 檢查數據庫類型並正確處理事務
+    const isPostgreSQL = !!process.env.DATABASE_URL;
+    let client = null;
 
     try {
+      if (isPostgreSQL) {
+        // PostgreSQL 事務處理
+        client = await Database.beginTransaction();
+      } else {
+        // SQLite 事務處理
+        await Database.beginTransaction();
+      }
+
       // 先刪除相關的規格
       await Database.run('DELETE FROM flavors WHERE product_id = ?', [id]);
       console.log('📝 已刪除相關規格');
@@ -569,14 +578,25 @@ router.delete('/admin/:id/permanent', authenticateAdmin, async (req, res) => {
       const result = await Database.run('DELETE FROM products WHERE id = ?', [id]);
       console.log('📝 刪除結果:', result);
 
-      await Database.commit();
+      if (isPostgreSQL) {
+        await Database.commit(client);
+      } else {
+        await Database.commit();
+      }
 
       res.json({
         success: true,
         message: '產品及相關規格已永久刪除'
       });
     } catch (error) {
-      await Database.rollback();
+      console.error('❌ 事務執行失敗:', error);
+      
+      if (isPostgreSQL && client) {
+        await Database.rollback(client);
+      } else if (!isPostgreSQL) {
+        await Database.rollback();
+      }
+      
       throw error;
     }
   } catch (error) {
