@@ -107,21 +107,30 @@ export const AdminWebsiteSettings: React.FC = () => {
   };
 
   const handleImageDelete = async (settingKey: string) => {
-    if (!settings[settingKey]) return;
+    // 檢查是否有有效的圖片路徑
+    const imagePath = settings[settingKey];
+    if (!imagePath || typeof imagePath !== 'string' || imagePath.trim() === '') {
+      console.warn('🚫 無法刪除圖片：路徑為空或無效', { settingKey, imagePath });
+      return;
+    }
 
     try {
+      console.log('🗑️ 準備刪除圖片:', { settingKey, imagePath });
+      
       const response = await api.delete('/admin/delete-image', {
-        data: { path: settings[settingKey] }
+        data: { path: imagePath }
       });
 
       if (response.data.success) {
         handleSettingChange(settingKey, '');
         toast.success('圖片已刪除');
+        console.log('✅ 圖片刪除成功:', settingKey);
       } else {
         toast.error(response.data.message || '刪除圖片失敗');
+        console.error('❌ 服務器返回錯誤:', response.data.message);
       }
     } catch (error) {
-      console.error('刪除圖片失敗:', error);
+      console.error('❌ 刪除圖片失敗:', error);
       toast.error('刪除圖片失敗');
     }
   };
