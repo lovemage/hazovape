@@ -451,8 +451,8 @@ export const FlavorsPage: React.FC = () => {
           {/* 移動端佈局：圖片 - 價格 - 描述 */}
           <div className="md:hidden space-y-4">
             {/* 圖片 */}
-            <div className="w-full">
-              <div className="w-full h-64 bg-gray-200 rounded-xl overflow-hidden shadow-sm">
+            <div className="w-full relative">
+              <div className="w-full h-64 bg-gray-200 rounded-xl overflow-hidden shadow-sm relative group">
                 <img
                   src={currentDisplayImage}
                   alt={selectedFlavorForImage ? `${selectedProduct.name} - ${selectedFlavorForImage.name}` : selectedProduct.name}
@@ -462,6 +462,58 @@ export const FlavorsPage: React.FC = () => {
                     target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
                   }}
                 />
+                
+                {/* 移動端圖片導航按鈕 */}
+                {hasMultipleImages && !selectedFlavorForImage && (
+                  <>
+                    <button
+                      onClick={goToPreviousImage}
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-all duration-200 z-10 active:scale-95"
+                      title="上一張圖片"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={goToNextImage}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-all duration-200 z-10 active:scale-95"
+                      title="下一張圖片"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+                
+                {/* 移動端圖片指示器 */}
+                {hasMultipleImages && !selectedFlavorForImage && (
+                  <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex gap-2">
+                    {productImages.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                          index === currentImageIndex
+                            ? 'bg-white scale-110 shadow-lg'
+                            : 'bg-white/60 hover:bg-white/80'
+                        }`}
+                        title={`圖片 ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {/* 移動端圖片狀態顯示 */}
+                {hasMultipleImages && !selectedFlavorForImage && (
+                  <div className="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                    {currentImageIndex + 1} / {productImages.length}
+                  </div>
+                )}
+
+                {/* 規格圖片標識 */}
+                {selectedFlavorForImage && (
+                  <div className="absolute top-3 left-3 bg-blue-500 text-white text-xs px-3 py-1 rounded-full">
+                    {selectedFlavorForImage.name}
+                  </div>
+                )}
               </div>
             </div>
 
