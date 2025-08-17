@@ -251,7 +251,7 @@ router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, 
         try {
           console.log(`📤 上傳文件 ${index + 1}:`, file.originalname);
           const result = await uploadBufferToCloudinary(file.buffer, {
-            folder: 'meelfull/products',
+            folder: 'hazo/products',
             public_id: `product_${Date.now()}_${index}`
           });
           console.log(`✅ Cloudinary 上傳成功:`, result.secure_url);
@@ -418,7 +418,7 @@ router.put('/admin/:id', authenticateAdmin, upload.array('images', 5), async (re
         try {
           console.log(`📤 上傳文件 ${index + 1}:`, file.originalname);
           const result = await uploadBufferToCloudinary(file.buffer, {
-            folder: 'meelfull/products',
+            folder: 'hazo/products',
             public_id: `product_${id}_${Date.now()}_${index}`
           });
           console.log(`✅ Cloudinary 上傳成功:`, result.secure_url);

@@ -563,7 +563,7 @@ router.post('/upload-image', authenticateAdmin, upload.single('image'), async (r
     // 上傳圖片到 Cloudinary
     try {
       const result = await uploadBufferToCloudinary(req.file.buffer, {
-        folder: 'meelfull/static',
+        folder: 'hazo/static',
         public_id: `popup_${Date.now()}`
       });
 

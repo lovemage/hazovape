@@ -205,7 +205,7 @@ router.post('/admin/:id/upload', authenticateAdmin, upload.array('images', 5), a
     // 上傳圖片到 Cloudinary
     const uploadPromises = req.files.map(async (file, index) => {
       const result = await uploadBufferToCloudinary(file.buffer, {
-        folder: 'meelfull/upsell',
+        folder: 'hazo/upsell',
         public_id: `upsell_${id}_${Date.now()}_${index}`
       });
       return result.secure_url;

@@ -3,8 +3,8 @@ const cloudinary = require('cloudinary').v2;
 // 配置 Cloudinary
 cloudinary.config({
   cloud_name: 'dnps7z7p8',
-  api_key: '578484754187146',
-  api_secret: 'iztUxmCQHI89uaLeKNvXL8tqCkg',
+  api_key: '135283526689588',
+  api_secret: 'kz8Sq6DqXecKWId8uc3vO24VQ4M',
   secure: true
 });
 
@@ -24,7 +24,7 @@ async function testCloudinaryConnection() {
 async function uploadToCloudinary(filePath, options = {}) {
   try {
     const result = await cloudinary.uploader.upload(filePath, {
-      folder: options.folder || 'meelfull',
+      folder: options.folder || 'hazo',
       use_filename: true,
       unique_filename: true,
       overwrite: false,
@@ -44,7 +44,7 @@ async function uploadBufferToCloudinary(buffer, options = {}) {
   return new Promise((resolve, reject) => {
     cloudinary.uploader.upload_stream(
       {
-        folder: options.folder || 'meelfull',
+        folder: options.folder || 'hazo',
         resource_type: 'auto',
         ...options
       },
