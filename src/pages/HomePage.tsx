@@ -237,12 +237,12 @@ export const HomePage: React.FC = () => {
               onClick={handleLogoClick}
             >
               <img 
-                src="/images/logo/logo.jpg" 
-                alt="MeelFull Logo" 
+                src="/hazo-png.png" 
+                alt="Hazo Logo" 
                 className="w-10 h-10 mr-3 group-hover:scale-105 transition-transform rounded-md object-cover"
               />
               <h1 className="text-xl font-bold text-meelful-primary">
-                MeelFull
+                Hazo
               </h1>
             </div>
 
@@ -312,7 +312,7 @@ export const HomePage: React.FC = () => {
             <div className="w-full">
               <img
                 src={popupImage}
-                alt="MeelFull Unlock 廣告"
+                alt="Hazo Unlock 廣告"
                 className="w-full h-auto max-w-md mx-auto rounded-lg shadow-lg"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;

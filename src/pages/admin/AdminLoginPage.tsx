@@ -77,8 +77,8 @@ export const AdminLoginPage: React.FC = () => {
           <div className="text-center mb-8">
             <div className="flex items-center justify-center mb-6">
               <img 
-                src="/images/logo/logo.jpg" 
-                alt="MeelFull Logo" 
+                src="/hazo-png.png" 
+                alt="Hazo Logo" 
                 className="w-16 h-16 rounded-lg object-cover"
               />
             </div>

@@ -164,7 +164,7 @@ export const OrderConfirmationPage: React.FC = () => {
             <div className="w-full">
               <img
                 src={popupImage}
-                                  alt="MeelFull Unlock 廣告"
+                                  alt="Hazo Unlock 廣告"
                 className="w-full h-auto object-cover rounded-t-2xl"
                 onError={(e) => {
                   console.error('廣告圖片載入失敗');

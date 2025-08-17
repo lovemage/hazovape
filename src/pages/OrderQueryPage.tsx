@@ -165,12 +165,12 @@ const OrderQueryPage: React.FC = () => {
               onClick={() => navigate('/')}
             >
               <img 
-                src="/images/logo/logo.jpg" 
-                alt="MeelFull Logo" 
+                src="/hazo-png.png" 
+                alt="Hazo Logo" 
                 className="w-10 h-10 mr-3 group-hover:scale-105 transition-transform rounded-md object-cover"
               />
               <h1 className="text-xl font-bold bg-gradient-to-r from-meelful-primary to-meelful-secondary bg-clip-text text-transparent">
-                MeelFull
+                Hazo
               </h1>
             </div>
 

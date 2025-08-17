@@ -163,8 +163,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           {/* Logo 區域 */}
           <div className="relative flex items-center justify-center h-16 px-4 border-b border-gray-200">
             <img 
-              src="/images/logo/logo.jpg" 
-              alt="MeelFull Logo" 
+              src="/hazo-png.png" 
+              alt="Hazo Logo" 
               className="w-10 h-10 rounded-md object-cover"
             />
             <Button
