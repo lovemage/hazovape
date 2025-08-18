@@ -107,8 +107,8 @@ INSERT INTO admin_users (username, password_hash, email) VALUES
 ('admin', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBdXVKvLHh.sMi', 'admin@mistmall.com');
 
 -- 插入口味類別
-INSERT INTO flavor_categories (id, name, description, sort_order) VALUES
-(1, '其他系列', '其他特殊口味', 1);
+-- INSERT INTO flavor_categories (id, name, description, sort_order) VALUES
+-- (1, '其他系列', '其他特殊口味', 1);
 
 -- 插入示例商品
 INSERT INTO products (name, price, multi_discount, images) VALUES

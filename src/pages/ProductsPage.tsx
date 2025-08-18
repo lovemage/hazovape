@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Search, X, ArrowLeft } from 'lucide-react';
+import { ShoppingBag, Search, X, ArrowLeft, ShoppingCart } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
@@ -46,11 +46,7 @@ export const ProductsPage: React.FC = () => {
       console.error('載入分類失敗:', error);
       // 使用預設分類作為後備
       setCategories([
-        { id: 1, name: '一次性拋棄式電子煙', description: '', sort_order: 1 },
-        { id: 2, name: '注油式主機與耗材', description: '', sort_order: 2 },
-        { id: 3, name: '拋棄式通用煙蛋系列', description: '', sort_order: 3 },
-        { id: 4, name: '小煙油系列', description: '', sort_order: 4 },
-        { id: 5, name: '其他產品', description: '', sort_order: 5 }
+        { id: 1, name: '其他', description: '', sort_order: 1 }
       ]);
     }
   };
@@ -292,7 +288,7 @@ export const ProductsPage: React.FC = () => {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {filteredProducts.map((product) => {
                 const discounts = getDiscountInfo(product);
                 
@@ -347,12 +343,52 @@ export const ProductsPage: React.FC = () => {
                             </p>
                           )}
                         </div>
-                        <Button
-                          size="sm"
-                          className="bg-vintage-green hover:bg-vintage-green/90 text-white"
+                        <button
+                          className="group"
+                          style={{
+                            width: '110px',
+                            height: '40px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-start',
+                            gap: '10px',
+                            backgroundColor: 'rgb(161, 255, 20)',
+                            borderRadius: '30px',
+                            color: 'rgb(19, 19, 19)',
+                            fontWeight: '600',
+                            border: 'none',
+                            position: 'relative',
+                            cursor: 'pointer',
+                            transitionDuration: '.2s',
+                            boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.116)',
+                            paddingLeft: '8px'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgb(192, 255, 20)';
+                            e.currentTarget.style.transitionDuration = '.5s';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgb(161, 255, 20)';
+                            e.currentTarget.style.transitionDuration = '.5s';
+                          }}
+                          onMouseDown={(e) => {
+                            e.currentTarget.style.transform = 'scale(0.97)';
+                            e.currentTarget.style.transitionDuration = '.2s';
+                          }}
+                          onMouseUp={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.transitionDuration = '.2s';
+                          }}
                         >
+                          <ShoppingCart 
+                            className="group-hover:rotate-[250deg] transition-transform duration-[1.5s]"
+                            style={{
+                              height: '25px',
+                              fill: 'rgb(19, 19, 19)'
+                            }}
+                          />
                           選購
-                        </Button>
+                        </button>
                       </div>
                     </div>
                   </div>

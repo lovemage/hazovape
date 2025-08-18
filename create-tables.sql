@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS products (
   name VARCHAR(200) NOT NULL,
   description TEXT,
   price DECIMAL(10,2) NOT NULL,
-  category VARCHAR(100) DEFAULT '其他產品',
+  category VARCHAR(100) DEFAULT '其他',
   multi_discount TEXT DEFAULT '{}',
   images TEXT DEFAULT '[]',
   is_active BOOLEAN DEFAULT true,

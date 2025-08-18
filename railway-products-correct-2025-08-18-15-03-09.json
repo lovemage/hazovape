@@ -1,0 +1,6322 @@
+{
+  "export_info": {
+    "timestamp": "2025-08-18T15:03:09.835Z",
+    "source": "Railway Database (via API)",
+    "total_products": 36,
+    "total_variants": 717
+  },
+  "products": [
+    {
+      "id": 226,
+      "name": "Relax拋棄式8000口",
+      "category": "disposable",
+      "brand": "Relx",
+      "price": 350,
+      "description": "限時特買買五送一\n下單五支後送的那支請添加官方LINE告知口味及下單資訊",
+      "stock": 20,
+      "created_at": "2025-08-05T13:07:50.743Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 20,
+      "variants": [
+        {
+          "id": 819,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "綠豆冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 820,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "極涼青堤",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 821,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "冷泡龍井",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 822,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "鳳梨",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 823,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "鐵觀音",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 824,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "混合莓果",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 825,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "芭樂",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 826,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "白桃烏龍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 827,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 828,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "檸檬紅茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 829,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "海鹽檸檬",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 830,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "百香果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 831,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "西瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 832,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "薄荷",
+          "stock": 17,
+          "price_modifier": 0
+        },
+        {
+          "id": 833,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "冬瓜檸檬",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 834,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "可樂",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 835,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "荔枝",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 836,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "葡萄",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 837,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "礦泉水",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 838,
+          "product_id": 226,
+          "variant_type": "口味",
+          "variant_value": "藍莓",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 200,
+      "name": "Ilia (發光煙彈)",
+      "category": "cartridge",
+      "brand": "ilia",
+      "price": 300,
+      "description": "全新活動\n買8送皮革(隨機色)\n買5送一般(隨機色)",
+      "stock": 580,
+      "created_at": "2025-07-28T20:42:10.131Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 29,
+      "variants": [
+        {
+          "id": 288,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "多肉葡萄",
+          "stock": 12,
+          "price_modifier": 0
+        },
+        {
+          "id": 289,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "荔枝甘露",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 290,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "老冰棍",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 291,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "蜜桃烏龍",
+          "stock": 14,
+          "price_modifier": 0
+        },
+        {
+          "id": 292,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "零度可樂",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 293,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "密瓜誘惑",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 294,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "冷翠龍井",
+          "stock": 8,
+          "price_modifier": 0
+        },
+        {
+          "id": 295,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "百香果汁",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 296,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "傾心草莓",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 297,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "綠豆冰棒",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 298,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "霸氣鳳梨",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 299,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "激情薄荷",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 300,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "深海冰泉",
+          "stock": 16,
+          "price_modifier": 0
+        },
+        {
+          "id": 301,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "冰鎮西瓜",
+          "stock": 15,
+          "price_modifier": 0
+        },
+        {
+          "id": 302,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "紅心芭樂",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 303,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "可爾必思",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 304,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "多肉芒芒",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 305,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "幸運菸草",
+          "stock": 14,
+          "price_modifier": 0
+        },
+        {
+          "id": 306,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "檸檬海鹽",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 307,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "冰釀藍莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 308,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "脆青蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 309,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "寶礦力",
+          "stock": 17,
+          "price_modifier": 0
+        },
+        {
+          "id": 310,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "奇異果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 311,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "黑松沙士",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 312,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "森林莓果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 313,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "鐵觀音",
+          "stock": 9,
+          "price_modifier": 0
+        },
+        {
+          "id": 314,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "激爽雪碧",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 315,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "冰心蜜桃",
+          "stock": 16,
+          "price_modifier": 0
+        },
+        {
+          "id": 316,
+          "product_id": 200,
+          "variant_type": "口味",
+          "variant_value": "南極冰",
+          "stock": 14,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 192,
+      "name": "Lana 8000口拋棄式",
+      "category": "disposable",
+      "brand": "Lana",
+      "price": 320,
+      "description": "買十盒送一盒\n活動與折扣卷擇一\n",
+      "stock": 400,
+      "created_at": "2025-07-28T20:42:06.752Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 20,
+      "variants": [
+        {
+          "id": 151,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "葡萄",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 152,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "青葡萄",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 153,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "百香果",
+          "stock": 14,
+          "price_modifier": 0
+        },
+        {
+          "id": 154,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "薄荷",
+          "stock": 17,
+          "price_modifier": 0
+        },
+        {
+          "id": 155,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "芭樂",
+          "stock": -1,
+          "price_modifier": 0
+        },
+        {
+          "id": 156,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "西瓜",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 157,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "荔枝",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 158,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "可樂",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 159,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 160,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "藍莓",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 161,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "蜜桃",
+          "stock": 17,
+          "price_modifier": 0
+        },
+        {
+          "id": 162,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "蘋果",
+          "stock": 15,
+          "price_modifier": 0
+        },
+        {
+          "id": 163,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "老冰棍",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 164,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "鐵觀音",
+          "stock": 17,
+          "price_modifier": 0
+        },
+        {
+          "id": 165,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "哈密瓜",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 166,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "橙汁",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 167,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "南極冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 168,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "雪碧",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 169,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "養樂多",
+          "stock": -1,
+          "price_modifier": 0
+        },
+        {
+          "id": 170,
+          "product_id": 192,
+          "variant_type": "口味",
+          "variant_value": "莓果",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 201,
+      "name": "SP2 (思博瑞煙彈)",
+      "category": "cartridge",
+      "brand": "SP2",
+      "price": 350,
+      "description": "買十盒送一盒\n活動與折扣卷擇一",
+      "stock": 720,
+      "created_at": "2025-07-28T20:42:02.981Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 36,
+      "variants": [
+        {
+          "id": 317,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "醇厚芒果",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 318,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "芭樂星冰",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 319,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "葡萄",
+          "stock": 16,
+          "price_modifier": 0
+        },
+        {
+          "id": 320,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "沙士啤酒",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 321,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "可樂",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 322,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "綠豆",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 323,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "百香果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 324,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "西瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 325,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "蜜桃烏龍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 326,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "老冰棍",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 327,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "礦力冰飲",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 328,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "荔���",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 329,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "檸檬海鹽糖",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 330,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "元氣蜜桃",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 331,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "清涼口香糖",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 332,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "茉莉龍井",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 333,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "超柔菸草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 334,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "森林莓果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 335,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "哈密瓜",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 336,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "青蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 337,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "南極冰",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 338,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "青梅",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 339,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "藍莓",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 340,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "酸爽鳳梨",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 341,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "紅顏知己",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 342,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "鐵觀音",
+          "stock": 16,
+          "price_modifier": 0
+        },
+        {
+          "id": 343,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "麥仔茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 344,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "冰礦荔枝",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 345,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "清涼薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 346,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "白葡萄凍檸",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 347,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "檸檬紅茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 348,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "冰礦茉莉",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 349,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "利賓納",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 350,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "凍檸冰橙",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 351,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "冰礦泉",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 352,
+          "product_id": 201,
+          "variant_type": "口味",
+          "variant_value": "茉莉綠茶",
+          "stock": 12,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 225,
+      "name": "韓版IQOS TEREA煙彈",
+      "category": "cartridge",
+      "brand": "IQOS",
+      "price": 2300,
+      "description": "韓T  1條10包",
+      "stock": 20,
+      "created_at": "2025-07-28 20:41:14",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 1,
+      "variant_count": 17,
+      "variants": [
+        {
+          "id": 802,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "閃銀 淡原味",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 803,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "琥珀 濃原味",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 804,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "深綠 淡薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 805,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "冰藍 濃薄荷",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 806,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "紫色 葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 807,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "花香 薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 808,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "抹茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 809,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "熱帶水果",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 810,
+          "product_id": 225,
+          "variant_type": "口味 ",
+          "variant_value": "黑冰葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 811,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "黑冰薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 812,
+          "product_id": 225,
+          "variant_type": "口味  ",
+          "variant_value": "櫻花爆���",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 813,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "黑野莓",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 814,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "青蘋果爆珠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 815,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "草莓爆珠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 816,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "綠洲爆珠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 817,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "太陽爆珠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 818,
+          "product_id": 225,
+          "variant_type": "口味",
+          "variant_value": "花香爆珠",
+          "stock": 19,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 197,
+      "name": "Ilia Ultra5 菸彈",
+      "category": "cartridge",
+      "brand": "ilia",
+      "price": 320,
+      "description": "買四盒送一主機(隨機色)",
+      "stock": 460,
+      "created_at": "2025-07-25T02:24:05.093Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 22,
+      "variants": [
+        {
+          "id": 217,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "脆青蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 218,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "超A薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 219,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "寶藏荔枝",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 220,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "鮮萃葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 221,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "紅心芭樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 222,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "手打檸檬",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 223,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "激爽可樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 224,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "清甜藍莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 225,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "多肉芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 226,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "百香果汁",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 227,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "爆汁蜜桃",
+          "stock": 17,
+          "price_modifier": 0
+        },
+        {
+          "id": 228,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "激情薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 229,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "冰鐵觀音",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 230,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "老冰棍兒",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 231,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "甜蜜瓜",
+          "stock": 17,
+          "price_modifier": 0
+        },
+        {
+          "id": 232,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "冰爽青梅",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 233,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "冰鮮西瓜",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 234,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "檸檬百香",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 235,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "麝香葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 236,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "高山茶韻",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 237,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "激爽雪碧",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 238,
+          "product_id": 197,
+          "variant_type": "口味",
+          "variant_value": "極冰蘇打",
+          "stock": 19,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 191,
+      "name": "ilia6500口拋棄式",
+      "category": "disposable",
+      "brand": "ilia",
+      "price": 320,
+      "description": "買十支送一支\n活動與折扣卷擇一",
+      "stock": 480,
+      "created_at": "2025-07-25T02:23:50.964Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 24,
+      "variants": [
+        {
+          "id": 107,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "冬瓜檸檬",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 108,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "冰葡萄柚",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 109,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "烏龍綠茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 110,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "老冰棍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 111,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "可樂",
+          "stock": 17,
+          "price_modifier": 0
+        },
+        {
+          "id": 112,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "哈密瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 113,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "海鹽檸檬",
+          "stock": 16,
+          "price_modifier": 0
+        },
+        {
+          "id": 114,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "水蜜桃",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 115,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "沙士",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 116,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "百香果",
+          "stock": 15,
+          "price_modifier": 0
+        },
+        {
+          "id": 117,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 118,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "芭樂",
+          "stock": -1,
+          "price_modifier": 0
+        },
+        {
+          "id": 119,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "荔枝",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 120,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "葡萄",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 121,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "薄荷",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 122,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "藍莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 123,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "蘇打",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 124,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 125,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "西瓜",
+          "stock": 10,
+          "price_modifier": 0
+        },
+        {
+          "id": 126,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "鐵觀音",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 127,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "雪碧",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 128,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "青葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 129,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "養樂多",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 130,
+          "product_id": 191,
+          "variant_type": "口味",
+          "variant_value": "龍井",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 223,
+      "name": "TUTX菸彈",
+      "category": "cartridge",
+      "brand": "TUTX",
+      "price": 280,
+      "description": "TUTX一代  通用\n買十盒送一盒\n活動與折扣卷擇一",
+      "stock": 20,
+      "created_at": "2025-07-25 02:17:59",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 24,
+      "variants": [
+        {
+          "id": 778,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "凍檸可樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 779,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "南極冰",
+          "stock": 15,
+          "price_modifier": 0
+        },
+        {
+          "id": 780,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "奇異果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 781,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "寶礦力",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 782,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "檸檬茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 783,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "水蜜桃",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 784,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "沙士",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 785,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "菸草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 786,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "百香果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 787,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "綠豆",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 788,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 789,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "荔枝",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 790,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "莓果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 791,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 792,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 793,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "藍莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 794,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "西瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 795,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "鐵觀音",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 796,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "鳳梨",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 797,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "龍井",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 798,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "芭樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 799,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 800,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "哈密瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 801,
+          "product_id": 223,
+          "variant_type": "口味",
+          "variant_value": "冰棍",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 222,
+      "name": "MEHA魅嗨菸彈",
+      "category": "cartridge",
+      "brand": "MEHA魅嗨",
+      "price": 260,
+      "description": "MEHA魅嗨一代通用\n買十盒送一盒\n活動與折扣卷擇一",
+      "stock": 20,
+      "created_at": "2025-07-25 01:12:28",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 31,
+      "variants": [
+        {
+          "id": 747,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "藍莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 748,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "荔枝",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 749,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "咖啡",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 750,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "芭樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 751,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "鐵觀音",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 752,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "豆奶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 753,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "西瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 754,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "西瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 755,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "鳳梨",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 756,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "沙士",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 757,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "薄荷",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 758,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 759,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "蜜桃",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 760,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "百香果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 761,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "菸草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 762,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "檸��草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 763,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "拉菲冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 764,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "冰泉",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 765,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "綠豆",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 766,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 767,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 768,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "海鹽檸檬",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 769,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "草莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 770,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 771,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "哈密瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 772,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "可樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 773,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "冰棍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 774,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "礦力",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 775,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "檳榔",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 776,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "薄荷菸草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 777,
+          "product_id": 222,
+          "variant_type": "口味",
+          "variant_value": "紅顏知己",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 221,
+      "name": "IQOS PRIME i系列主機",
+      "category": "host",
+      "brand": "IQOS 主機系列",
+      "price": 3800,
+      "description": "PRIME i",
+      "stock": 20,
+      "created_at": "2025-07-21 13:34:39",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 1,
+      "variant_count": 4,
+      "variants": [
+        {
+          "id": 743,
+          "product_id": 221,
+          "variant_type": "顏色",
+          "variant_value": "PRIME i 午夜黑",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 744,
+          "product_id": 221,
+          "variant_type": "顏色",
+          "variant_value": "PRIME i 綠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 745,
+          "product_id": 221,
+          "variant_type": "顏色",
+          "variant_value": "PRIME i 葡萄酒紅",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 746,
+          "product_id": 221,
+          "variant_type": "顏色",
+          "variant_value": "PRIME i冰鋒藍",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 220,
+      "name": "IQOS ILUMA i系列主機",
+      "category": "host",
+      "brand": "IQOS 主機系列",
+      "price": 2800,
+      "description": "ILUMA i",
+      "stock": 20,
+      "created_at": "2025-07-21 13:33:14",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 1,
+      "variant_count": 4,
+      "variants": [
+        {
+          "id": 739,
+          "product_id": 220,
+          "variant_type": "顏色",
+          "variant_value": "ILUMA i 冰鋒藍",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 740,
+          "product_id": 220,
+          "variant_type": "顏色",
+          "variant_value": "ILUMA i 午夜黑",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 741,
+          "product_id": 220,
+          "variant_type": "顏色",
+          "variant_value": "ILUMA i 烈焰橘",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 742,
+          "product_id": 220,
+          "variant_type": "顏色",
+          "variant_value": "ILUMA i 馬卡龍紫",
+          "stock": -1,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 219,
+      "name": "IQOS ONE  i系列主機",
+      "category": "host",
+      "brand": "IQOS 主機系列",
+      "price": 2200,
+      "description": "IQOS ILUMA主機",
+      "stock": 20,
+      "created_at": "2025-07-20 15:23:14",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 1,
+      "variant_count": 5,
+      "variants": [
+        {
+          "id": 727,
+          "product_id": 219,
+          "variant_type": "顏色",
+          "variant_value": "ONE i  冰鋒藍",
+          "stock": 1,
+          "price_modifier": 0
+        },
+        {
+          "id": 728,
+          "product_id": 219,
+          "variant_type": "顏色",
+          "variant_value": "ONE i  馬卡龍紫",
+          "stock": -1,
+          "price_modifier": 0
+        },
+        {
+          "id": 729,
+          "product_id": 219,
+          "variant_type": "顏色",
+          "variant_value": "ONE i  烈焰橘",
+          "stock": -1,
+          "price_modifier": 0
+        },
+        {
+          "id": 730,
+          "product_id": 219,
+          "variant_type": "顏色",
+          "variant_value": "ONE i  午夜黑",
+          "stock": -1,
+          "price_modifier": 0
+        },
+        {
+          "id": 839,
+          "product_id": 219,
+          "variant_type": "顏色",
+          "variant_value": "青葉綠",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 218,
+      "name": "日本版IQOS TEREA煙彈",
+      "category": "cartridge",
+      "brand": "IQOS",
+      "price": 2400,
+      "description": "iqos日T  1條10包",
+      "stock": 20,
+      "created_at": "2025-07-19 17:06:52",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 1,
+      "variant_count": 29,
+      "variants": [
+        {
+          "id": 698,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "特濃",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 699,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "濃原味",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 700,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "淡原味",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 701,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "堅果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 702,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "紅寶石",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 703,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "雪松",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 704,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "八角",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 705,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "丁香",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 706,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "太陽珍珠",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 707,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "綠洲珍珠",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 708,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "草莓珍珠",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 709,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "青蘋果珍珠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 710,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "薄荷珍珠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 711,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "櫻花珍珠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 712,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "麝香葡萄珍珠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 713,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "黑冰薄荷",
+          "stock": 16,
+          "price_modifier": 0
+        },
+        {
+          "id": 714,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "青檸檬",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 715,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "濃薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 716,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "淡薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 717,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "迷迭香",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 718,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "熱帶水果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 719,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "藍莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 720,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "青蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 721,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "水蜜桃",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 722,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "黑檸檬",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 723,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "黑冰水果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 724,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "黑藍莓",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 725,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "黑野莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 726,
+          "product_id": 218,
+          "variant_type": "口味",
+          "variant_value": "黑柑橘",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "SP2一代主機",
+      "category": "host",
+      "brand": "SP2",
+      "price": 650,
+      "description": "SP2主機通用ILIA HTA",
+      "stock": 79,
+      "created_at": "2025-07-13T12:54:06.843Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 23,
+      "variants": [
+        {
+          "id": 51,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "星冰霧藍",
+          "stock": 25,
+          "price_modifier": 0
+        },
+        {
+          "id": 52,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "碟羽藍綠",
+          "stock": 30,
+          "price_modifier": 0
+        },
+        {
+          "id": 53,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "金影粉",
+          "stock": 28,
+          "price_modifier": 0
+        },
+        {
+          "id": 54,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "幻夜黑",
+          "stock": 34,
+          "price_modifier": 0
+        },
+        {
+          "id": 55,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "魅海藍",
+          "stock": 22,
+          "price_modifier": 0
+        },
+        {
+          "id": 56,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "媚焰紅",
+          "stock": 26,
+          "price_modifier": 0
+        },
+        {
+          "id": 57,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "媚海藍(漸層)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 58,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "黑武士",
+          "stock": 30,
+          "price_modifier": 0
+        },
+        {
+          "id": 59,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "淡雅銀白",
+          "stock": 29,
+          "price_modifier": 0
+        },
+        {
+          "id": 60,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "碧波粉綠",
+          "stock": 24,
+          "price_modifier": 0
+        },
+        {
+          "id": 61,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "星悅湖藍",
+          "stock": 27,
+          "price_modifier": 0
+        },
+        {
+          "id": 62,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "電泳雪白",
+          "stock": 31,
+          "price_modifier": 0
+        },
+        {
+          "id": 63,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "炫影紫紅",
+          "stock": 23,
+          "price_modifier": 0
+        },
+        {
+          "id": 64,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "丁香淡紫",
+          "stock": 25,
+          "price_modifier": 0
+        },
+        {
+          "id": 65,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "海棠粉",
+          "stock": 28,
+          "price_modifier": 0
+        },
+        {
+          "id": 66,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "鈦黑",
+          "stock": 33,
+          "price_modifier": 0
+        },
+        {
+          "id": 67,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "鈦紅",
+          "stock": 25,
+          "price_modifier": 0
+        },
+        {
+          "id": 68,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "鈦粉",
+          "stock": 22,
+          "price_modifier": 0
+        },
+        {
+          "id": 69,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "鈦銀",
+          "stock": 30,
+          "price_modifier": 0
+        },
+        {
+          "id": 70,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "鈦原色",
+          "stock": 28,
+          "price_modifier": 0
+        },
+        {
+          "id": 71,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "鈦藍",
+          "stock": 24,
+          "price_modifier": 0
+        },
+        {
+          "id": 72,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "鈦白",
+          "stock": 26,
+          "price_modifier": 0
+        },
+        {
+          "id": 73,
+          "product_id": 2,
+          "variant_type": "顏色",
+          "variant_value": "鈦綠",
+          "stock": 21,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 195,
+      "name": "Ilia布紋主機",
+      "category": "host",
+      "brand": "ilia",
+      "price": 750,
+      "description": "IIlia 布紋主機  通用SP2 HTA LANA",
+      "stock": 160,
+      "created_at": "2025-07-12T22:19:54.017Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 8,
+      "variants": [
+        {
+          "id": 203,
+          "product_id": 195,
+          "variant_type": "顏色",
+          "variant_value": "布紋黑",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 204,
+          "product_id": 195,
+          "variant_type": "顏色",
+          "variant_value": "布紋粉",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 205,
+          "product_id": 195,
+          "variant_type": "顏色",
+          "variant_value": "布紋藍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 206,
+          "product_id": 195,
+          "variant_type": "顏色",
+          "variant_value": "奶油藍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 207,
+          "product_id": 195,
+          "variant_type": "顏色",
+          "variant_value": "布紋灰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 208,
+          "product_id": 195,
+          "variant_type": "顏色",
+          "variant_value": "布紋綠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 209,
+          "product_id": 195,
+          "variant_type": "顏色",
+          "variant_value": "牛仔藍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 210,
+          "product_id": 195,
+          "variant_type": "顏色",
+          "variant_value": "奶油紫",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 196,
+      "name": "Ilia皮革主機",
+      "category": "host",
+      "brand": "ilia",
+      "price": 750,
+      "description": "IIlia 皮革主機  通用SP2 HTA LANA",
+      "stock": 120,
+      "created_at": "2025-07-12T22:19:49.984Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 6,
+      "variants": [
+        {
+          "id": 211,
+          "product_id": 196,
+          "variant_type": "顏色",
+          "variant_value": "魅影黑",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 212,
+          "product_id": 196,
+          "variant_type": "顏色",
+          "variant_value": "櫻花粉",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 213,
+          "product_id": 196,
+          "variant_type": "顏色",
+          "variant_value": "Hermès橘",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 214,
+          "product_id": 196,
+          "variant_type": "顏色",
+          "variant_value": "銀河灰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 215,
+          "product_id": 196,
+          "variant_type": "顏色",
+          "variant_value": "慕雪白",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 216,
+          "product_id": 196,
+          "variant_type": "顏色",
+          "variant_value": "Gucci綠",
+          "stock": 19,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 194,
+      "name": "Ilia 一代主機",
+      "category": "host",
+      "brand": "ilia",
+      "price": 650,
+      "description": "Ilia 一代主機 通用SP2 HTA LANA",
+      "stock": 180,
+      "created_at": "2025-07-12T22:19:45.724Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 9,
+      "variants": [
+        {
+          "id": 194,
+          "product_id": 194,
+          "variant_type": "顏色",
+          "variant_value": "櫻落粉金",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 195,
+          "product_id": 194,
+          "variant_type": "顏色",
+          "variant_value": "黎零青山",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 196,
+          "product_id": 194,
+          "variant_type": "顏色",
+          "variant_value": "星辰銀灰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 197,
+          "product_id": 194,
+          "variant_type": "顏色",
+          "variant_value": "初雪白",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 198,
+          "product_id": 194,
+          "variant_type": "顏色",
+          "variant_value": "騎士黑",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 199,
+          "product_id": 194,
+          "variant_type": "顏色",
+          "variant_value": "夢幻紫晶",
+          "stock": 17,
+          "price_modifier": 0
+        },
+        {
+          "id": 200,
+          "product_id": 194,
+          "variant_type": "顏色",
+          "variant_value": "寶寶粉",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 201,
+          "product_id": 194,
+          "variant_type": "顏色",
+          "variant_value": "寶寶藍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 202,
+          "product_id": 194,
+          "variant_type": "顏色",
+          "variant_value": "天空之境",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 203,
+      "name": "DOT SWITCH",
+      "category": "cartridge",
+      "brand": "DOTMOD電子菸 DOT SWITCH",
+      "price": 320,
+      "description": "買十盒送一盒+1單桿(隨機色)",
+      "stock": 700,
+      "created_at": "2025-07-05 08:46:07",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 17,
+      "variants": [
+        {
+          "id": 402,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "香草星冰樂",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 403,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "草莓奇異果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 404,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "葡萄冰",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 405,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "小熊軟糖",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 406,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "西瓜冰",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 407,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "能量飲料",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 408,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "藍莓冰",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 409,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "香草菸草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 410,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "檸檬可樂",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 411,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 412,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "養樂多",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 413,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "蜜桃芒果",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 414,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "酸蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 415,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "鳳梨冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 416,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "芭樂冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 417,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "奶油菸草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 418,
+          "product_id": 203,
+          "variant_type": "口味",
+          "variant_value": "綜合水果",
+          "stock": 18,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 202,
+      "name": "東京魔盒",
+      "category": "cartridge",
+      "brand": "東京魔盒 TOKYO MOHOO BOX",
+      "price": 450,
+      "description": "買三盒以上加購100送主機(隨機色)",
+      "stock": 1000,
+      "created_at": "2025-07-05 08:24:01",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 49,
+      "variants": [
+        {
+          "id": 353,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 354,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "百香果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 355,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "荔枝",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 356,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "蜜桃",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 357,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "老冰棍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 358,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "莓果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 359,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "藍莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 360,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "可樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 361,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "紅牛",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 362,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "葡萄柚",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 363,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "養樂多",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 364,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "��樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 365,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "檸檬",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 366,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "雙蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 367,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "礦泉水",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 368,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "龍井",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 369,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "芒果火龍果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 370,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "哈密瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 371,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "蜜桃烏龍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 372,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 373,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 374,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "草莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 375,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "桃子芒果西瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 376,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "西瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 377,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "寶礦力",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 378,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "檸檬茉莉茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 379,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "烏龍茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 380,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "鐵觀音",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 381,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "草莓西瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 382,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "草莓奇異果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 383,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "波羅冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 384,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "覆盆子",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 385,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "綠豆沙",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 386,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "雪碧",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 387,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "青葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 388,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "沙士",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 389,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "沙士糖(極涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 390,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "草莓優格冰沙(極涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 391,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "檸檬酸奶冰沙(極涼)",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 392,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "葡萄荔枝(極涼)",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 393,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "柳橙綠茶(極涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 394,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "古巴雪茄(無涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 395,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "草莓巧克力(無涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 396,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "草莓(無涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 397,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "芭樂(無涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 398,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "葡萄(無涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 399,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "經典菸草(無涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 400,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "百香果(無涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 401,
+          "product_id": 202,
+          "variant_type": "口味",
+          "variant_value": "加購機(顏色隨機)",
+          "stock": 19,
+          "price_modifier": -350
+        }
+      ]
+    },
+    {
+      "id": 199,
+      "name": "HTA Pods (黑桃煙蛋)",
+      "category": "cartridge",
+      "brand": "HTA",
+      "price": 250,
+      "description": "買十盒送一盒\n活動與折扣卷擇一",
+      "stock": 300,
+      "created_at": "2025-06-21 03:39:15",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 14,
+      "variants": [
+        {
+          "id": 274,
+          "product_id": 199,
+          "variant_type": "口味",
+          "variant_value": "玫瑰荔枝",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 275,
+          "product_id": 199,
+          "variant_type": "口味",
+          "variant_value": "珍珠芭樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 276,
+          "product_id": 199,
+          "variant_type": "口味",
+          "variant_value": "濃郁草莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 277,
+          "product_id": 199,
+          "variant_type": "口味",
+          "variant_value": "冰鎮西瓜",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 278,
+          "product_id": 199,
+          "variant_type": "口味",
+          "variant_value": "白桃冰茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 279,
+          "product_id": 199,
+          "variant_type": "口味",
+          "variant_value": "加州蜜桃",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 280,
+          "product_id": 199,
+          "variant_type": "口味",
+          "variant_value": "勁爽薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 281,
+          "product_id": 199,
+          "variant_type": "口味",
+          "variant_value": "百香果",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 282,
+          "product_id": 199,
+          "variant_type": "口味",
+          "variant_value": "經典菸草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 283,
+          "product_id": 199,
+          "variant_type": "口味",
+          "variant_value": "愛文芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 284,
+          "product_id": 199,
+          "variant_type": "口味",
+          "variant_value": "藍莓爆珠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 285,
+          "product_id": 199,
+          "variant_type": "口味",
+          "variant_value": "巨峰葡萄",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 286,
+          "product_id": 199,
+          "variant_type": "口味",
+          "variant_value": "鐵觀音",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 287,
+          "product_id": 199,
+          "variant_type": "口味",
+          "variant_value": "清爽可樂",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 198,
+      "name": "Lana Pods (煙彈)",
+      "category": "cartridge",
+      "brand": "Lana",
+      "price": 280,
+      "description": "買十盒送一盒\n活動與折扣卷擇一",
+      "stock": 700,
+      "created_at": "2025-06-21 03:32:36",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 35,
+      "variants": [
+        {
+          "id": 239,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "葡萄",
+          "stock": 15,
+          "price_modifier": 0
+        },
+        {
+          "id": 240,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "可樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 241,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "綠豆",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 242,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "荔枝",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 243,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "西瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 244,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "蜜桃",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 245,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "鳳梨",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 246,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "獼猴桃",
+          "stock": 15,
+          "price_modifier": 0
+        },
+        {
+          "id": 247,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "雪碧",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 248,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "冰棍",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 249,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "草莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 250,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "橙冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 251,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "百香果",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 252,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "沙士啤酒",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 253,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "紅茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 254,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "莓果",
+          "stock": 17,
+          "price_modifier": 0
+        },
+        {
+          "id": 255,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "鐵觀音",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 256,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "冰泉",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 257,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "青蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 258,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 259,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "烏龍",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 260,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "咖啡",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 261,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "藍莓",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 262,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "蜜桃葡萄香蕉",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 263,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "蔓越莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 264,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "草莓西瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 265,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "紅酒",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 266,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "芋頭冰淇淋",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 267,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "彩虹糖",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 268,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "薄荷口香糖",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 269,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "葡萄柚",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 270,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "芭樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 271,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "哈密瓜",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 272,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "茉莉龍井",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 273,
+          "product_id": 198,
+          "variant_type": "口味",
+          "variant_value": "百香芒果",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 193,
+      "name": "HTA黑桃主機",
+      "category": "host",
+      "brand": "HTA",
+      "price": 450,
+      "description": "HTA 黑桃主機 - 一代二代通用、350mAH電池、CP值極高",
+      "stock": 140,
+      "created_at": "2025-06-21 03:21:16",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 7,
+      "variants": [
+        {
+          "id": 178,
+          "product_id": 193,
+          "variant_type": "顏色",
+          "variant_value": "皎月白",
+          "stock": 17,
+          "price_modifier": 0
+        },
+        {
+          "id": 179,
+          "product_id": 193,
+          "variant_type": "顏色",
+          "variant_value": "絕絕紫",
+          "stock": -1,
+          "price_modifier": 0
+        },
+        {
+          "id": 180,
+          "product_id": 193,
+          "variant_type": "顏色",
+          "variant_value": "典雅黑",
+          "stock": -1,
+          "price_modifier": 0
+        },
+        {
+          "id": 181,
+          "product_id": 193,
+          "variant_type": "顏色",
+          "variant_value": "橙紅橙",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 182,
+          "product_id": 193,
+          "variant_type": "顏色",
+          "variant_value": "霧霾藍",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 183,
+          "product_id": 193,
+          "variant_type": "顏色",
+          "variant_value": "墨松綠",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 184,
+          "product_id": 193,
+          "variant_type": "顏色",
+          "variant_value": "蜜桃粉",
+          "stock": -1,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 190,
+      "name": "ilia五代主機",
+      "category": "host",
+      "brand": "ilia",
+      "price": 450,
+      "description": "科技特色：最新智能芯片，提供穩定且高效的煙霧輸出。精確調節功率和溫度，適應不同口感需求。支持多種煙彈和線圈類型，輕鬆更換。高品質煙油，純正口感，味蕾享受。極致輕薄的機身設計，時尚外觀。符合人體工學的握持設計，手感舒適。大容量電池，長效續航，全天使用。快速充電技術，縮短充電時間。多重保護機制，過熱、短路、過充保護。採用環保無毒材料製造，健康安全。",
+      "stock": 150,
+      "created_at": "2025-06-21 03:08:48",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 5,
+      "variants": [
+        {
+          "id": 74,
+          "product_id": 190,
+          "variant_type": "顏色",
+          "variant_value": "ilia五代專用主機 霜月白",
+          "stock": 29,
+          "price_modifier": 0
+        },
+        {
+          "id": 79,
+          "product_id": 190,
+          "variant_type": "顏色",
+          "variant_value": "ilia五代專用主機 霞光粉",
+          "stock": 30,
+          "price_modifier": 0
+        },
+        {
+          "id": 80,
+          "product_id": 190,
+          "variant_type": "顏色",
+          "variant_value": "ilia五代專用主機 星河藍",
+          "stock": 29,
+          "price_modifier": 0
+        },
+        {
+          "id": 81,
+          "product_id": 190,
+          "variant_type": "顏色",
+          "variant_value": "ilia五代專用主機 魅影灰",
+          "stock": 30,
+          "price_modifier": 0
+        },
+        {
+          "id": 82,
+          "product_id": 190,
+          "variant_type": "顏色",
+          "variant_value": "ilia五代專用主機 耀巖黑",
+          "stock": 30,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 204,
+      "name": "O2優氧4%",
+      "category": "oil",
+      "brand": "O2優氧",
+      "price": 500,
+      "description": "O2優氧4%煙油，提供36種豐富口味選擇，適合各種電子煙設備使用。",
+      "stock": 20,
+      "created_at": "2020-01-01T00:00:00.000Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 36,
+      "variants": [
+        {
+          "id": 419,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "玫瑰花果茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 420,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "櫻花氣泡水",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 421,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "檸檬薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 422,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "蜂蜜茉莉茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 423,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "高山鐵觀音",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 424,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "清甜蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 425,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "冰涼荔枝",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 426,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "拉拉山水蜜桃",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 427,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "經典藍莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 428,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "沁涼柳橙",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 429,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "酷涼薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 430,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "涼爽西瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 431,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "綠豆冰沙",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 432,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "可樂氣泡",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 433,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "繽紛蘇打",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 434,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "果漾百香",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 435,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "葡萄柚",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 436,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "老冰棍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 437,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "檸檬紅茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 438,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "草莓綠茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 439,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "午夜雞尾酒",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 440,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "海鹽檸檬糖",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 441,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "紅心芭樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 442,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "哈啾葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 443,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "愛文芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 444,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "夕張哈密瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 445,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "蜜桃烏龍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 446,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "青梅冰沙",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 447,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "沙士泡泡冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 448,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "紅牛能量飲",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 449,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "覆盆莓果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 450,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "金鑽鳳梨",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 451,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "香醇菸草(不涼）",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 452,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "藍莓菸草（不涼）",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 453,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "奶油菸草（不涼）",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 454,
+          "product_id": 204,
+          "variant_type": "flavor",
+          "variant_value": "太妃糖菸草（不涼）",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 205,
+      "name": "O2優氧4%",
+      "category": "cartridge",
+      "brand": "O2優氧",
+      "price": 320,
+      "description": "O2優氧4%煙彈，多種口味選擇",
+      "stock": 20,
+      "created_at": "2020-01-01T00:00:00.000Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 36,
+      "variants": [
+        {
+          "id": 455,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "櫻花氣泡水",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 456,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "高山鐵觀音",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 457,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "冰涼荔枝",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 458,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "拉拉山水蜜桃",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 459,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "經典藍莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 460,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "沁涼柳橙",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 461,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "酷涼薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 462,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "涼爽西瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 463,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "綠豆冰沙",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 464,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "可樂氣泡",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 465,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "繽紛蘇打",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 466,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "果漾百香",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 467,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "葡萄柚",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 468,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "老冰棍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 469,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "檸檬紅茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 470,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "草莓綠茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 471,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "午夜雞尾酒",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 472,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "紅心芭樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 473,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "哈啾葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 474,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "愛文芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 475,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "夕張哈密瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 476,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "蜜桃烏龍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 477,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "青梅冰沙",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 478,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "沙士泡泡冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 479,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "紅牛能量飲",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 480,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "蜂蜜茉莉茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 481,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "金鑽鳳梨",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 482,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "香醇菸草(不涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 483,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "檸檬薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 484,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "奶油菸草(不涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 485,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "太妃糖菸草(不涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 486,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "玫瑰花果茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 492,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "覆盆莓果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 497,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "藍莓菸草(不涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 500,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "清甜蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 524,
+          "product_id": 205,
+          "variant_type": "口味",
+          "variant_value": "海鹽檸檬糖",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 206,
+      "name": "O2優氧4%主機",
+      "category": "host",
+      "brand": "O2優氧",
+      "price": 650,
+      "description": "O2優氧4%主機，多色可選",
+      "stock": 20,
+      "created_at": "2020-01-01T00:00:00.000Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 6,
+      "variants": [
+        {
+          "id": 487,
+          "product_id": 206,
+          "variant_type": "顏色",
+          "variant_value": "灰色",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 488,
+          "product_id": 206,
+          "variant_type": "顏色",
+          "variant_value": "銀白",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 489,
+          "product_id": 206,
+          "variant_type": "顏色",
+          "variant_value": "天空藍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 490,
+          "product_id": 206,
+          "variant_type": "顏色",
+          "variant_value": "珍珠白",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 491,
+          "product_id": 206,
+          "variant_type": "顏色",
+          "variant_value": "亮黑",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 506,
+          "product_id": 206,
+          "variant_type": "顏色",
+          "variant_value": "軍綠",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 207,
+      "name": "KAMA3%",
+      "category": "oil",
+      "brand": "KAMA",
+      "price": 500,
+      "description": "KAMA3%煙油，豐富口味選擇",
+      "stock": 20,
+      "created_at": "2020-01-01T00:00:00.000Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 20,
+      "variants": [
+        {
+          "id": 493,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "青提蘆薈(白葡萄)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 494,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "淡雪草莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 495,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "莓果派對",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 496,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "波波葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 498,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "金星蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 499,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "旺情鳳梨",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 501,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "芭黎戀人(芭樂)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 502,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "兒時沙士",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 503,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "思樂冰沙",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 504,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "清新薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 505,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "西瓜冰棒",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 507,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "純純蜂蜜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 508,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "茉香翡翠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 509,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "咖啡菸草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 510,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "黑巧菸草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 517,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "夏日芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 518,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "蜂蜜青柚",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 519,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "冰川泉水",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 521,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "桃桃仙子",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 530,
+          "product_id": 207,
+          "variant_type": "口味",
+          "variant_value": "熱帶百香",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 208,
+      "name": "KAMA  主機",
+      "category": "host",
+      "brand": "KAMA",
+      "price": 650,
+      "description": "KAMA3%主機，多色可選包含特仕版",
+      "stock": 20,
+      "created_at": "2020-01-01T00:00:00.000Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 11,
+      "variants": [
+        {
+          "id": 511,
+          "product_id": 208,
+          "variant_type": "顏色",
+          "variant_value": "黑",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 512,
+          "product_id": 208,
+          "variant_type": "顏色",
+          "variant_value": "白",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 513,
+          "product_id": 208,
+          "variant_type": "顏色",
+          "variant_value": "灰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 514,
+          "product_id": 208,
+          "variant_type": "顏色",
+          "variant_value": "粉金漸層",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 515,
+          "product_id": 208,
+          "variant_type": "顏色",
+          "variant_value": "藍漸層",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 516,
+          "product_id": 208,
+          "variant_type": "顏色",
+          "variant_value": "午夜黑-特仕版",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 520,
+          "product_id": 208,
+          "variant_type": "顏色",
+          "variant_value": "奶茶粉-特仕版",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 531,
+          "product_id": 208,
+          "variant_type": "顏色",
+          "variant_value": "象牙白-特仕版",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 539,
+          "product_id": 208,
+          "variant_type": "顏色",
+          "variant_value": "深墨綠-特仕版",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 553,
+          "product_id": 208,
+          "variant_type": "顏色",
+          "variant_value": "紳士藍-特仕版",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 586,
+          "product_id": 208,
+          "variant_type": "顏色",
+          "variant_value": "淺海藍-特仕版",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 209,
+      "name": "KAMA3%(2顆裝)",
+      "category": "cartridge",
+      "brand": "KAMA",
+      "price": 280,
+      "description": "KAMA3%煙彈2顆裝，豐富口味選擇",
+      "stock": 20,
+      "created_at": "2020-01-01T00:00:00.000Z",
+      "is_discontinued": 1,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 20,
+      "variants": [
+        {
+          "id": 522,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "桃桃仙子",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 523,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "青提蘆薈(白葡萄)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 525,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "莓果派對",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 526,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "波波葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 527,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "西瓜冰棒",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 528,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "金星蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 529,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "旺情鳳梨",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 532,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "熱帶百香",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 533,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "夏日芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 534,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "思樂冰沙",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 535,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "清新薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 536,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "蜂蜜青柚",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 537,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "冰川泉水",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 538,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "純純蜂蜜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 540,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "咖啡菸草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 541,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "黑巧菸草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 545,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "兒時沙士",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 547,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "淡雪草莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 585,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "芭黎戀人(芭樂)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 587,
+          "product_id": 209,
+          "variant_type": "口味",
+          "variant_value": "茉香翡翠",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 210,
+      "name": "TROY粉筆灰3%",
+      "category": "oil",
+      "brand": "TROY",
+      "price": 500,
+      "description": "TROY粉筆灰3%煙油，超多口味選擇",
+      "stock": 20,
+      "created_at": "2020-01-01T00:00:00.000Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 40,
+      "variants": [
+        {
+          "id": 542,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "極冰葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 543,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "極冰草莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 544,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "極冰百香果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 546,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 548,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "草莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 549,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "水蜜桃",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 550,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 551,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "西瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 552,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "哈密瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 554,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "奇異果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 555,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "芭樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 556,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "橘子",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 557,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "荔枝",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 558,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "櫻桃",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 559,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "莓果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 560,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "藍莓",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 561,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "蜜桃冰茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 562,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "鐵觀音",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 563,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "龍井茉莉",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 564,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "紅茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 565,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "檸檬水",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 566,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "可樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 567,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "白葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 568,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "沙士",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 569,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 570,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "冰棍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 571,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "冰泉",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 572,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "寶礦力",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 573,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "養樂多",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 574,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "彩虹糖",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 575,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "檸檬愛玉",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 576,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "芒果鳳梨",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 577,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "三重芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 578,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "旺仔牛奶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 579,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "梅子冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 580,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "古巴雪茄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 581,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "土耳其菸草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 582,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "鳳梨",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 583,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "百香果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 584,
+          "product_id": 210,
+          "variant_type": "口味",
+          "variant_value": "紅牛",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 211,
+      "name": "THE2樂兔3%(特洛伊改版新包裝)",
+      "category": "cartridge",
+      "brand": "TROY",
+      "price": 320,
+      "description": "THE2樂兔3%煙彈，特洛伊改版新包裝，豐富口味選擇",
+      "stock": 20,
+      "created_at": "2020-01-01T00:00:00.000Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 29,
+      "variants": [
+        {
+          "id": 588,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "冰凍荔枝",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 589,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "冰凍檸檬",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 590,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "冰凍奇異果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 591,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "冰凍泉水",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 592,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "熱戀草莓",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 593,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "葡萄果粒",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 594,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "熱情百香",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 595,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "醇香蜜瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 596,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "青青梅子",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 597,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "紅心芭樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 598,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "旺來鳳梨",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 599,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "西瓜冰沙",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 600,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "元氣蜜桃",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 601,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "多汁蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 602,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "黑松沙士",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 603,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "跳跳可樂",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 604,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "芬達橘子",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 605,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "養樂多",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 606,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "能量紅牛",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 607,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "運動飲料",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 608,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "蘇打冰棒",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 609,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "冰鐵觀音",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 610,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "蜜桃茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 611,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "清爽薄荷",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 612,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "古巴雪茄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 613,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "土耳其菸草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 637,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "冰凍草莓",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 638,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "冰凍百香",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 690,
+          "product_id": 211,
+          "variant_type": "口味",
+          "variant_value": "冰凍葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 212,
+      "name": "TOLETX3.5%",
+      "category": "cartridge",
+      "brand": "TOLETX",
+      "price": 320,
+      "description": "TOLETX3.5%煙彈，高濃度口感，多種口味",
+      "stock": 20,
+      "created_at": "2020-01-01T00:00:00.000Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 29,
+      "variants": [
+        {
+          "id": 614,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "櫻花葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 615,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "白玉山竹冰",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 616,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "青提冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 617,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "荔枝冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 618,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "草莓冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 619,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "西瓜冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 620,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "芭樂冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 621,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "香醇密瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 622,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "沙士冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 623,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "可樂冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 624,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "綠豆冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 625,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "薄荷冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 626,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "茉莉鐵觀音",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 627,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "冰爽雪碧",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 628,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "海鹽檸檬",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 629,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "極冰礦泉水",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 630,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "青蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 631,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "藍莓果冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 632,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "百香果冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 633,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "鳳梨冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 634,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "奇異果",
+          "stock": 19,
+          "price_modifier": 0
+        },
+        {
+          "id": 635,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "黑冰爆珠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 636,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "凍檸茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 639,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "古巴雪茄(不涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 640,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "水蜜桃冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 650,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "愛文芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 660,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "經典菸草(不涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 689,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "柳���冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 691,
+          "product_id": 212,
+          "variant_type": "口味",
+          "variant_value": "蘇打冰棒",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 213,
+      "name": "TOLETX主機",
+      "category": "host",
+      "brand": "TOLETX",
+      "price": 650,
+      "description": "TOLETX主機，精緻外觀設計，多色可選",
+      "stock": 20,
+      "created_at": "2020-01-01T00:00:00.000Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 4,
+      "variants": [
+        {
+          "id": 641,
+          "product_id": 213,
+          "variant_type": "顏色",
+          "variant_value": "黑色",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 642,
+          "product_id": 213,
+          "variant_type": "顏色",
+          "variant_value": "白色",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 643,
+          "product_id": 213,
+          "variant_type": "顏色",
+          "variant_value": "流光銀",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 644,
+          "product_id": 213,
+          "variant_type": "顏色",
+          "variant_value": "流光藍",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 214,
+      "name": "TOLET1拋棄式",
+      "category": "disposable",
+      "brand": "TOLET1",
+      "price": 350,
+      "description": "TOLET1拋棄式電子煙，即開即用，多種口味",
+      "stock": 20,
+      "created_at": "2020-01-01T00:00:00.000Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 14,
+      "variants": [
+        {
+          "id": 645,
+          "product_id": 214,
+          "variant_type": "口味",
+          "variant_value": "葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 646,
+          "product_id": 214,
+          "variant_type": "口味",
+          "variant_value": "芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 647,
+          "product_id": 214,
+          "variant_type": "口味",
+          "variant_value": "經典菸草",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 648,
+          "product_id": 214,
+          "variant_type": "口味",
+          "variant_value": "柚子",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 649,
+          "product_id": 214,
+          "variant_type": "口味",
+          "variant_value": "哈密瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 651,
+          "product_id": 214,
+          "variant_type": "口味",
+          "variant_value": "鐵觀音",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 652,
+          "product_id": 214,
+          "variant_type": "口味",
+          "variant_value": "百香果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 653,
+          "product_id": 214,
+          "variant_type": "口味",
+          "variant_value": "檸檬海鹽",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 654,
+          "product_id": 214,
+          "variant_type": "口味",
+          "variant_value": "薄荷",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 655,
+          "product_id": 214,
+          "variant_type": "口味",
+          "variant_value": "莓果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 656,
+          "product_id": 214,
+          "variant_type": "口味",
+          "variant_value": "百香奇異果芭樂",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 657,
+          "product_id": 214,
+          "variant_type": "口味",
+          "variant_value": "紅茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 658,
+          "product_id": 214,
+          "variant_type": "口味",
+          "variant_value": "蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 686,
+          "product_id": 214,
+          "variant_type": "口味",
+          "variant_value": "芭樂",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 215,
+      "name": "TOLETX騎士鹽3.5%",
+      "category": "oil",
+      "brand": "TOLETX",
+      "price": 500,
+      "description": "TOLETX騎士鹽3.5%煙油，高品質鹽類煙油",
+      "stock": 20,
+      "created_at": "2020-01-01T00:00:00.000Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 28,
+      "variants": [
+        {
+          "id": 659,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "櫻花葡萄",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 661,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "青提冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 662,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "荔枝冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 663,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "草莓冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 664,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "西瓜冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 665,
+          "product_id": 215,
+          "variant_type": "��味",
+          "variant_value": "水蜜桃冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 666,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "芭樂冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 667,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "香醇密瓜",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 668,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "愛文芒果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 669,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "沙士冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 670,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "綠豆冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 671,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "薄荷冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 672,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "茉莉鐵觀音",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 673,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "冰爽雪碧",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 674,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "海鹽檸檬",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 675,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "極冰礦泉水",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 676,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "青蘋果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 677,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "藍莓果冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 678,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "百香果冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 679,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "鳳梨冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 680,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "奇異果",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 681,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "黑冰爆珠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 682,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "凍檸茶",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 683,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "蘇打冰棒",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 684,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "柳橙冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 685,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "古巴雪茄(不涼)",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 687,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "白玉山竹冰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 688,
+          "product_id": 215,
+          "variant_type": "口味",
+          "variant_value": "可樂冰",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 216,
+      "name": "DOT SWITCH   主機",
+      "category": "host",
+      "brand": "DOTMOD電子菸 DOT SWITCH",
+      "price": 500,
+      "description": "DOT SWITCH 專屬主機",
+      "stock": 20,
+      "created_at": "2020-01-01T00:00:00.000Z",
+      "is_discontinued": 0,
+      "coupon_excluded": 0,
+      "shipping_excluded": 0,
+      "variant_count": 6,
+      "variants": [
+        {
+          "id": 692,
+          "product_id": 216,
+          "variant_type": "顏色",
+          "variant_value": "漸層綠",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 693,
+          "product_id": 216,
+          "variant_type": "顏色",
+          "variant_value": "漸層橙",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 694,
+          "product_id": 216,
+          "variant_type": "顏色",
+          "variant_value": "橘灰",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 695,
+          "product_id": 216,
+          "variant_type": "顏色",
+          "variant_value": "漸層藍",
+          "stock": 20,
+          "price_modifier": 0
+        },
+        {
+          "id": 696,
+          "product_id": 216,
+          "variant_type": "顏色",
+          "variant_value": "銀黑漸層",
+          "stock": 18,
+          "price_modifier": 0
+        },
+        {
+          "id": 697,
+          "product_id": 216,
+          "variant_type": "顏色",
+          "variant_value": "紅黑漸層",
+          "stock": 20,
+          "price_modifier": 0
+        }
+      ]
+    }
+  ]
+}

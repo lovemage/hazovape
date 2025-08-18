@@ -365,7 +365,7 @@ router.get('/admin/batch-import/template', (req, res) => {
 橙子
 ---
 
-產品名稱: 小煙油系列 - 蘋果味
+產品名稱: 其他 - 蘋果味
 規格:
 10ml
 30ml

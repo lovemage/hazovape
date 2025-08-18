@@ -620,7 +620,7 @@ export const AdminProducts: React.FC = () => {
                 <div className="mt-3 pt-3 border-t border-blue-200">
                   <h5 className="font-medium text-blue-900 mb-2">🏷️ 可用分類：</h5>
                   <div className="flex flex-wrap gap-2">
-                    {['一次性拋棄式電子煙', '注油式主機與耗材', '拋棄式通用煙蛋系列', '小煙油系列', '其他產品'].map(category => (
+                    {['其他'].map(category => (
                       <span key={category} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
                         {category}
                       </span>
@@ -637,7 +637,7 @@ export const AdminProducts: React.FC = () => {
 {`名稱: OXVA NEXLIM 大蠻牛
 價格: 300
 庫存: 100
-分類: 一次性拋棄式電子煙
+分類: 其他
 描述: 高品質電子煙設備...
 多件優惠: {"2": 0.9, "5": 0.8}
 是否啟用: true

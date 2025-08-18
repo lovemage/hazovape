@@ -34,7 +34,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     price: 0,
     stock: 0,
     description: '',
-    category: '其他產品',
+    category: '其他',
     is_active: true,
     multi_discount: {} as Record<number, number>
   });
@@ -62,11 +62,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       console.error('載入分類失敗:', error);
       // 使用預設分類作為後備
       setCategories([
-        { id: 1, name: '一次性拋棄式電子煙', description: '', sort_order: 1 },
-        { id: 2, name: '注油式主機與耗材', description: '', sort_order: 2 },
-        { id: 3, name: '拋棄式通用煙蛋系列', description: '', sort_order: 3 },
-        { id: 4, name: '小煙油系列', description: '', sort_order: 4 },
-        { id: 5, name: '其他產品', description: '', sort_order: 5 }
+        { id: 1, name: '其他', description: '', sort_order: 1 }
       ]);
     } finally {
       setCategoriesLoading(false);
@@ -80,7 +76,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         price: product.price || 0,
         stock: product.stock || 0,
         description: product.description || '',
-        category: product.category || '其他產品',
+        category: product.category || '其他',
         is_active: product.is_active ?? true,
         multi_discount: typeof product.multi_discount === 'string' 
           ? JSON.parse(product.multi_discount || '{}')
@@ -99,7 +95,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         price: 0,
         stock: 0,
         description: '',
-        category: '其他產品',
+        category: '其他',
         is_active: true,
         multi_discount: {}
       });
@@ -375,7 +371,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     required
                   >
                     {categories.length === 0 ? (
-                      <option value="其他產品">其他產品</option>
+                      <option value="其他">其他</option>
                     ) : (
                       categories.map((category) => (
                         <option key={category.id} value={category.name}>

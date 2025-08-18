@@ -29,16 +29,12 @@ async function migrateAddProductCategory() {
     console.log('📝 添加 category 字段到 products 表...');
     await Database.run(`
       ALTER TABLE products 
-      ADD COLUMN category TEXT DEFAULT '其他產品'
+      ADD COLUMN category TEXT DEFAULT '其他'
     `);
     
     console.log('✅ 產品分類字段添加成功');
     console.log('📋 可用分類:');
-    console.log('  - 一次性拋棄式電子煙');
-    console.log('  - 注油式主機與耗材');
-    console.log('  - 拋棄式通用煙蛋系列');
-    console.log('  - 小煙油系列');
-    console.log('  - 其他產品');
+    console.log('  - 其他');
     
   } catch (error) {
     console.error('❌ 產品分類字段遷移失敗:', error.message);

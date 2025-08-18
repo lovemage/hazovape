@@ -301,7 +301,7 @@ router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, 
         name,
         description || '',
         price,
-        category || '其他產品',
+        category || '其他',
         JSON.stringify(parsedMultiDiscount),
         JSON.stringify(allImages),
         true,
@@ -465,7 +465,7 @@ router.put('/admin/:id', authenticateAdmin, upload.array('images', 5), async (re
         name,
         description || '',
         price,
-        category || '其他產品',
+        category || '其他',
         JSON.stringify(parsedMultiDiscount),
         JSON.stringify(currentImages),
         id
@@ -740,7 +740,7 @@ function parseProductBlock(block, lineNumber) {
     name: '',
     price: 0,
     stock: 0,
-    category: '其他產品',
+    category: '其他',
     description: '',
     multi_discount: {},
     is_active: true
@@ -760,7 +760,7 @@ function parseProductBlock(block, lineNumber) {
       product.stock = parseInt(line.substring(colonIndex + 1).trim()) || 0;
     } else if (line.includes('分類：') || line.includes('分類:')) {
       const colonIndex = line.indexOf('：') !== -1 ? line.indexOf('：') : line.indexOf(':');
-      product.category = line.substring(colonIndex + 1).trim() || '其他產品';
+      product.category = line.substring(colonIndex + 1).trim() || '其他';
     } else if (line.includes('描述：') || line.includes('描述:')) {
       const colonIndex = line.indexOf('：') !== -1 ? line.indexOf('：') : line.indexOf(':');
       product.description = line.substring(colonIndex + 1).trim();
@@ -844,7 +844,7 @@ router.get('/admin/batch-import/template', (req, res) => {
 # 5. 文件編碼: UTF-8
 # 6. 注意：庫存由規格管理，產品表不存儲庫存
 #
-# 可用分類: 一次性拋棄式電子煙、注油式主機與耗材、拋棄式通用煙蛋系列、小煙油系列、其他產品
+# 可用分類: 其他
 #
 # 多件優惠格式: {"數量": 折扣係數}
 # 例如: {"2": 0.9, "5": 0.8} 表示買2件9折，買5件8折
@@ -854,7 +854,7 @@ router.get('/admin/batch-import/template', (req, res) => {
 名稱: OXVA NEXLIM 大蠻牛
 價格: 300
 庫存: 100
-分類: 一次性拋棄式電子煙
+分類: 其他
 描述: OXVA NeXLIM 是 OXVA 推出的最新一代電子煙設備，旨在為用戶提供卓越的體驗。主要特點包括強大的電池容量、雙網格技術、可調節功率範圍等功能。
 多件優惠: {"2": 0.9, "5": 0.8, "10": 0.7}
 是否啟用: true
@@ -885,7 +885,7 @@ router.get('/admin/batch-import/template', (req, res) => {
 名稱: 電子煙配件套裝
 價格: 120
 庫存: 80
-分類: 其他產品
+分類: 其他
 描述: 包含充電線、清潔工具、備用零件等，是電子煙用戶的必備配件。
 是否啟用: true
 ---`;
@@ -958,7 +958,7 @@ router.get('/categories/list', async (req, res) => {
       '注油式主機與耗材',
       '拋棄式通用煙蛋系列',
       '小煙油系列',
-      '其他產品'
+      '其他'
     ];
     
     const allCategories = [...new Set([...standardCategories, ...categoryList])];

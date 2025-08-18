@@ -28,11 +28,7 @@ async function migrateAddProductCategoriesTable() {
       console.log('📝 插入預設產品分類...');
       
       const defaultCategories = [
-        { name: '一次性拋棄式電子煙', description: '一次性使用的電子煙產品', sort_order: 1 },
-        { name: '注油式主機與耗材', description: '可重複使用的電子煙主機及相關耗材', sort_order: 2 },
-        { name: '拋棄式通用煙蛋系列', description: '通用型拋棄式煙蛋產品', sort_order: 3 },
-        { name: '小煙油系列', description: '小容量煙油產品', sort_order: 4 },
-        { name: '其他產品', description: '其他相關產品', sort_order: 5 }
+        { name: '其他', description: '其他相關產品', sort_order: 1 }
       ];
 
       for (const category of defaultCategories) {
