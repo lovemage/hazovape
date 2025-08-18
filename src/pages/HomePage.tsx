@@ -8,6 +8,7 @@ import { announcementAPI, productAPI, settingsAPI, productCategoryAPI } from '..
 import { getProductImageUrl } from '../utils/imageUtils';
 import { Announcement, Product } from '../types';
 import { FloatingContactButtons } from '../components/FloatingContactButtons';
+import { HeroCarousel } from '../components/HeroCarousel';
 
 interface ProductCategory {
   id: number;
@@ -39,6 +40,7 @@ export const HomePage: React.FC = () => {
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [heroBackgroundImage, setHeroBackgroundImage] = useState<string>('');
+  const [heroImages, setHeroImages] = useState<string[]>([]);
 
   // 載入產品分類
   const loadCategories = useCallback(async () => {
@@ -143,6 +145,23 @@ export const HomePage: React.FC = () => {
           setHeroBackgroundImage(settings.hero_background_image);
           console.log('🏠 Hero 背景圖片載入成功:', settings.hero_background_image);
         }
+        
+        // 載入Hero輪播圖片（支援最多3張）
+        const heroImageUrls = [];
+        for (let i = 1; i <= 3; i++) {
+          const imageKey = `hero_image_${i}`;
+          if (settings[imageKey]) {
+            heroImageUrls.push(settings[imageKey]);
+            console.log(`🏠 Hero輪播圖片${i}載入成功:`, settings[imageKey]);
+          }
+        }
+        
+        // 如果沒有輪播圖片但有背景圖片，使用背景圖片
+        if (heroImageUrls.length === 0 && settings.hero_background_image) {
+          heroImageUrls.push(settings.hero_background_image);
+        }
+        
+        setHeroImages(heroImageUrls);
         if (settings.homepage_section_enabled !== undefined) {
           const enabled = settings.homepage_section_enabled === 'true' || settings.homepage_section_enabled === true;
           setSectionEnabled(enabled);
@@ -360,42 +379,13 @@ export const HomePage: React.FC = () => {
         </div>
       )}
       
-      {/* Hero 區域 */}
-      <div 
-        className="relative min-h-[38vh] md:min-h-screen bg-contain bg-center bg-no-repeat overflow-hidden pt-16"
-        style={{
-          backgroundImage: `url('${heroBackgroundImage || '/images/seep-vape-hero.png'}')`,
-          backgroundSize: 'contain'
-        }}
-      >
-        {/* 內容覆蓋層 */}
-        <div className="relative z-10 flex items-center justify-center min-h-[calc(38vh-4rem)] md:min-h-[calc(100vh-4rem)]">
-          <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl">
-            
-            {/* Hero 區域標題（僅在啟用且有內容時顯示） */}
-            {heroEnabled && (
-              <>
-                {/* 主標題 */}
-                {homepageTitle && (
-                  <h1 className="text-4xl md:text-7xl lg:text-8xl font-bold mb-2 md:mb-6 bg-gradient-to-r from-gray-800 via-gray-600 to-gray-800 bg-clip-text text-transparent drop-shadow-2xl">
-                    {homepageTitle}
-                  </h1>
-                )}
-                
-                {/* 副標題 */}
-                {homepageSubtitle && (
-                  <p className="text-lg md:text-2xl lg:text-3xl text-gray-700 mb-4 md:mb-12 leading-relaxed font-medium drop-shadow-lg max-w-3xl mx-auto">
-                    {homepageSubtitle}
-                  </p>
-                )}
-              </>
-            )}
-            
-            
-          </div>
-        </div>
-        
-      </div>
+      {/* Hero 輪播區域 */}
+      <HeroCarousel 
+        images={heroImages}
+        heroEnabled={heroEnabled}
+        homepageTitle={homepageTitle}
+        homepageSubtitle={homepageSubtitle}
+      />
 
       {/* 標題副標題區塊 */}
       {sectionEnabled && (
@@ -463,7 +453,7 @@ export const HomePage: React.FC = () => {
                     onClick={() => handleProductClick(product)}
                     className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer"
                   >
-                    <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
+                    <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
                       <img
                         src={getProductImageUrl(product)}
                         alt={product.name}
@@ -500,7 +490,7 @@ export const HomePage: React.FC = () => {
                       onClick={() => handleProductClick(product)}
                       className="flex-none w-72 bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer snap-start"
                     >
-                      <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
+                      <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
                         <img
                           src={getProductImageUrl(product)}
                           alt={product.name}

@@ -38,7 +38,7 @@ export const FlavorForm: React.FC<FlavorFormProps> = ({
     name: '',
     product_id: productId || 0,
     category_id: 1,
-    stock: 0,
+    stock: 99,
     sort_order: 0,
     price: '', // 新增價格字段
     is_active: true

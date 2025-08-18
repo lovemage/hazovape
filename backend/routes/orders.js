@@ -73,31 +73,32 @@ async function sendTelegramNotification(order, orderItems) {
     const telegramBot = new TelegramBot(config.token, { polling: false });
 
     const itemsText = orderItems.map(item => {
-      let flavorsText = '無';
+      // 改為規格格式顯示
+      let flavorsText = '';
       try {
         if (item.flavors) {
           const flavors = JSON.parse(item.flavors);
           if (Array.isArray(flavors) && flavors.length > 0) {
-            flavorsText = flavors.join(', ');
+            flavorsText = `-${flavors.map((flavor, index) => `${flavor}${item.quantity}`).join(' ')}`;
           }
         }
       } catch (error) {
-        flavorsText = '無';
+        flavorsText = '';
       }
-      return `${item.product_name} x${item.quantity} - $${item.subtotal} (口味: ${flavorsText})`;
+      return `${item.product_name}${flavorsText} x${item.quantity} - ${Math.floor(item.subtotal)}元`;
     }).join('\n');
 
     // 準備優惠券信息
     let couponInfo = '';
     if (order.coupon_code && order.discount_amount && order.discount_amount > 0) {
-      couponInfo = `\n🎫 優惠券: ${order.coupon_code} (折扣: $${order.discount_amount})`;
+      couponInfo = `\n🎫 優惠券: ${order.coupon_code} (折扣: ${Math.floor(order.discount_amount)}元)`;
     }
 
     // 計算原始金額（如果有折扣）
-    let amountInfo = `💰 總金額: $${order.total_amount}`;
+    let amountInfo = `💰 總金額: ${Math.floor(order.total_amount)}元`;
     if (order.discount_amount && order.discount_amount > 0) {
       const originalAmount = parseInt(order.total_amount) + parseInt(order.discount_amount);
-      amountInfo = `💰 原價: $${originalAmount}\n💰 折扣後: $${order.total_amount}`;
+      amountInfo = `💰 原價: ${Math.floor(originalAmount)}元\n💰 折扣後: ${Math.floor(order.total_amount)}元`;
     }
 
     const message = `
@@ -108,7 +109,7 @@ async function sendTelegramNotification(order, orderItems) {
 📞 電話: ${order.customer_phone}
 🏪 店號: ${order.store_number}
 ${amountInfo}${couponInfo}
-🕐 下單時間: ${order.created_at}
+🕐 下單時間: ${new Date(order.created_at).toLocaleDateString('zh-TW').replace(/\//g, '/') + ' ' + new Date(order.created_at).toLocaleTimeString('zh-TW', { hour12: false }).slice(0, 5)}
 
 📦 訂購商品:
 ${itemsText}
@@ -461,10 +462,18 @@ router.post('/', async (req, res) => {
       const order = await Database.get('SELECT * FROM orders WHERE id = ?', [orderResult.id]);
       const orderItems = await Database.all('SELECT * FROM order_items WHERE order_id = ?', [orderResult.id]);
 
-      // 發送 Telegram 通知
-      const telegramSent = await sendTelegramNotification(order, orderItems);
-      if (telegramSent) {
-        await Database.run('UPDATE orders SET telegram_sent = true WHERE id = ?', [orderResult.id]);
+      // 發送 Telegram 通知（不影響訂單創建）
+      try {
+        const telegramSent = await sendTelegramNotification(order, orderItems);
+        if (telegramSent) {
+          await Database.run('UPDATE orders SET telegram_sent = true WHERE id = ?', [orderResult.id]);
+          console.log('✅ Telegram通知發送成功並已標記');
+        } else {
+          console.log('⚠️  Telegram通知發送失敗，但訂單創建成功');
+        }
+      } catch (telegramError) {
+        console.error('⚠️  Telegram通知發送異常:', telegramError.message);
+        console.log('✅ 訂單仍正常創建，Telegram通知可稍後重發');
       }
 
       res.json({

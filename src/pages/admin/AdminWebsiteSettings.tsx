@@ -163,8 +163,26 @@ export const AdminWebsiteSettings: React.FC = () => {
         },
         {
           key: 'hero_background_image',
-          label: 'Hero 背景圖片',
-          description: '首頁 Hero 區域的背景圖片（建議尺寸：1920x1080 或更高）',
+          label: 'Hero 背景圖片（舊版）',
+          description: '首頁 Hero 區域的背景圖片（建議尺寸：1920x1080 或更高）- 僅在未設置輪播圖片時使用',
+          type: 'image'
+        },
+        {
+          key: 'hero_image_1',
+          label: 'Hero 輪播圖片 1',
+          description: 'Hero 區域輪播的第一張圖片（建議尺寸：1920x1080 或更高）',
+          type: 'image'
+        },
+        {
+          key: 'hero_image_2',
+          label: 'Hero 輪播圖片 2',
+          description: 'Hero 區域輪播的第二張圖片（建議尺寸：1920x1080 或更高）',
+          type: 'image'
+        },
+        {
+          key: 'hero_image_3',
+          label: 'Hero 輪播圖片 3',
+          description: 'Hero 區域輪播的第三張圖片（建議尺寸：1920x1080 或更高）',
           type: 'image'
         },
         {

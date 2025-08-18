@@ -45,7 +45,7 @@ async function testTelegramConfig() {
 
     // 測試發送消息
     console.log('💬 發送測試消息...');
-    const testMessage = `🧪 VJ Vape Telegram 測試
+    const testMessage = `🧪 Hazo Telegram 測試
     
 ✅ Bot 連接成功！
 🕐 測試時間: ${new Date().toLocaleString('zh-TW')}

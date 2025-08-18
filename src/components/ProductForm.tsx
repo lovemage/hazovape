@@ -334,31 +334,18 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               />
             </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="price">價格 *</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={formData.price}
-                    onChange={(e) => handleInputChange('price', parseInt(e.target.value) || 0)}
-                    placeholder="0"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="stock">庫存</Label>
-                  <Input
-                    id="stock"
-                    type="number"
-                    min="0"
-                    value={formData.stock}
-                    onChange={(e) => handleInputChange('stock', parseInt(e.target.value) || 0)}
-                    placeholder="0"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="price">價格 *</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={formData.price}
+                  onChange={(e) => handleInputChange('price', parseInt(e.target.value) || 0)}
+                  placeholder="0"
+                  required
+                />
               </div>
 
               <div>

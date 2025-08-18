@@ -27,7 +27,7 @@ export const BatchFlavorForm: React.FC<BatchFlavorFormProps> = ({
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Set<number>>(new Set());
   const [flavorTemplates, setFlavorTemplates] = useState<FlavorTemplate[]>([
-    { name: '', sortOrder: 1, stockQuantity: 0 }
+    { name: '', sortOrder: 1, stockQuantity: 99 }
   ]);
   const [loading, setLoading] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -77,7 +77,7 @@ export const BatchFlavorForm: React.FC<BatchFlavorFormProps> = ({
       { 
         name: '', 
         sortOrder: prev.length + 1, 
-        stockQuantity: 0 
+        stockQuantity: 99 
       }
     ]);
   };
