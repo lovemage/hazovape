@@ -324,13 +324,13 @@ async function initializePostgreSQL() {
     }
 
     // 插入範例公告
-    await pool.query(`
-      INSERT INTO announcements (title, content, type, is_active, sort_order)
-      VALUES 
-        ('歡迎來到 MeelFull', '我們提供最優質的產品，感謝您的支持！', 'info', true, 10),
-        ('新品上架通知', '精選茶葉禮盒現已上架，限時優惠中！', 'success', true, 5)
-      ON CONFLICT DO NOTHING
-    `);
+    // await pool.query(`
+    //   INSERT INTO announcements (title, content, type, is_active, sort_order)
+    //   VALUES 
+    //     ('歡迎來到 MeelFull', '我們提供最優質的產品，感謝您的支持！', 'info', true, 10),
+    //     ('新品上架通知', '精選茶葉禮盒現已上架，限時優惠中！', 'success', true, 5)
+    //   ON CONFLICT DO NOTHING
+    // `);
 
     console.log('✅ 默認設置已插入');
     console.log('🎉 PostgreSQL 數據庫初始化完成！');

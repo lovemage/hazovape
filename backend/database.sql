@@ -117,9 +117,9 @@ INSERT INTO products (name, price, multi_discount, images) VALUES
 ('手工餅乾組合', 149.00, '{"3": 0.85, "5": 0.75}', '["product3_1.jpg", "product3_2.jpg", "product3_3.jpg"]');
 
 -- 插入示例公告
-INSERT INTO announcements (title, content, priority) VALUES
-('歡迎來到 Mist Mall', '我們提供最優質的茶葉、咖啡和手工餅乾，感謝您的支持！', 10),
-('新品上架通知', '精選茶葉禮盒現已上架，限時優惠中！', 5);
+-- INSERT INTO announcements (title, content, priority) VALUES
+-- ('歡迎來到 Mist Mall', '我們提供最優質的茶葉、咖啡和手工餅乾，感謝您的支持！', 10),
+-- ('新品上架通知', '精選茶葉禮盒現已上架，限時優惠中！', 5);
 
 -- 插入網站設置
 INSERT INTO site_settings (setting_key, setting_value, setting_type, description, category) VALUES

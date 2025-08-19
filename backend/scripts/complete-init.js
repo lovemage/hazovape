@@ -168,14 +168,14 @@ async function completeInit() {
     }
     
     // 6. 創建示例公告
-    console.log('6. 創建示例公告...');
+    console.log('6. 跳過創建示例公告...');
     const announcementCount = await Database.get('SELECT COUNT(*) as count FROM announcements');
     if (announcementCount.count === 0) {
-      await Database.run(
-        'INSERT INTO announcements (title, content, is_active, priority) VALUES (?, ?, ?, ?)',
-        ['歡迎來到 Mist Mall', '感謝您選擇我們的商品！我們提供最優質的茶葉和咖啡產品。', 1, 1]
-      );
-      console.log('✅ 創建示例公告');
+      // await Database.run(
+      //   'INSERT INTO announcements (title, content, is_active, priority) VALUES (?, ?, ?, ?)',
+      //   ['歡迎來到 Mist Mall', '感謝您選擇我們的商品！我們提供最優質的茶葉和咖啡產品。', 1, 1]
+      // );
+      console.log('⏭️ 跳過創建示例公告');
     }
     
     // 7. 驗證數據
