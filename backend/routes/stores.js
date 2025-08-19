@@ -334,6 +334,7 @@ router.post('/map-callback', (req, res) => {
             <div id="status" class="status">正在處理門市選擇...</div>
             <div>
                 <button class="button" onclick="retryCallback()">重新傳送</button>
+                <button class="button" onclick="checkAndTransfer()">檢查並傳送</button>
                 <button class="button" onclick="copyStoreInfo()">複製門市資訊</button>
                 <button class="button" onclick="closeWindow()">關閉視窗</button>
             </div>
@@ -446,6 +447,85 @@ router.post('/map-callback', (req, res) => {
                 } else {
                     updateStatus('❌ 已達最大重試次數', 'error');
                 }
+            }
+
+            function checkAndTransfer() {
+                console.log('🔍 手動檢查與傳送');
+                
+                // 檢查 localStorage 中的數據
+                try {
+                    const storedData = localStorage.getItem('ecpay_store_selection');
+                    console.log('📦 localStorage 數據:', storedData);
+                    
+                    if (storedData) {
+                        const parsedData = JSON.parse(storedData);
+                        console.log('📦 解析後的數據:', parsedData);
+                        updateStatus('✅ localStorage 中找到門市數據', 'success');
+                    } else {
+                        updateStatus('⚠️ localStorage 中沒有門市數據', 'info');
+                    }
+                } catch (error) {
+                    console.error('❌ 檢查 localStorage 失敗:', error);
+                    updateStatus('❌ 檢查 localStorage 失敗', 'error');
+                }
+                
+                // 嘗試通過不同方法傳送數據
+                updateStatus('🔄 嘗試多種傳送方法...', 'info');
+                
+                // 方法1: 直接重新儲存並觸發事件
+                const storeSelectionData = {
+                    timestamp: Date.now(),
+                    storeData: storeData,
+                    source: 'ecpay_callback_manual'
+                };
+                
+                localStorage.setItem('ecpay_store_selection_manual', JSON.stringify(storeSelectionData));
+                
+                // 方法2: 嘗試向主域發送消息
+                try {
+                    const mainSiteUrl = window.location.origin;
+                    console.log('🌐 主站 URL:', mainSiteUrl);
+                    
+                    // 嘗試向所有可能的窗口發送消息
+                    if (window.opener) {
+                        window.opener.postMessage({
+                            type: 'ECPAY_STORE_SELECTION',
+                            data: storeData,
+                            source: 'manual_transfer'
+                        }, '*');
+                        updateStatus('📡 已發送 postMessage 到 opener', 'success');
+                    }
+                    
+                    // 嘗試向當前窗口的父窗口發送
+                    if (window.parent && window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'ECPAY_STORE_SELECTION',
+                            data: storeData,
+                            source: 'manual_transfer'
+                        }, '*');
+                        updateStatus('📡 已發送 postMessage 到 parent', 'success');
+                    }
+                    
+                } catch (postError) {
+                    console.error('❌ postMessage 失敗:', postError);
+                }
+                
+                // 方法3: 嘗試重定向到主站並帶參數
+                setTimeout(() => {
+                    const mainSiteUrl = window.location.origin;
+                    const params = new URLSearchParams({
+                        storeId: storeData.storeId,
+                        storeName: storeData.storeName,
+                        storeAddress: storeData.storeAddress,
+                        from: 'ecpay_callback'
+                    });
+                    
+                    const redirectUrl = \`\${mainSiteUrl}/checkout?\${params.toString()}\`;
+                    console.log('🔄 準備重定向到:', redirectUrl);
+                    updateStatus('🔄 正在重定向到結帳頁面...', 'info');
+                    
+                    window.location.href = redirectUrl;
+                }, 2000);
             }
 
             function copyStoreInfo() {

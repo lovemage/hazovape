@@ -72,13 +72,15 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
     const handleMessage = (event: MessageEvent) => {
       console.log('📨 收到 postMessage:', event.data);
       
-      if (event.data && event.data.type === 'STORE_SELECTION' && event.data.data) {
+      if (event.data && (event.data.type === 'STORE_SELECTION' || event.data.type === 'ECPAY_STORE_SELECTION') && event.data.data) {
         const ecpayStoreData = event.data.data;
         console.log('📨 通過 postMessage 收到門市數據:', ecpayStoreData);
         
         // 使用同樣的處理邏輯
-        if (window.handleStoreSelection) {
+        if (typeof (window as any).handleStoreSelection === 'function') {
           (window as any).handleStoreSelection(ecpayStoreData);
+        } else {
+          console.error('❌ postMessage handleStoreSelection 函數不存在');
         }
       }
     };
@@ -87,7 +89,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
     const handleStorageChange = (event: StorageEvent) => {
       console.log('📦 收到 localStorage 變化:', event.key, event.newValue);
       
-      if (event.key === 'ecpay_store_selection' && event.newValue) {
+      if ((event.key === 'ecpay_store_selection' || event.key === 'ecpay_store_selection_manual') && event.newValue) {
         try {
           const selectionData = JSON.parse(event.newValue);
           console.log('📦 解析 localStorage 門市數據:', selectionData);
@@ -121,6 +123,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
     // 檢查是否有遺留的 localStorage 數據 (頁面刷新場景)
     const checkExistingStorageData = () => {
       try {
+        // 檢查普通回調數據
         const existingData = localStorage.getItem('ecpay_store_selection');
         if (existingData) {
           const selectionData = JSON.parse(existingData);
@@ -141,6 +144,30 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
           } else if (timeDiff >= 30000) {
             // 清理過期數據
             localStorage.removeItem('ecpay_store_selection');
+          }
+        }
+        
+        // 檢查手動回調數據
+        const manualData = localStorage.getItem('ecpay_store_selection_manual');
+        if (manualData) {
+          console.log('🔄 發現手動 localStorage 門市數據');
+          const selectionData = JSON.parse(manualData);
+          const timeDiff = Date.now() - selectionData.timestamp;
+          
+          if (timeDiff < 60000 && selectionData.storeData) { // 手動數據給60秒
+            console.log('🔄 手動檢查數據:', selectionData.storeData);
+            
+            if (typeof (window as any).handleStoreSelection === 'function') {
+              (window as any).handleStoreSelection(selectionData.storeData);
+              console.log('✅ 手動檢查 handleStoreSelection 調用完成');
+            } else {
+              console.error('❌ 手動檢查 handleStoreSelection 函數不存在');
+            }
+            
+            localStorage.removeItem('ecpay_store_selection_manual');
+          } else {
+            // 清理過期數據
+            localStorage.removeItem('ecpay_store_selection_manual');
           }
         }
       } catch (error) {
