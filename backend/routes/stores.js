@@ -361,35 +361,67 @@ router.post('/map-callback', (req, res) => {
             function sendStoreDataToParent() {
                 return new Promise((resolve, reject) => {
                     try {
-                        console.log('🔄 嘗試傳送門市數據到父視窗, 嘗試次數:', callbackAttempts + 1);
+                        console.log('🔄 嘗試傳送門市數據，嘗試次數:', callbackAttempts + 1);
+                        console.log('🔄 門市數據:', storeData);
                         
-                        // 檢查父視窗是否存在且可訪問
-                        if (!window.opener) {
-                            throw new Error('找不到父視窗');
+                        let success = false;
+                        
+                        // 方法 1: 嘗試使用 window.opener (傳統彈窗方式)
+                        try {
+                            if (window.opener && !window.opener.closed && typeof window.opener.handleStoreSelection === 'function') {
+                                console.log('✅ 找到 handleStoreSelection 函數，執行回調');
+                                window.opener.handleStoreSelection(storeData);
+                                updateStatus('✅ 門市資訊已成功傳送 (window.opener)', 'success');
+                                success = true;
+                            }
+                        } catch (openerError) {
+                            console.log('⚠️ window.opener 方法失敗:', openerError.message);
                         }
                         
-                        if (window.opener.closed) {
-                            throw new Error('父視窗已關閉');
+                        // 方法 2: 使用 localStorage 作為跨標籤頁通訊 (ECPay 回調常用)
+                        if (!success) {
+                            console.log('🔄 使用 localStorage 儲存門市數據');
+                            
+                            const storeSelectionData = {
+                                timestamp: Date.now(),
+                                storeData: storeData,
+                                source: 'ecpay_callback'
+                            };
+                            
+                            localStorage.setItem('ecpay_store_selection', JSON.stringify(storeSelectionData));
+                            
+                            // 觸發 storage 事件來通知其他標籤頁
+                            window.dispatchEvent(new StorageEvent('storage', {
+                                key: 'ecpay_store_selection',
+                                newValue: JSON.stringify(storeSelectionData),
+                                oldValue: null
+                            }));
+                            
+                            updateStatus('✅ 門市資訊已儲存至 localStorage', 'success');
+                            success = true;
                         }
-
-                        // 嘗試呼叫父視窗的回調函數
-                        if (typeof window.opener.handleStoreSelection === 'function') {
-                            console.log('✅ 找到 handleStoreSelection 函數，執行回調');
-                            window.opener.handleStoreSelection(storeData);
-                            updateStatus('✅ 門市資訊已成功傳送', 'success');
+                        
+                        // 方法 3: 嘗試 postMessage 到所有可能的視窗
+                        if (!success) {
+                            try {
+                                if (window.opener) {
+                                    console.log('🔄 嘗試使用 postMessage');
+                                    window.opener.postMessage({
+                                        type: 'STORE_SELECTION',
+                                        data: storeData
+                                    }, '*');
+                                    updateStatus('📡 已使用 postMessage 傳送', 'success');
+                                    success = true;
+                                }
+                            } catch (postMessageError) {
+                                console.log('⚠️ postMessage 方法失敗:', postMessageError.message);
+                            }
+                        }
+                        
+                        if (success) {
                             resolve(true);
                         } else {
-                            console.log('❌ 父視窗中找不到 handleStoreSelection 函數');
-                            
-                            // 嘗試使用 postMessage 作為備選方案
-                            console.log('🔄 嘗試使用 postMessage');
-                            window.opener.postMessage({
-                                type: 'STORE_SELECTION',
-                                data: storeData
-                            }, '*');
-                            
-                            updateStatus('📡 已使用 postMessage 傳送', 'success');
-                            resolve(true);
+                            throw new Error('所有傳送方法都失敗');
                         }
                         
                     } catch (error) {
@@ -461,6 +493,17 @@ router.post('/map-callback', (req, res) => {
                     } catch (error) {
                         console.error('❌ 關閉視窗失敗:', error);
                         updateStatus('❌ 無法自動關閉，請手動關閉視窗', 'error');
+                        
+                        // 如果無法關閉，嘗試重定向回主站
+                        setTimeout(() => {
+                            try {
+                                const mainSiteUrl = window.location.origin;
+                                updateStatus('🔄 重定向回主站...', 'info');
+                                window.location.href = mainSiteUrl;
+                            } catch (redirectError) {
+                                console.error('❌ 重定向失敗:', redirectError);
+                            }
+                        }, 2000);
                     }
                 }, 1000);
             }

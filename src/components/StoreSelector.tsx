@@ -72,12 +72,67 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
       }
     };
 
+    // 設定 localStorage 監聽器 (主要回調方案)
+    const handleStorageChange = (event: StorageEvent) => {
+      console.log('📦 收到 localStorage 變化:', event.key, event.newValue);
+      
+      if (event.key === 'ecpay_store_selection' && event.newValue) {
+        try {
+          const selectionData = JSON.parse(event.newValue);
+          console.log('📦 解析 localStorage 門市數據:', selectionData);
+          
+          if (selectionData.storeData && selectionData.source === 'ecpay_callback') {
+            // 檢查時間戳，只處理最近 30 秒內的數據
+            const timeDiff = Date.now() - selectionData.timestamp;
+            if (timeDiff < 30000) { // 30秒內
+              console.log('✅ 通過 localStorage 收到有效門市數據');
+              (window as any).handleStoreSelection(selectionData.storeData);
+              
+              // 清理 localStorage 數據
+              localStorage.removeItem('ecpay_store_selection');
+            } else {
+              console.log('⚠️ localStorage 數據過期，忽略');
+            }
+          }
+        } catch (error) {
+          console.error('❌ 解析 localStorage 數據失敗:', error);
+        }
+      }
+    };
+
+    // 檢查是否有遺留的 localStorage 數據 (頁面刷新場景)
+    const checkExistingStorageData = () => {
+      try {
+        const existingData = localStorage.getItem('ecpay_store_selection');
+        if (existingData) {
+          const selectionData = JSON.parse(existingData);
+          const timeDiff = Date.now() - selectionData.timestamp;
+          
+          if (timeDiff < 30000 && selectionData.storeData && selectionData.source === 'ecpay_callback') {
+            console.log('🔄 發現有效的 localStorage 門市數據，自動載入');
+            (window as any).handleStoreSelection(selectionData.storeData);
+            localStorage.removeItem('ecpay_store_selection');
+          } else if (timeDiff >= 30000) {
+            // 清理過期數據
+            localStorage.removeItem('ecpay_store_selection');
+          }
+        }
+      } catch (error) {
+        console.error('❌ 檢查 localStorage 數據失敗:', error);
+      }
+    };
+
     window.addEventListener('message', handleMessage);
+    window.addEventListener('storage', handleStorageChange);
+    
+    // 初始檢查
+    checkExistingStorageData();
 
     // 清理函數
     return () => {
       delete (window as any).handleStoreSelection;
       window.removeEventListener('message', handleMessage);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, [onStoreSelect]);
 
