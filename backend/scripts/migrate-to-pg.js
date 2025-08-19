@@ -281,13 +281,13 @@ async function initializePostgreSQL() {
     }
 
     // 插入範例產品和分類
-    await pool.query(`
-      INSERT INTO product_categories (name, description, sort_order, is_active)
-      VALUES ('茶葉系列', '精選茶葉產品', 1, true), 
-             ('咖啡系列', '優質咖啡豆', 2, true),
-             ('點心系列', '手工製作點心', 3, true)
-      ON CONFLICT DO NOTHING
-    `);
+    // await pool.query(`
+    //   INSERT INTO product_categories (name, description, sort_order, is_active)
+    //   VALUES ('茶葉系列', '精選茶葉產品', 1, true), 
+    //          ('咖啡系列', '優質咖啡豆', 2, true),
+    //          ('點心系列', '手工製作點心', 3, true)
+    //   ON CONFLICT DO NOTHING
+    // `);
 
     // 檢查是否已有產品，如果有則跳過插入範例產品
     const existingProducts = await pool.query('SELECT COUNT(*) as count FROM products');
