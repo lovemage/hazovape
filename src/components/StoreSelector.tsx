@@ -53,7 +53,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
   }, [onStoreSelect]);
 
   // 開啟綠界電子地圖選擇器
-  const openMapSelector = useCallback(async (logisticsSubType: string = 'UNIMART') => {
+  const openMapSelector = useCallback(async (logisticsSubType: string = 'UNIMARTC2C') => {
     setIsLoading(true);
     
     try {
@@ -144,12 +144,12 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
         <div className="flex justify-center">
           <Button
             type="button"
-            onClick={() => openMapSelector('UNIMART')}
+            onClick={() => openMapSelector('UNIMARTC2C')}
             disabled={isLoading}
             className="flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg font-medium"
           >
             <MapPin className="w-5 h-5" />
-            選擇 7-ELEVEN 門市
+            選擇 7-ELEVEN 門市 (超商交貨便)
           </Button>
         </div>
 

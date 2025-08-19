@@ -207,7 +207,7 @@ router.get('/meta/locations', async (req, res) => {
 router.post('/map-selector', async (req, res) => {
   try {
     const {
-      logisticsSubType = 'UNIMART', // 只支援 UNIMART: 7-ELEVEN
+      logisticsSubType = 'UNIMARTC2C', // C2C: UNIMARTC2C (7-ELEVEN超商交貨便)
       isCollection = 'N',
       extraData = '',
       device = 0  // 0: PC, 1: Mobile

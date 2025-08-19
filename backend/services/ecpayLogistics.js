@@ -2,19 +2,18 @@ const crypto = require('crypto');
 
 class ECPayLogistics {
   constructor() {
-    // 綠界物流API設定 - 檢查環境和商店配對
-    // 如果商店代號3466445不支援正式環境的UNIMART，先改回測試環境
-    this.storeListUrl = 'https://logistics-stage.ecpay.com.tw/Helper/GetStoreList';
-    this.mapUrl = 'https://logistics-stage.ecpay.com.tw/Express/map';
-    this.merchantID = process.env.ECPAY_MERCHANT_ID || '2000132';
+    // 綠界物流API設定 - 正式環境C2C
+    this.storeListUrl = 'https://logistics.ecpay.com.tw/Helper/GetStoreList';
+    this.mapUrl = 'https://logistics.ecpay.com.tw/Express/map';
+    this.merchantID = process.env.ECPAY_MERCHANT_ID || '3466445';
     this.platformID = process.env.ECPAY_PLATFORM_ID || '';
-    this.hashKey = process.env.ECPAY_HASH_KEY || '5294y06JbISpM5x9';
-    this.hashIV = process.env.ECPAY_HASH_IV || 'v77hoKGq4kWxNNIS';
+    this.hashKey = process.env.ECPAY_HASH_KEY || 'u0mKtzqI07btGNNT';
+    this.hashIV = process.env.ECPAY_HASH_IV || 'ZjAbsWWZUvOu8NA0';
     
-    console.log('🔧 綠界API配置:');
+    console.log('🔧 綠界API配置 (正式環境C2C):');
     console.log('- 環境:', this.mapUrl.includes('stage') ? '測試環境' : '正式環境');
     console.log('- 商店代號:', this.merchantID);
-    console.log('- LogisticsSubType: UNIMART (7-ELEVEN)');
+    console.log('- 支援LogisticsSubType: UNIMARTC2C (7-ELEVEN超商交貨便)');
   }
 
   // 產生檢查碼 - 完全按照綠界官方規範
