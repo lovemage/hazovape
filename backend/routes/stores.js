@@ -498,7 +498,11 @@ router.post('/map-callback', (req, res) => {
     </html>
     `;
 
+    // 設定適當的頭部，允許內聯腳本執行
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Content-Security-Policy', 
+      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; form-action 'self' https://logistics.ecpay.com.tw https://logistics-stage.ecpay.com.tw;"
+    );
     res.send(callbackHtml);
 
   } catch (error) {

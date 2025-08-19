@@ -32,7 +32,19 @@ if (process.env.NODE_ENV === 'production') {
   console.log('✅ 已啟用 trust proxy 設置');
 }
 
-// 中間件
+// 中間件 - 為ECPay回調路由創建專用的CSP中間件
+const ecpayCallbackCSP = (req, res, next) => {
+  // 只對ECPay回調路由放寬CSP限制
+  if (req.path === '/api/stores/map-callback') {
+    res.setHeader('Content-Security-Policy', 
+      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; form-action 'self' https://logistics.ecpay.com.tw https://logistics-stage.ecpay.com.tw;"
+    );
+  }
+  next();
+};
+
+app.use(ecpayCallbackCSP);
+
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
