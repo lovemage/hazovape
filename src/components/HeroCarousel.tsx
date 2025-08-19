@@ -33,35 +33,33 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
 
   // 手動導航
   const goToPrevious = () => {
-    setIsAutoPlaying(false);
     setCurrentIndex((prev) => (prev - 1 + validImages.length) % validImages.length);
-    // 恢復自動播放
-    setTimeout(() => setIsAutoPlaying(true), 8000);
   };
 
   const goToNext = () => {
-    setIsAutoPlaying(false);
     setCurrentIndex((prev) => (prev + 1) % validImages.length);
-    // 恢復自動播放
-    setTimeout(() => setIsAutoPlaying(true), 8000);
   };
 
   const goToSlide = (index: number) => {
-    setIsAutoPlaying(false);
     setCurrentIndex(index);
-    // 恢復自動播放
-    setTimeout(() => setIsAutoPlaying(true), 8000);
   };
 
-  // 如果沒有圖片，使用默認背景
-  const currentImage = validImages.length > 0 ? validImages[currentIndex] : '/images/seep-vape-hero.png';
+  // 如果沒有圖片，不顯示任何背景
+  const currentImage = validImages.length > 0 ? validImages[currentIndex] : null;
+
+  // 如果沒有圖片且未啟用hero，不顯示整個組件
+  if (validImages.length === 0 && !heroEnabled) {
+    return null;
+  }
 
   return (
     <div 
-      className="relative min-h-[38vh] md:min-h-screen bg-contain bg-center bg-no-repeat overflow-hidden pt-16 transition-all duration-1000 ease-in-out"
+      className={`relative min-h-[38vh] md:min-h-screen overflow-hidden pt-16 transition-all duration-1000 ease-in-out ${
+        currentImage ? 'bg-contain bg-center bg-no-repeat' : 'bg-gradient-to-br from-gray-100 to-gray-200'
+      }`}
       style={{
-        backgroundImage: `url('${currentImage}')`,
-        backgroundSize: 'contain'
+        backgroundImage: currentImage ? `url('${currentImage}')` : undefined,
+        backgroundSize: currentImage ? 'contain' : undefined
       }}
     >
       {/* 內容覆蓋層 */}
