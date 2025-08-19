@@ -203,6 +203,85 @@ router.get('/meta/locations', async (req, res) => {
   }
 });
 
+// 生成電子地圖選擇器參數
+router.post('/map-selector', async (req, res) => {
+  try {
+    const {
+      logisticsSubType = 'UNIMART', // UNIMART: 7-ELEVEN, FAMI: 全家, HILIFE: 萊爾富, OKMART: OK超商
+      isCollection = 'N',
+      extraData = ''
+    } = req.body;
+
+    // 生成回傳URL
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://hazo-vape-48500ebcf15b.herokuapp.com'
+      : 'http://localhost:3001';
+    
+    const serverReplyURL = `${baseUrl}/api/stores/map-callback`;
+
+    console.log('🗺️ 開始生成電子地圖參數');
+    
+    const mapData = ecpayLogistics.generateMapParams({
+      logisticsSubType,
+      isCollection,
+      serverReplyURL,
+      extraData
+    });
+
+    res.json({
+      success: true,
+      message: '電子地圖參數生成成功',
+      ...mapData
+    });
+
+  } catch (error) {
+    console.error('❌ 生成電子地圖參數失敗:', error);
+    res.status(500).json({
+      success: false,
+      message: '生成電子地圖參數失敗',
+      error: error.message
+    });
+  }
+});
+
+// 電子地圖回傳處理
+router.post('/map-callback', (req, res) => {
+  try {
+    console.log('📍 收到電子地圖回傳:', req.body);
+    
+    const storeData = {
+      storeId: req.body.CVSStoreID || '',
+      storeName: req.body.CVSStoreName || '',
+      storeAddress: req.body.CVSAddress || '',
+      storeTelephone: req.body.CVSTelephone || '',
+      extraData: req.body.ExtraData || ''
+    };
+
+    // 回傳JavaScript來關閉彈窗並傳遞數據給父視窗
+    const callbackScript = `
+    <script>
+      try {
+        // 傳遞店舖資料給父視窗
+        if (window.opener && typeof window.opener.handleStoreSelection === 'function') {
+          window.opener.handleStoreSelection(${JSON.stringify(storeData)});
+        }
+        // 關閉彈出視窗
+        window.close();
+      } catch (error) {
+        console.error('回傳處理錯誤:', error);
+        alert('店舖選擇完成，請手動關閉此視窗');
+      }
+    </script>
+    `;
+
+    res.send(callbackScript);
+
+  } catch (error) {
+    console.error('❌ 電子地圖回傳處理失敗:', error);
+    res.status(500).send('處理失敗');
+  }
+});
+
 // 測試檢查碼生成的路由
 router.get('/test-checkmac', async (req, res) => {
   try {

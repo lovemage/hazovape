@@ -3,7 +3,8 @@ const crypto = require('crypto');
 class ECPayLogistics {
   constructor() {
     // 綠界物流API設定 - 使用測試環境
-    this.apiUrl = 'https://logistics-stage.ecpay.com.tw/Helper/GetStoreList';
+    this.storeListUrl = 'https://logistics-stage.ecpay.com.tw/Helper/GetStoreList';
+    this.mapUrl = 'https://logistics-stage.ecpay.com.tw/Express/map';
     this.merchantID = process.env.ECPAY_MERCHANT_ID || '2000132';
     this.platformID = process.env.ECPAY_PLATFORM_ID || '';
     this.hashKey = process.env.ECPAY_HASH_KEY || '5294y06JbISpM5x9';
@@ -112,7 +113,7 @@ class ECPayLogistics {
       console.log('📤 POST請求體內容:', formData.toString());
 
       // 發送API請求
-      const response = await fetch(this.apiUrl, {
+      const response = await fetch(this.storeListUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -301,6 +302,76 @@ class ECPayLogistics {
         checkMacValue: ourCheckMac
       }
     };
+  }
+
+  // 生成電子地圖選擇器參數
+  generateMapParams(options = {}) {
+    try {
+      const {
+        logisticsType = 'CVS',
+        logisticsSubType = 'UNIMART',
+        isCollection = 'N',
+        serverReplyURL,
+        extraData = ''
+      } = options;
+
+      // 基本參數
+      const params = {
+        MerchantID: this.merchantID,
+        LogisticsType: logisticsType,
+        LogisticsSubType: logisticsSubType,
+        IsCollection: isCollection,
+        ExtraData: extraData
+      };
+
+      // 添加回傳URL（如果提供）
+      if (serverReplyURL) {
+        params.ServerReplyURL = serverReplyURL;
+      }
+
+      // 只有當PlatformID有值時才加入
+      if (this.platformID && this.platformID.trim()) {
+        params.PlatformID = this.platformID;
+      }
+
+      // 生成檢查碼
+      const checkMacValue = this.generateCheckMacValue(params);
+      
+      const finalParams = {
+        ...params,
+        CheckMacValue: checkMacValue
+      };
+
+      console.log('🗺️ 電子地圖參數生成完成:', {
+        ...finalParams,
+        CheckMacValue: finalParams.CheckMacValue.substring(0, 10) + '...'
+      });
+
+      return {
+        url: this.mapUrl,
+        params: finalParams,
+        formHtml: this.generateMapFormHtml(finalParams)
+      };
+
+    } catch (error) {
+      console.error('❌ 生成電子地圖參數失敗:', error);
+      throw error;
+    }
+  }
+
+  // 生成電子地圖表單HTML
+  generateMapFormHtml(params) {
+    let formHtml = `<form id="ecpayForm" method="post" action="${this.mapUrl}" target="_blank">\n`;
+    
+    Object.keys(params).forEach(key => {
+      formHtml += `  <input type="hidden" name="${key}" value="${params[key]}" />\n`;
+    });
+    
+    formHtml += `  <input type="submit" value="選擇門市" />\n`;
+    formHtml += `</form>\n`;
+    formHtml += `<script>document.getElementById('ecpayForm').submit();</script>`;
+    
+    return formHtml;
   }
 }
 
