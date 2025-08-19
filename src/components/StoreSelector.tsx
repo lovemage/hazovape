@@ -33,6 +33,9 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
 
   // 設定全域回調函數來接收綠界地圖選擇結果
   useEffect(() => {
+    console.log('🔧 StoreSelector useEffect 執行，設定回調函數');
+    console.log('🔧 onStoreSelect 函數:', onStoreSelect);
+    
     // 在window上設定回調函數
     (window as any).handleStoreSelection = (ecpayStoreData: EcpayStoreData) => {
       console.log('🏪 收到門市選擇回調:', ecpayStoreData);
@@ -45,8 +48,16 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
       };
       
       console.log('🏪 轉換後的門市數據:', storeData);
-      onStoreSelect(storeData);
-      toast.success(`已選擇門市：${storeData.name}`);
+      console.log('🏪 正在調用 onStoreSelect:', onStoreSelect);
+      
+      try {
+        onStoreSelect(storeData);
+        console.log('✅ onStoreSelect 調用成功');
+        toast.success(`已選擇門市：${storeData.name}`);
+      } catch (error) {
+        console.error('❌ onStoreSelect 調用失敗:', error);
+        toast.error('門市選擇失敗，請重試');
+      }
       
       // 發送確認訊息給回調視窗
       setTimeout(() => {
@@ -86,7 +97,14 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
             const timeDiff = Date.now() - selectionData.timestamp;
             if (timeDiff < 30000) { // 30秒內
               console.log('✅ 通過 localStorage 收到有效門市數據');
-              (window as any).handleStoreSelection(selectionData.storeData);
+              console.log('📦 準備調用 handleStoreSelection，數據:', selectionData.storeData);
+              
+              if (typeof (window as any).handleStoreSelection === 'function') {
+                (window as any).handleStoreSelection(selectionData.storeData);
+                console.log('✅ handleStoreSelection 調用完成');
+              } else {
+                console.error('❌ handleStoreSelection 函數不存在');
+              }
               
               // 清理 localStorage 數據
               localStorage.removeItem('ecpay_store_selection');
@@ -110,7 +128,15 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
           
           if (timeDiff < 30000 && selectionData.storeData && selectionData.source === 'ecpay_callback') {
             console.log('🔄 發現有效的 localStorage 門市數據，自動載入');
-            (window as any).handleStoreSelection(selectionData.storeData);
+            console.log('🔄 初始檢查數據:', selectionData.storeData);
+            
+            if (typeof (window as any).handleStoreSelection === 'function') {
+              (window as any).handleStoreSelection(selectionData.storeData);
+              console.log('✅ 初始檢查 handleStoreSelection 調用完成');
+            } else {
+              console.error('❌ 初始檢查 handleStoreSelection 函數不存在');
+            }
+            
             localStorage.removeItem('ecpay_store_selection');
           } else if (timeDiff >= 30000) {
             // 清理過期數據

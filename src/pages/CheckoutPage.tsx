@@ -48,11 +48,20 @@ export const CheckoutPage: React.FC = () => {
 
   // 處理門市選擇
   const handleStoreSelect = (store: { id: string; name: string; tel: string; address: string }) => {
-    setCustomerInfo(prev => ({
-      ...prev,
-      storeNumber: store.id,
-      storeName: store.name
-    }));
+    console.log('📍 CheckoutPage 收到門市選擇:', store);
+    console.log('📍 當前 customerInfo:', customerInfo);
+    
+    setCustomerInfo(prev => {
+      const newInfo = {
+        ...prev,
+        storeNumber: store.id,
+        storeName: store.name
+      };
+      console.log('📍 更新後的 customerInfo:', newInfo);
+      return newInfo;
+    });
+    
+    console.log('✅ handleStoreSelect 執行完成');
   };
 
   // 驗證優惠券
