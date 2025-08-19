@@ -140,46 +140,16 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
   return (
     <div className={`space-y-4 ${className}`}>
       <div className="space-y-3">
-        {/* 超商選擇按鈕 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {/* 7-ELEVEN門市選擇按鈕 */}
+        <div className="flex justify-center">
           <Button
             type="button"
             onClick={() => openMapSelector('UNIMART')}
             disabled={isLoading}
-            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+            className="flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg font-medium"
           >
-            <MapPin className="w-4 h-4" />
-            7-ELEVEN
-          </Button>
-          <Button
-            type="button"
-            onClick={() => openMapSelector('FAMI')}
-            disabled={isLoading}
-            variant="outline"
-            className="flex items-center justify-center gap-2"
-          >
-            <MapPin className="w-4 h-4" />
-            全家
-          </Button>
-          <Button
-            type="button"
-            onClick={() => openMapSelector('HILIFE')}
-            disabled={isLoading}
-            variant="outline"
-            className="flex items-center justify-center gap-2"
-          >
-            <MapPin className="w-4 h-4" />
-            萊爾富
-          </Button>
-          <Button
-            type="button"
-            onClick={() => openMapSelector('OKMART')}
-            disabled={isLoading}
-            variant="outline"
-            className="flex items-center justify-center gap-2"
-          >
-            <MapPin className="w-4 h-4" />
-            OK超商
+            <MapPin className="w-5 h-5" />
+            選擇 7-ELEVEN 門市
           </Button>
         </div>
 

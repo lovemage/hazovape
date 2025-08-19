@@ -207,9 +207,10 @@ router.get('/meta/locations', async (req, res) => {
 router.post('/map-selector', async (req, res) => {
   try {
     const {
-      logisticsSubType = 'UNIMART', // UNIMART: 7-ELEVEN, FAMI: 全家, HILIFE: 萊爾富, OKMART: OK超商
+      logisticsSubType = 'UNIMART', // 只支援 UNIMART: 7-ELEVEN
       isCollection = 'N',
-      extraData = ''
+      extraData = '',
+      device = 0  // 0: PC, 1: Mobile
     } = req.body;
 
     // 生成回傳URL
@@ -225,7 +226,8 @@ router.post('/map-selector', async (req, res) => {
       logisticsSubType,
       isCollection,
       serverReplyURL,
-      extraData
+      extraData,
+      device
     });
 
     res.json({

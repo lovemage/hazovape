@@ -2,13 +2,13 @@ const crypto = require('crypto');
 
 class ECPayLogistics {
   constructor() {
-    // 綠界物流API設定 - 使用測試環境
-    this.storeListUrl = 'https://logistics-stage.ecpay.com.tw/Helper/GetStoreList';
-    this.mapUrl = 'https://logistics-stage.ecpay.com.tw/Express/map';
-    this.merchantID = process.env.ECPAY_MERCHANT_ID || '2000132';
+    // 綠界物流API設定 - 使用正式環境
+    this.storeListUrl = 'https://logistics.ecpay.com.tw/Helper/GetStoreList';
+    this.mapUrl = 'https://logistics.ecpay.com.tw/Express/map';
+    this.merchantID = process.env.ECPAY_MERCHANT_ID || '3466445';
     this.platformID = process.env.ECPAY_PLATFORM_ID || '';
-    this.hashKey = process.env.ECPAY_HASH_KEY || '5294y06JbISpM5x9';
-    this.hashIV = process.env.ECPAY_HASH_IV || 'v77hoKGq4kWxNNIS';
+    this.hashKey = process.env.ECPAY_HASH_KEY || 'u0mKtzqI07btGNNT';
+    this.hashIV = process.env.ECPAY_HASH_IV || 'ZjAbsWWZUvOu8NA0';
   }
 
   // 產生檢查碼 - 完全按照綠界官方規範
@@ -312,27 +312,25 @@ class ECPayLogistics {
         logisticsSubType = 'UNIMART',
         isCollection = 'N',
         serverReplyURL,
-        extraData = ''
+        extraData = '',
+        device = 0
       } = options;
+
+      // 生成唯一的交易編號
+      const now = new Date();
+      const merchantTradeNo = `HAZO${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}${String(now.getMilliseconds()).padStart(3, '0').substring(0, 2)}`;
 
       // 基本參數
       const params = {
         MerchantID: this.merchantID,
+        MerchantTradeNo: merchantTradeNo,
         LogisticsType: logisticsType,
         LogisticsSubType: logisticsSubType,
         IsCollection: isCollection,
-        ExtraData: extraData
+        ServerReplyURL: serverReplyURL || '',
+        ExtraData: extraData,
+        Device: device.toString()
       };
-
-      // 添加回傳URL（如果提供）
-      if (serverReplyURL) {
-        params.ServerReplyURL = serverReplyURL;
-      }
-
-      // 只有當PlatformID有值時才加入
-      if (this.platformID && this.platformID.trim()) {
-        params.PlatformID = this.platformID;
-      }
 
       // 生成檢查碼
       const checkMacValue = this.generateCheckMacValue(params);
