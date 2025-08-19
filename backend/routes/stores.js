@@ -249,38 +249,269 @@ router.post('/map-selector', async (req, res) => {
 // 電子地圖回傳處理
 router.post('/map-callback', (req, res) => {
   try {
-    console.log('📍 收到電子地圖回傳:', req.body);
+    console.log('📍 收到電子地圖回傳 - 原始數據:', req.body);
+    console.log('📍 請求頭:', req.headers);
     
+    // ECPay 可能使用不同的參數名稱，我們需要檢查所有可能的欄位
+    const rawData = req.body;
+    
+    // 嘗試從不同可能的欄位名稱中提取數據
     const storeData = {
-      storeId: req.body.CVSStoreID || '',
-      storeName: req.body.CVSStoreName || '',
-      storeAddress: req.body.CVSAddress || '',
-      storeTelephone: req.body.CVSTelephone || '',
-      extraData: req.body.ExtraData || ''
+      storeId: rawData.CVSStoreID || rawData.storeId || rawData.StoreId || rawData.storeid || '',
+      storeName: rawData.CVSStoreName || rawData.storeName || rawData.StoreName || rawData.storename || '',
+      storeAddress: rawData.CVSAddress || rawData.storeAddress || rawData.StoreAddress || rawData.address || '',
+      storeTelephone: rawData.CVSTelephone || rawData.storeTelephone || rawData.StoreTelephone || rawData.telephone || rawData.phone || '',
+      extraData: rawData.ExtraData || rawData.extraData || ''
     };
 
-    // 回傳JavaScript來關閉彈窗並傳遞數據給父視窗
-    const callbackScript = `
-    <script>
-      try {
-        // 傳遞店舖資料給父視窗
-        if (window.opener && typeof window.opener.handleStoreSelection === 'function') {
-          window.opener.handleStoreSelection(${JSON.stringify(storeData)});
-        }
-        // 關閉彈出視窗
-        window.close();
-      } catch (error) {
-        console.error('回傳處理錯誤:', error);
-        alert('店舖選擇完成，請手動關閉此視窗');
-      }
-    </script>
+    console.log('📍 解析後的店舖數據:', storeData);
+
+    // 回傳完整的 HTML 頁面，包含詳細的 JavaScript 處理
+    const callbackHtml = `
+    <!DOCTYPE html>
+    <html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>門市選擇完成</title>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                color: white;
+            }
+            .container {
+                text-align: center;
+                padding: 2rem;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                backdrop-filter: blur(10px);
+                max-width: 400px;
+            }
+            .store-info {
+                background: rgba(255, 255, 255, 0.2);
+                padding: 1rem;
+                border-radius: 8px;
+                margin: 1rem 0;
+                text-align: left;
+            }
+            .button {
+                background: rgba(255, 255, 255, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                cursor: pointer;
+                margin: 5px;
+                font-size: 14px;
+            }
+            .button:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
+            .status {
+                margin: 1rem 0;
+                padding: 0.5rem;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 6px;
+                font-size: 14px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>✅ 門市選擇完成</h2>
+            <div class="store-info">
+                <p><strong>門市名稱：</strong><span id="storeName">${storeData.storeName}</span></p>
+                <p><strong>門市代號：</strong><span id="storeId">${storeData.storeId}</span></p>
+                <p><strong>門市地址：</strong><span id="storeAddress">${storeData.storeAddress}</span></p>
+                ${storeData.storeTelephone ? `<p><strong>門市電話：</strong><span id="storeTel">${storeData.storeTelephone}</span></p>` : ''}
+            </div>
+            <div id="status" class="status">正在處理門市選擇...</div>
+            <div>
+                <button class="button" onclick="retryCallback()">重新傳送</button>
+                <button class="button" onclick="copyStoreInfo()">複製門市資訊</button>
+                <button class="button" onclick="closeWindow()">關閉視窗</button>
+            </div>
+        </div>
+
+        <script>
+            console.log('🏪 ECPay 回調頁面載入');
+            
+            const storeData = ${JSON.stringify(storeData)};
+            console.log('📋 門市數據:', storeData);
+
+            let callbackAttempts = 0;
+            const maxAttempts = 3;
+
+            function updateStatus(message, type = 'info') {
+                const statusEl = document.getElementById('status');
+                if (statusEl) {
+                    statusEl.textContent = message;
+                    statusEl.style.backgroundColor = type === 'success' ? 'rgba(40, 167, 69, 0.3)' : 
+                                                   type === 'error' ? 'rgba(220, 53, 69, 0.3)' : 
+                                                   'rgba(255, 255, 255, 0.1)';
+                }
+            }
+
+            function sendStoreDataToParent() {
+                return new Promise((resolve, reject) => {
+                    try {
+                        console.log('🔄 嘗試傳送門市數據到父視窗, 嘗試次數:', callbackAttempts + 1);
+                        
+                        // 檢查父視窗是否存在且可訪問
+                        if (!window.opener) {
+                            throw new Error('找不到父視窗');
+                        }
+                        
+                        if (window.opener.closed) {
+                            throw new Error('父視窗已關閉');
+                        }
+
+                        // 嘗試呼叫父視窗的回調函數
+                        if (typeof window.opener.handleStoreSelection === 'function') {
+                            console.log('✅ 找到 handleStoreSelection 函數，執行回調');
+                            window.opener.handleStoreSelection(storeData);
+                            updateStatus('✅ 門市資訊已成功傳送', 'success');
+                            resolve(true);
+                        } else {
+                            console.log('❌ 父視窗中找不到 handleStoreSelection 函數');
+                            
+                            // 嘗試使用 postMessage 作為備選方案
+                            console.log('🔄 嘗試使用 postMessage');
+                            window.opener.postMessage({
+                                type: 'STORE_SELECTION',
+                                data: storeData
+                            }, '*');
+                            
+                            updateStatus('📡 已使用 postMessage 傳送', 'success');
+                            resolve(true);
+                        }
+                        
+                    } catch (error) {
+                        console.error('❌ 傳送門市數據失敗:', error);
+                        updateStatus('❌ 傳送失敗: ' + error.message, 'error');
+                        reject(error);
+                    }
+                });
+            }
+
+            function retryCallback() {
+                if (callbackAttempts < maxAttempts) {
+                    callbackAttempts++;
+                    updateStatus('🔄 重新嘗試傳送中...', 'info');
+                    sendStoreDataToParent().then(() => {
+                        setTimeout(() => {
+                            closeWindow();
+                        }, 2000);
+                    }).catch((error) => {
+                        console.error('重試失敗:', error);
+                    });
+                } else {
+                    updateStatus('❌ 已達最大重試次數', 'error');
+                }
+            }
+
+            function copyStoreInfo() {
+                const info = \`門市名稱: \${storeData.storeName}\\n門市代號: \${storeData.storeId}\\n門市地址: \${storeData.storeAddress}\${storeData.storeTelephone ? '\\n門市電話: ' + storeData.storeTelephone : ''}\`;
+                
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(info).then(() => {
+                        updateStatus('✅ 門市資訊已複製', 'success');
+                    }).catch(() => {
+                        fallbackCopy(info);
+                    });
+                } else {
+                    fallbackCopy(info);
+                }
+            }
+
+            function fallbackCopy(text) {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        updateStatus('✅ 門市資訊已複製', 'success');
+                    } else {
+                        updateStatus('❌ 複製失敗', 'error');
+                    }
+                } catch (err) {
+                    updateStatus('❌ 複製失敗', 'error');
+                }
+                
+                document.body.removeChild(textArea);
+            }
+
+            function closeWindow() {
+                updateStatus('🔄 視窗即將關閉...', 'info');
+                setTimeout(() => {
+                    try {
+                        window.close();
+                    } catch (error) {
+                        console.error('❌ 關閉視窗失敗:', error);
+                        updateStatus('❌ 無法自動關閉，請手動關閉視窗', 'error');
+                    }
+                }, 1000);
+            }
+
+            // 頁面載入後自動執行
+            window.addEventListener('load', () => {
+                console.log('📄 頁面完全載入，開始自動回調流程');
+                
+                // 給父視窗一些時間來設置回調函數
+                setTimeout(() => {
+                    sendStoreDataToParent().then(() => {
+                        // 成功傳送後等待2秒再關閉
+                        setTimeout(() => {
+                            closeWindow();
+                        }, 2000);
+                    }).catch((error) => {
+                        console.error('自動回調失敗:', error);
+                        updateStatus('❌ 自動傳送失敗，請使用下方按鈕', 'error');
+                    });
+                }, 1000);
+            });
+
+            // 監聽來自父視窗的確認訊息
+            window.addEventListener('message', (event) => {
+                console.log('📨 收到來自父視窗的訊息:', event.data);
+                if (event.data && event.data.type === 'STORE_SELECTION_RECEIVED') {
+                    updateStatus('✅ 父視窗已確認收到門市資訊', 'success');
+                    setTimeout(() => {
+                        closeWindow();
+                    }, 1500);
+                }
+            });
+        </script>
+    </body>
+    </html>
     `;
 
-    res.send(callbackScript);
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(callbackHtml);
 
   } catch (error) {
     console.error('❌ 電子地圖回傳處理失敗:', error);
-    res.status(500).send('處理失敗');
+    res.status(500).send(`
+      <html>
+        <body>
+          <h3>處理失敗</h3>
+          <p>錯誤: ${error.message}</p>
+          <button onclick="window.close()">關閉視窗</button>
+        </body>
+      </html>
+    `);
   }
 });
 

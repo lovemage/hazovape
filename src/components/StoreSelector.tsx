@@ -35,6 +35,8 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
   useEffect(() => {
     // 在window上設定回調函數
     (window as any).handleStoreSelection = (ecpayStoreData: EcpayStoreData) => {
+      console.log('🏪 收到門市選擇回調:', ecpayStoreData);
+      
       const storeData: StoreData = {
         id: ecpayStoreData.storeId,
         name: ecpayStoreData.storeName,
@@ -42,13 +44,40 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
         address: ecpayStoreData.storeAddress
       };
       
+      console.log('🏪 轉換後的門市數據:', storeData);
       onStoreSelect(storeData);
       toast.success(`已選擇門市：${storeData.name}`);
+      
+      // 發送確認訊息給回調視窗
+      setTimeout(() => {
+        const popups = window.open('', 'ecpay_map_window');
+        if (popups && !popups.closed) {
+          popups.postMessage({ type: 'STORE_SELECTION_RECEIVED' }, '*');
+        }
+      }, 100);
     };
+
+    // 設定 postMessage 監聽器作為備選方案
+    const handleMessage = (event: MessageEvent) => {
+      console.log('📨 收到 postMessage:', event.data);
+      
+      if (event.data && event.data.type === 'STORE_SELECTION' && event.data.data) {
+        const ecpayStoreData = event.data.data;
+        console.log('📨 通過 postMessage 收到門市數據:', ecpayStoreData);
+        
+        // 使用同樣的處理邏輯
+        if (window.handleStoreSelection) {
+          (window as any).handleStoreSelection(ecpayStoreData);
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
 
     // 清理函數
     return () => {
       delete (window as any).handleStoreSelection;
+      window.removeEventListener('message', handleMessage);
     };
   }, [onStoreSelect]);
 
@@ -102,7 +131,21 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
         
         if (mapWindow) {
           form.submit();
-          toast.info('請在彈出視窗中選擇門市');
+          toast.info('請在彈出視窗中選擇門市，選擇完成後會自動回傳');
+          
+          // 監控彈窗狀態
+          const checkWindowClosed = setInterval(() => {
+            if (mapWindow.closed) {
+              clearInterval(checkWindowClosed);
+              console.log('🔄 ECPay 地圖視窗已關閉');
+            }
+          }, 1000);
+          
+          // 30秒後清理監控
+          setTimeout(() => {
+            clearInterval(checkWindowClosed);
+          }, 30000);
+          
         } else {
           toast.error('請允許彈出視窗來選擇門市');
         }
