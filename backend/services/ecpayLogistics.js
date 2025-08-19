@@ -10,46 +10,55 @@ class ECPayLogistics {
     this.hashIV = process.env.ECPAY_HASH_IV || 'v77hoKGq4kWxNNIS';
   }
 
-  // 產生檢查碼
+  // 產生檢查碼 - 依照綠界規範
   generateCheckMacValue(params) {
     try {
-      // 1. 參數排序 (排除CheckMacValue)
-      const sortedParams = {};
+      console.log('🔐 開始生成檢查碼，原始參數:', params);
+      
+      // 1. 移除CheckMacValue參數並按A-Z排序
+      const filteredParams = {};
       Object.keys(params)
         .filter(key => key !== 'CheckMacValue')
-        .sort()
+        .sort((a, b) => {
+          // 依照A-Z字母排序，遇第一個相同時比較第二個，以此類推
+          return a.localeCompare(b, 'en', { sensitivity: 'base' });
+        })
         .forEach(key => {
-          sortedParams[key] = params[key];
+          // 確保值為字串且去除前後空白
+          filteredParams[key] = String(params[key]).trim();
         });
 
-      // 2. 組合字串
-      let checkStr = `HashKey=${this.hashKey}`;
-      for (const [key, value] of Object.entries(sortedParams)) {
+      console.log('🔐 排序後參數:', filteredParams);
+
+      // 2. 組合字串格式: HashKey=xxx&param1=value1&param2=value2&HashIV=xxx
+      let checkStr = `HashKey=${this.hashKey.trim()}`;
+      for (const [key, value] of Object.entries(filteredParams)) {
         checkStr += `&${key}=${value}`;
       }
-      checkStr += `&HashIV=${this.hashIV}`;
+      checkStr += `&HashIV=${this.hashIV.trim()}`;
 
       console.log('🔐 檢查碼原始字串:', checkStr);
 
-      // 3. URL encode
-      checkStr = encodeURIComponent(checkStr);
+      // 3. URL Encode (依照綠界.NET編碼規範)
+      let encodedStr = encodeURIComponent(checkStr);
       
       // 4. 轉小寫
-      checkStr = checkStr.toLowerCase();
+      encodedStr = encodedStr.toLowerCase();
 
-      // 5. 解碼某些特殊字符
-      checkStr = checkStr.replace(/%2d/g, '-');
-      checkStr = checkStr.replace(/%5f/g, '_');
-      checkStr = checkStr.replace(/%2e/g, '.');
-      checkStr = checkStr.replace(/%21/g, '!');
-      checkStr = checkStr.replace(/%2a/g, '*');
-      checkStr = checkStr.replace(/%28/g, '(');
-      checkStr = checkStr.replace(/%29/g, ')');
+      // 5. 依照綠界URLEncode轉換表進行字元替換
+      encodedStr = encodedStr.replace(/%2d/g, '-');  // -
+      encodedStr = encodedStr.replace(/%5f/g, '_');  // _
+      encodedStr = encodedStr.replace(/%2e/g, '.');  // .
+      encodedStr = encodedStr.replace(/%21/g, '!');  // !
+      encodedStr = encodedStr.replace(/%2a/g, '*');  // *
+      encodedStr = encodedStr.replace(/%28/g, '(');  // (
+      encodedStr = encodedStr.replace(/%29/g, ')');  // )
+      encodedStr = encodedStr.replace(/%20/g, '+');  // 空格轉為+
 
-      console.log('🔐 處理後字串:', checkStr);
+      console.log('🔐 URL編碼後字串:', encodedStr);
 
       // 6. SHA256加密
-      const hash = crypto.createHash('sha256').update(checkStr).digest('hex');
+      const hash = crypto.createHash('sha256').update(encodedStr, 'utf8').digest('hex');
       
       // 7. 轉大寫
       const result = hash.toUpperCase();
@@ -67,12 +76,18 @@ class ECPayLogistics {
     try {
       console.log('🏪 開始獲取綠界店舖列表:', cvsType);
 
-      // 準備API參數
+      // 準備API參數 (注意：HashKey和HashIV不能包含在送出的參數中)
       const params = {
-        PlatformID: this.platformID,
         MerchantID: this.merchantID,
         CvsType: cvsType
       };
+
+      // 只有當PlatformID有值時才加入
+      if (this.platformID && this.platformID.trim()) {
+        params.PlatformID = this.platformID;
+      }
+
+      console.log('📦 準備送出的參數（不含CheckMacValue）:', params);
 
       // 產生檢查碼
       params.CheckMacValue = this.generateCheckMacValue(params);
@@ -92,7 +107,7 @@ class ECPayLogistics {
       const response = await fetch(this.apiUrl, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
           'Accept': 'text/html'
         },
         body: formData.toString()
