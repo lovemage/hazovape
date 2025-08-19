@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingBag, Settings, Search, X, MessageCircle, Star, Gift, Truck, Coins, ChevronDown, ShoppingCart } from 'lucide-react';
+import { ShoppingBag, Settings, Search, X, MessageCircle, Star, Gift, Truck, Coins, ChevronDown, Rocket } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useCart } from '../contexts/CartContext';
 import { AnnouncementCarousel } from '../components/TypewriterText';
@@ -449,7 +449,7 @@ export const HomePage: React.FC = () => {
                     onClick={() => handleProductClick(product)}
                     className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer"
                   >
-                    <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
+                    <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden relative">
                       <img
                         src={getProductImageUrl(product)}
                         alt={product.name}
@@ -459,6 +459,17 @@ export const HomePage: React.FC = () => {
                           target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
                         }}
                       />
+                      {/* HAZO 角標 */}
+                      <div 
+                        className="absolute top-2 right-2 px-2 py-1 text-xs font-bold text-black rounded-bl-lg"
+                        style={{
+                          backgroundColor: 'rgb(161, 255, 20)',
+                          fontSize: '10px',
+                          letterSpacing: '0.5px'
+                        }}
+                      >
+                        HAZO
+                      </div>
                     </div>
                     <div className="p-6">
                       <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-1">{product.name}</h3>
@@ -480,6 +491,7 @@ export const HomePage: React.FC = () => {
                             borderRadius: '30px',
                             color: 'rgb(19, 19, 19)',
                             fontWeight: '600',
+                            fontSize: '14px',
                             border: 'none',
                             position: 'relative',
                             cursor: 'pointer',
@@ -504,7 +516,7 @@ export const HomePage: React.FC = () => {
                             e.currentTarget.style.transitionDuration = '.2s';
                           }}
                         >
-                          <ShoppingCart 
+                          <Rocket 
                             className="group-hover:rotate-[250deg] transition-transform duration-[1.5s]"
                             style={{
                               height: '25px',
@@ -531,7 +543,7 @@ export const HomePage: React.FC = () => {
                       onClick={() => handleProductClick(product)}
                       className="flex-none w-72 bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer snap-start"
                     >
-                      <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
+                      <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden relative">
                         <img
                           src={getProductImageUrl(product)}
                           alt={product.name}
@@ -541,6 +553,17 @@ export const HomePage: React.FC = () => {
                             target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
                           }}
                         />
+                        {/* HAZO 角標 */}
+                        <div 
+                          className="absolute top-2 right-2 px-2 py-1 text-xs font-bold text-black rounded-bl-lg"
+                          style={{
+                            backgroundColor: 'rgb(161, 255, 20)',
+                            fontSize: '10px',
+                            letterSpacing: '0.5px'
+                          }}
+                        >
+                          HAZO
+                        </div>
                       </div>
                       <div className="p-6">
                         <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-1">{product.name}</h3>
@@ -562,6 +585,7 @@ export const HomePage: React.FC = () => {
                               borderRadius: '30px',
                               color: 'rgb(19, 19, 19)',
                               fontWeight: '600',
+                              fontSize: '14px',
                               border: 'none',
                               position: 'relative',
                               cursor: 'pointer',
@@ -586,7 +610,7 @@ export const HomePage: React.FC = () => {
                               e.currentTarget.style.transitionDuration = '.2s';
                             }}
                           >
-                            <ShoppingCart 
+                            <Rocket 
                               className="group-hover:rotate-[250deg] transition-transform duration-[1.5s]"
                               style={{
                                 height: '25px',

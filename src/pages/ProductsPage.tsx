@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Search, X, ArrowLeft, ShoppingCart } from 'lucide-react';
+import { ShoppingBag, Search, X, ArrowLeft, Rocket } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
@@ -299,7 +299,7 @@ export const ProductsPage: React.FC = () => {
                     onClick={() => handleProductSelect(product)}
                   >
                     {/* 商品圖片 */}
-                    <div className="aspect-square bg-gray-50 rounded-t-lg overflow-hidden">
+                    <div className="aspect-square bg-gray-50 rounded-t-lg overflow-hidden relative">
                       <img
                         src={getProductImage(product)}
                         alt={product.name}
@@ -309,6 +309,17 @@ export const ProductsPage: React.FC = () => {
                           target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5YTNhZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuaaguaXoOWcluePizwvdGV4dD48L3N2Zz4=';
                         }}
                       />
+                      {/* HAZO 角標 */}
+                      <div 
+                        className="absolute top-2 right-2 px-2 py-1 text-xs font-bold text-black rounded-bl-lg"
+                        style={{
+                          backgroundColor: 'rgb(161, 255, 20)',
+                          fontSize: '10px',
+                          letterSpacing: '0.5px'
+                        }}
+                      >
+                        HAZO
+                      </div>
                     </div>
 
                     {/* 商品信息 */}
@@ -356,6 +367,7 @@ export const ProductsPage: React.FC = () => {
                             borderRadius: '30px',
                             color: 'rgb(19, 19, 19)',
                             fontWeight: '600',
+                            fontSize: '14px',
                             border: 'none',
                             position: 'relative',
                             cursor: 'pointer',
@@ -380,7 +392,7 @@ export const ProductsPage: React.FC = () => {
                             e.currentTarget.style.transitionDuration = '.2s';
                           }}
                         >
-                          <ShoppingCart 
+                          <Rocket 
                             className="group-hover:rotate-[250deg] transition-transform duration-[1.5s]"
                             style={{
                               height: '25px',

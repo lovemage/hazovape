@@ -954,10 +954,6 @@ router.get('/categories/list', async (req, res) => {
     
     // 確保所有標準分類都包含在內
     const standardCategories = [
-      '一次性拋棄式電子煙',
-      '注油式主機與耗材',
-      '拋棄式通用煙蛋系列',
-      '小煙油系列',
       '其他'
     ];
     
