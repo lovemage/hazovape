@@ -45,15 +45,17 @@ class ECPayLogistics {
       // 4. 轉小寫
       encodedStr = encodedStr.toLowerCase();
 
-      // 5. 依照綠界URLEncode轉換表進行字元替換
-      encodedStr = encodedStr.replace(/%2d/g, '-');  // -
-      encodedStr = encodedStr.replace(/%5f/g, '_');  // _
-      encodedStr = encodedStr.replace(/%2e/g, '.');  // .
-      encodedStr = encodedStr.replace(/%21/g, '!');  // !
-      encodedStr = encodedStr.replace(/%2a/g, '*');  // *
-      encodedStr = encodedStr.replace(/%28/g, '(');  // (
-      encodedStr = encodedStr.replace(/%29/g, ')');  // )
-      encodedStr = encodedStr.replace(/%20/g, '+');  // 空格轉為+
+      // 5. 依照綠界.NET編碼(ECPAY)轉換表進行字元替換
+      encodedStr = encodedStr.replace(/%2d/g, '-');   // –
+      encodedStr = encodedStr.replace(/%5f/g, '_');   // _
+      encodedStr = encodedStr.replace(/%2e/g, '.');   // .
+      encodedStr = encodedStr.replace(/%21/g, '!');   // !
+      encodedStr = encodedStr.replace(/%2a/g, '*');   // *
+      encodedStr = encodedStr.replace(/%28/g, '(');   // (
+      encodedStr = encodedStr.replace(/%29/g, ')');   // )
+      encodedStr = encodedStr.replace(/%20/g, '+');   // space空格
+      // 保持這些字符為編碼狀態（不替換）
+      // %7e ~, %40 @, %23 #, %24 $, %25 %, %5e ^, %26 &, %3d =, %2b +, %3b ;, %3f ?, %2f /, %5c \, %3e >, %3c <, %60 `, %5b [, %5d ], %7b {, %7d }, %3a :, %27 ', %22 ", %2c ,, %7c |
 
       console.log('🔐 URL編碼後字串:', encodedStr);
 
@@ -89,19 +91,27 @@ class ECPayLogistics {
 
       console.log('📦 準備送出的參數（不含CheckMacValue）:', params);
 
-      // 產生檢查碼
-      params.CheckMacValue = this.generateCheckMacValue(params);
-
-      console.log('📦 API請求參數:', {
+      // 產生檢查碼 - 使用相同的參數
+      const checkMacValue = this.generateCheckMacValue(params);
+      
+      // 重要：確保檢查碼計算和POST的參數完全相符
+      const finalParams = {
         ...params,
-        CheckMacValue: params.CheckMacValue.substring(0, 10) + '...'
+        CheckMacValue: checkMacValue
+      };
+
+      console.log('📦 最終API請求參數:', {
+        ...finalParams,
+        CheckMacValue: finalParams.CheckMacValue.substring(0, 10) + '...'
       });
 
-      // 準備POST請求體
+      // 準備POST請求體 - 使用完全相同的參數
       const formData = new URLSearchParams();
-      Object.keys(params).forEach(key => {
-        formData.append(key, params[key]);
+      Object.keys(finalParams).forEach(key => {
+        formData.append(key, finalParams[key]);
       });
+      
+      console.log('📤 POST請求體內容:', formData.toString());
 
       // 發送API請求
       const response = await fetch(this.apiUrl, {
@@ -234,6 +244,26 @@ class ECPayLogistics {
         total: 0
       };
     }
+  }
+
+  // 測試檢查碼生成的方法
+  testCheckMacValue() {
+    const testParams = {
+      MerchantID: this.merchantID,
+      CvsType: 'UNIMART'
+    };
+    
+    console.log('🧪 測試參數:', testParams);
+    console.log('🧪 測試用HashKey:', this.hashKey);
+    console.log('🧪 測試用HashIV:', this.hashIV);
+    
+    const checkMac = this.generateCheckMacValue(testParams);
+    console.log('🧪 測試生成的CheckMacValue:', checkMac);
+    
+    return {
+      params: testParams,
+      checkMacValue: checkMac
+    };
   }
 }
 

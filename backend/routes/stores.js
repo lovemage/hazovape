@@ -203,4 +203,25 @@ router.get('/meta/locations', async (req, res) => {
   }
 });
 
+// 測試檢查碼生成的路由
+router.get('/test-checkmac', async (req, res) => {
+  try {
+    console.log('🧪 開始測試檢查碼生成');
+    const testResult = ecpayLogistics.testCheckMacValue();
+    
+    res.json({
+      success: true,
+      message: '檢查碼測試完成',
+      ...testResult
+    });
+  } catch (error) {
+    console.error('❌ 檢查碼測試失敗:', error);
+    res.status(500).json({
+      success: false,
+      message: '檢查碼測試失敗',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
