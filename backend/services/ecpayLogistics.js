@@ -2,13 +2,19 @@ const crypto = require('crypto');
 
 class ECPayLogistics {
   constructor() {
-    // 綠界物流API設定 - 使用正式環境
-    this.storeListUrl = 'https://logistics.ecpay.com.tw/Helper/GetStoreList';
-    this.mapUrl = 'https://logistics.ecpay.com.tw/Express/map';
-    this.merchantID = process.env.ECPAY_MERCHANT_ID || '3466445';
+    // 綠界物流API設定 - 檢查環境和商店配對
+    // 如果商店代號3466445不支援正式環境的UNIMART，先改回測試環境
+    this.storeListUrl = 'https://logistics-stage.ecpay.com.tw/Helper/GetStoreList';
+    this.mapUrl = 'https://logistics-stage.ecpay.com.tw/Express/map';
+    this.merchantID = process.env.ECPAY_MERCHANT_ID || '2000132';
     this.platformID = process.env.ECPAY_PLATFORM_ID || '';
-    this.hashKey = process.env.ECPAY_HASH_KEY || 'u0mKtzqI07btGNNT';
-    this.hashIV = process.env.ECPAY_HASH_IV || 'ZjAbsWWZUvOu8NA0';
+    this.hashKey = process.env.ECPAY_HASH_KEY || '5294y06JbISpM5x9';
+    this.hashIV = process.env.ECPAY_HASH_IV || 'v77hoKGq4kWxNNIS';
+    
+    console.log('🔧 綠界API配置:');
+    console.log('- 環境:', this.mapUrl.includes('stage') ? '測試環境' : '正式環境');
+    console.log('- 商店代號:', this.merchantID);
+    console.log('- LogisticsSubType: UNIMART (7-ELEVEN)');
   }
 
   // 產生檢查碼 - 完全按照綠界官方規範
@@ -370,6 +376,47 @@ class ECPayLogistics {
     formHtml += `<script>document.getElementById('ecpayForm').submit();</script>`;
     
     return formHtml;
+  }
+
+  // 配置檢查和診斷
+  checkConfiguration() {
+    const config = {
+      merchantID: this.merchantID,
+      environment: this.mapUrl.includes('stage') ? 'STAGE' : 'PRODUCTION',
+      mapUrl: this.mapUrl,
+      storeListUrl: this.storeListUrl,
+      hashKeyLength: this.hashKey.length,
+      hashIVLength: this.hashIV.length
+    };
+
+    console.log('🔍 綠界配置檢查:', config);
+
+    // 檢查常見配置問題
+    const issues = [];
+    
+    if (config.environment === 'PRODUCTION' && config.merchantID === '2000132') {
+      issues.push('警告: 正式環境使用測試商店代號');
+    }
+    
+    if (config.environment === 'STAGE' && config.merchantID !== '2000132') {
+      issues.push('警告: 測試環境使用非標準商店代號');
+    }
+
+    if (config.hashKeyLength !== 16) {
+      issues.push(`HashKey長度異常: ${config.hashKeyLength}, 應為16`);
+    }
+
+    if (config.hashIVLength !== 16) {
+      issues.push(`HashIV長度異常: ${config.hashIVLength}, 應為16`);
+    }
+
+    if (issues.length > 0) {
+      console.log('⚠️ 配置問題:', issues);
+    } else {
+      console.log('✅ 配置檢查通過');
+    }
+
+    return { config, issues };
   }
 }
 

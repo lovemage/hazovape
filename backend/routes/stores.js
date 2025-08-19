@@ -284,6 +284,27 @@ router.post('/map-callback', (req, res) => {
   }
 });
 
+// 配置檢查路由
+router.get('/config-check', async (req, res) => {
+  try {
+    console.log('🔧 開始配置檢查');
+    const checkResult = ecpayLogistics.checkConfiguration();
+    
+    res.json({
+      success: true,
+      message: '配置檢查完成',
+      ...checkResult
+    });
+  } catch (error) {
+    console.error('❌ 配置檢查失敗:', error);
+    res.status(500).json({
+      success: false,
+      message: '配置檢查失敗',
+      error: error.message
+    });
+  }
+});
+
 // 測試檢查碼生成的路由
 router.get('/test-checkmac', async (req, res) => {
   try {
