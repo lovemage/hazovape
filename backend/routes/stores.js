@@ -1,123 +1,61 @@
 const express = require('express');
 const Database = require('../config/database');
+const ECPayLogistics = require('../services/ecpayLogistics');
 
 const router = express.Router();
+const ecpayLogistics = new ECPayLogistics();
 
-// 搜尋門市 API
+// 搜尋門市 API - 使用綠界物流API
 router.get('/search', async (req, res) => {
   try {
-    const { query, type = 'name', limit = 10 } = req.query;
+    const { query, type = 'name', cvsType = 'UNIMART' } = req.query;
 
     if (!query || !query.trim()) {
       return res.json({
         stores: [],
         total: 0,
         query: query || '',
-        type
+        type,
+        cvsType
       });
     }
 
     const searchQuery = query.trim();
-    console.log('🔍 搜尋門市:', { query: searchQuery, type, limit });
+    console.log('🔍 使用綠界API搜尋門市:', { query: searchQuery, type, cvsType });
 
-    let sql = '';
-    let params = [];
+    // 使用綠界物流API搜尋店舖
+    const result = await ecpayLogistics.searchStores(searchQuery, type, cvsType);
 
-    switch (type) {
-      case 'name':
-        sql = `
-          SELECT id, name, tel, address
-          FROM stores 
-          WHERE name LIKE ? 
-          ORDER BY name
-          LIMIT ?
-        `;
-        params = [`%${searchQuery}%`, parseInt(limit)];
-        break;
-      
-      case 'address':
-        sql = `
-          SELECT id, name, tel, address
-          FROM stores 
-          WHERE address LIKE ? OR city LIKE ? OR area LIKE ?
-          ORDER BY city, area, name
-          LIMIT ?
-        `;
-        params = [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, parseInt(limit)];
-        break;
-      
-      case 'number':
-        sql = `
-          SELECT id, name, tel, address
-          FROM stores 
-          WHERE id LIKE ?
-          ORDER BY id
-          LIMIT ?
-        `;
-        params = [`%${searchQuery}%`, parseInt(limit)];
-        break;
-      
-      default:
-        // 綜合搜尋
-        sql = `
-          SELECT id, name, tel, address
-          FROM stores 
-          WHERE name LIKE ? OR address LIKE ? OR id LIKE ?
-          ORDER BY 
-            CASE 
-              WHEN name LIKE ? THEN 1
-              WHEN id LIKE ? THEN 2
-              WHEN address LIKE ? THEN 3
-              ELSE 4
-            END,
-            name
-          LIMIT ?
-        `;
-        params = [
-          `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`,
-          `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`,
-          parseInt(limit)
-        ];
+    if (!result.success) {
+      console.error('❌ 綠界API搜尋失敗:', result.error);
+      return res.status(500).json({
+        success: false,
+        message: '搜尋門市失敗',
+        error: result.error,
+        stores: [],
+        total: 0
+      });
     }
 
-    const stores = await Database.all(sql, params);
-
-    // 只回傳基本資料：店號、店名、電話、地址
-    const processedStores = stores.map(store => ({
-      id: store.id,
-      name: store.name,
-      tel: store.tel,
-      address: store.address
-    }));
-
-    console.log(`✅ 找到 ${processedStores.length} 個門市`);
+    console.log(`✅ 找到 ${result.stores.length} 個門市`);
 
     res.json({
-      stores: processedStores,
-      total: processedStores.length,
+      stores: result.stores,
+      total: result.total,
       query: searchQuery,
-      type
+      type,
+      cvsType,
+      source: 'ecpay'
     });
 
   } catch (error) {
     console.error('❌ 搜尋門市失敗:', error);
-    
-    // 如果是表不存在的錯誤，返回空結果而不是錯誤
-    if (error.message && error.message.includes('no such table: stores')) {
-      console.log('⚠️ stores表不存在，返回空結果');
-      return res.json({
-        stores: [],
-        total: 0,
-        query: query || '',
-        type,
-        message: '門市資料尚未初始化'
-      });
-    }
-    
     res.status(500).json({
       success: false,
       message: '搜尋門市失敗',
-      error: error.message
+      error: error.message,
+      stores: [],
+      total: 0
     });
   }
 });
