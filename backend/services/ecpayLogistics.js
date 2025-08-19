@@ -2,12 +2,12 @@ const crypto = require('crypto');
 
 class ECPayLogistics {
   constructor() {
-    // 綠界物流API設定
-    this.apiUrl = 'https://logistics.ecpay.com.tw/Helper/GetStoreList';
-    this.merchantID = process.env.ECPAY_MERCHANT_ID || '3466445';
+    // 綠界物流API設定 - 使用測試環境
+    this.apiUrl = 'https://logistics-stage.ecpay.com.tw/Helper/GetStoreList';
+    this.merchantID = process.env.ECPAY_MERCHANT_ID || '2000132';
     this.platformID = process.env.ECPAY_PLATFORM_ID || '';
-    this.hashKey = process.env.ECPAY_HASH_KEY || 'u0mKtzqI07btGNNT';
-    this.hashIV = process.env.ECPAY_HASH_IV || 'ZjAbsWWZUvOu8NA0';
+    this.hashKey = process.env.ECPAY_HASH_KEY || '5294y06JbISpM5x9';
+    this.hashIV = process.env.ECPAY_HASH_IV || 'v77hoKGq4kWxNNIS';
   }
 
   // 產生檢查碼
@@ -29,17 +29,33 @@ class ECPayLogistics {
       }
       checkStr += `&HashIV=${this.hashIV}`;
 
+      console.log('🔐 檢查碼原始字串:', checkStr);
+
       // 3. URL encode
       checkStr = encodeURIComponent(checkStr);
       
       // 4. 轉小寫
       checkStr = checkStr.toLowerCase();
 
-      // 5. SHA256加密
+      // 5. 解碼某些特殊字符
+      checkStr = checkStr.replace(/%2d/g, '-');
+      checkStr = checkStr.replace(/%5f/g, '_');
+      checkStr = checkStr.replace(/%2e/g, '.');
+      checkStr = checkStr.replace(/%21/g, '!');
+      checkStr = checkStr.replace(/%2a/g, '*');
+      checkStr = checkStr.replace(/%28/g, '(');
+      checkStr = checkStr.replace(/%29/g, ')');
+
+      console.log('🔐 處理後字串:', checkStr);
+
+      // 6. SHA256加密
       const hash = crypto.createHash('sha256').update(checkStr).digest('hex');
       
-      // 6. 轉大寫
-      return hash.toUpperCase();
+      // 7. 轉大寫
+      const result = hash.toUpperCase();
+      console.log('🔐 最終檢查碼:', result);
+      
+      return result;
     } catch (error) {
       console.error('❌ 產生檢查碼失敗:', error);
       throw error;
