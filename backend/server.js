@@ -38,6 +38,7 @@ app.use(helmet({
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
       "img-src": ["'self'", "data:", "blob:", "https:"],
+      "form-action": ["'self'", "https://logistics.ecpay.com.tw", "https://logistics-stage.ecpay.com.tw"],
     },
   },
 }));
