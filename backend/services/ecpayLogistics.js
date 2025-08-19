@@ -10,61 +10,59 @@ class ECPayLogistics {
     this.hashIV = process.env.ECPAY_HASH_IV || 'v77hoKGq4kWxNNIS';
   }
 
-  // 產生檢查碼 - 依照綠界規範
+  // 產生檢查碼 - 完全按照綠界官方規範
   generateCheckMacValue(params) {
     try {
       console.log('🔐 開始生成檢查碼，原始參數:', params);
       
-      // 1. 移除CheckMacValue參數並按A-Z排序
-      const filteredParams = {};
-      Object.keys(params)
+      // 步驟1: 移除CheckMacValue參數並按A-Z排序
+      const sortedKeys = Object.keys(params)
         .filter(key => key !== 'CheckMacValue')
         .sort((a, b) => {
-          // 依照A-Z字母排序，遇第一個相同時比較第二個，以此類推
+          // 依照第一個英文字母A到Z排序，遇相同時比較第二個字母
           return a.localeCompare(b, 'en', { sensitivity: 'base' });
-        })
-        .forEach(key => {
-          // 確保值為字串且去除前後空白
-          filteredParams[key] = String(params[key]).trim();
         });
 
-      console.log('🔐 排序後參數:', filteredParams);
+      // 步驟1: 將參數依順序串連，格式: param1=value1&param2=value2
+      let paramString = '';
+      sortedKeys.forEach((key, index) => {
+        if (index > 0) paramString += '&';
+        paramString += `${key}=${params[key]}`;
+      });
 
-      // 2. 組合字串格式: HashKey=xxx&param1=value1&param2=value2&HashIV=xxx
-      let checkStr = `HashKey=${this.hashKey.trim()}`;
-      for (const [key, value] of Object.entries(filteredParams)) {
-        checkStr += `&${key}=${value}`;
-      }
-      checkStr += `&HashIV=${this.hashIV.trim()}`;
+      console.log('🔐 步驟1 - 排序串連後:', paramString);
 
-      console.log('🔐 檢查碼原始字串:', checkStr);
+      // 步驟2: 參數最前面加上HashKey、最後面加上HashIV
+      const hashString = `HashKey=${this.hashKey}&${paramString}&HashIV=${this.hashIV}`;
+      console.log('🔐 步驟2 - 加入HashKey/HashIV:', hashString);
 
-      // 3. URL Encode (依照綠界.NET編碼規範)
-      let encodedStr = encodeURIComponent(checkStr);
+      // 步驟3: 進行URL encode
+      let encodedString = encodeURIComponent(hashString);
+      console.log('🔐 步驟3 - URL編碼:', encodedString);
+
+      // 步驟4: 轉為小寫
+      encodedString = encodedString.toLowerCase();
+      console.log('🔐 步驟4 - 轉小寫:', encodedString);
+
+      // 步驟5: 依照綠界.NET編碼規範進行字元替換
+      encodedString = encodedString.replace(/%2d/g, '-');   // -
+      encodedString = encodedString.replace(/%5f/g, '_');   // _
+      encodedString = encodedString.replace(/%2e/g, '.');   // .
+      encodedString = encodedString.replace(/%21/g, '!');   // !
+      encodedString = encodedString.replace(/%2a/g, '*');   // *
+      encodedString = encodedString.replace(/%28/g, '(');   // (
+      encodedString = encodedString.replace(/%29/g, ')');   // )
+      // 注意：空格在encodeURIComponent中會變成%20，但在綠界範例中是+
       
-      // 4. 轉小寫
-      encodedStr = encodedStr.toLowerCase();
+      console.log('🔐 步驟5 - 字元替換後:', encodedString);
 
-      // 5. 依照綠界.NET編碼(ECPAY)轉換表進行字元替換
-      encodedStr = encodedStr.replace(/%2d/g, '-');   // –
-      encodedStr = encodedStr.replace(/%5f/g, '_');   // _
-      encodedStr = encodedStr.replace(/%2e/g, '.');   // .
-      encodedStr = encodedStr.replace(/%21/g, '!');   // !
-      encodedStr = encodedStr.replace(/%2a/g, '*');   // *
-      encodedStr = encodedStr.replace(/%28/g, '(');   // (
-      encodedStr = encodedStr.replace(/%29/g, ')');   // )
-      encodedStr = encodedStr.replace(/%20/g, '+');   // space空格
-      // 保持這些字符為編碼狀態（不替換）
-      // %7e ~, %40 @, %23 #, %24 $, %25 %, %5e ^, %26 &, %3d =, %2b +, %3b ;, %3f ?, %2f /, %5c \, %3e >, %3c <, %60 `, %5b [, %5d ], %7b {, %7d }, %3a :, %27 ', %22 ", %2c ,, %7c |
+      // 步驟6: 使用MD5加密（注意：不是SHA256！）
+      const hash = crypto.createHash('md5').update(encodedString, 'utf8').digest('hex');
+      console.log('🔐 步驟6 - MD5加密:', hash);
 
-      console.log('🔐 URL編碼後字串:', encodedStr);
-
-      // 6. SHA256加密
-      const hash = crypto.createHash('sha256').update(encodedStr, 'utf8').digest('hex');
-      
-      // 7. 轉大寫
+      // 步驟7: 轉大寫產生CheckMacValue
       const result = hash.toUpperCase();
-      console.log('🔐 最終檢查碼:', result);
+      console.log('🔐 步驟7 - 最終檢查碼:', result);
       
       return result;
     } catch (error) {
@@ -248,21 +246,60 @@ class ECPayLogistics {
 
   // 測試檢查碼生成的方法
   testCheckMacValue() {
-    const testParams = {
+    // 使用官方範例數據進行測試
+    const officialTestParams = {
+      MerchantID: '2000933',
+      MerchantTradeNo: 'A20130312153023',
+      MerchantTradeDate: '2013/03/12 15:30:23',
+      LogisticsType: 'CVS',
+      LogisticsSubType: 'FAMIC2C',
+      GoodsAmount: '1000',
+      IsCollection: 'N',
+      ServerReplyURL: 'https://www.ecpay.com.tw/ServerReplyURL',
+      SenderName: '寄件者姓名',
+      ReceiverName: '收件者姓名',
+      ReceiverStoreID: '001779'
+    };
+
+    // 使用官方範例的HashKey和HashIV
+    const originalHashKey = this.hashKey;
+    const originalHashIV = this.hashIV;
+    
+    this.hashKey = 'XBERn1YOvpM9nfZc';
+    this.hashIV = 'h1ONHk4P4yqbl5LK';
+    
+    console.log('🧪 官方範例測試');
+    console.log('🧪 測試參數:', officialTestParams);
+    console.log('🧪 測試用HashKey:', this.hashKey);
+    console.log('🧪 測試用HashIV:', this.hashIV);
+    
+    const officialCheckMac = this.generateCheckMacValue(officialTestParams);
+    console.log('🧪 官方範例生成的CheckMacValue:', officialCheckMac);
+    console.log('🧪 預期結果應為: 692FD6E2CDB539CCDB7206C76DC239AD');
+    
+    // 恢復原本的設定
+    this.hashKey = originalHashKey;
+    this.hashIV = originalHashIV;
+
+    // 測試我們自己的參數
+    const ourTestParams = {
       MerchantID: this.merchantID,
       CvsType: 'UNIMART'
     };
     
-    console.log('🧪 測試參數:', testParams);
-    console.log('🧪 測試用HashKey:', this.hashKey);
-    console.log('🧪 測試用HashIV:', this.hashIV);
-    
-    const checkMac = this.generateCheckMacValue(testParams);
-    console.log('🧪 測試生成的CheckMacValue:', checkMac);
+    const ourCheckMac = this.generateCheckMacValue(ourTestParams);
     
     return {
-      params: testParams,
-      checkMacValue: checkMac
+      officialTest: {
+        params: officialTestParams,
+        checkMacValue: officialCheckMac,
+        expected: '692FD6E2CDB539CCDB7206C76DC239AD',
+        isCorrect: officialCheckMac === '692FD6E2CDB539CCDB7206C76DC239AD'
+      },
+      ourTest: {
+        params: ourTestParams,
+        checkMacValue: ourCheckMac
+      }
     };
   }
 }
