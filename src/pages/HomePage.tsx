@@ -243,7 +243,7 @@ export const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* 頭部導航 */}
-      <nav className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm shadow-sm border-b z-50">
+      <nav className="fixed top-0 left-0 right-0 shadow-sm border-b z-50 animated-nav">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -256,7 +256,7 @@ export const HomePage: React.FC = () => {
                 alt="Hazo Logo" 
                 className="w-10 h-10 mr-3 group-hover:scale-105 transition-transform rounded-md object-cover"
               />
-              <h1 className="text-xl font-bold text-meelful-primary">
+              <h1 className="text-xl font-bold text-white">
                 Hazo
               </h1>
             </div>
@@ -267,7 +267,7 @@ export const HomePage: React.FC = () => {
               <div className="relative">
                 <Button
                   variant="ghost"
-                  className="flex items-center gap-2 text-vintage-green hover:text-vintage-green hover:bg-vintage-pink/50"
+                  className="flex items-center gap-2 text-white hover:text-blue-100 hover:bg-white/20"
                   onClick={() => setShowCategoryMenu(!showCategoryMenu)}
                   onBlur={() => setTimeout(() => setShowCategoryMenu(false), 200)}
                 >
@@ -297,7 +297,7 @@ export const HomePage: React.FC = () => {
               onClick={toggleCart}
               variant="outline"
               size="sm"
-              className="relative hover:bg-vintage-pink/50 border-vintage-green/50 text-vintage-green hover:text-vintage-green"
+              className="relative hover:bg-white/20 border-white/50 text-white hover:text-blue-100"
             >
               <ShoppingBag className="w-4 h-4 mr-2" />
               購物車

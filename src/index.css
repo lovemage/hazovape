@@ -201,3 +201,25 @@ img {
 .pixel-button-secondary:active {
   background: linear-gradient(135deg, #a5bcc3 0%, #91aab2 100%);
 }
+
+/* 動態導航列背景 */
+.animated-nav {
+  background: linear-gradient(45deg, #2196F3 0%, #1565C0 100%);
+  background-size: 200% 200%;
+  animation: background 6s ease infinite;
+  backdrop-filter: blur(8px);
+}
+
+@keyframes background {
+  0% {
+    background-position: 0% 50%;
+  }
+  
+  50% {
+    background-position: 100% 50%;
+  }
+  
+  100% {
+    background-position: 0% 50%;
+  }
+}
