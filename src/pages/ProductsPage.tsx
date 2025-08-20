@@ -21,6 +21,46 @@ export const ProductsPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { getTotalItems, toggleCart } = useCart();
+
+  // 分類顏色映射函數
+  const getCategoryColors = (category: string) => {
+    const colorMap: Record<string, { bg: string; text: string }> = {
+      '拋棄式': { bg: 'bg-blue-100', text: 'text-blue-700' },
+      '主機': { bg: 'bg-purple-100', text: 'text-purple-700' },
+      '煙彈': { bg: 'bg-green-100', text: 'text-green-700' },
+      '配件': { bg: 'bg-orange-100', text: 'text-orange-700' },
+      '電子煙': { bg: 'bg-red-100', text: 'text-red-700' },
+      '煙油': { bg: 'bg-yellow-100', text: 'text-yellow-700' },
+      '其他': { bg: 'bg-gray-100', text: 'text-gray-700' },
+      '新品': { bg: 'bg-pink-100', text: 'text-pink-700' },
+      '熱銷': { bg: 'bg-emerald-100', text: 'text-emerald-700' },
+      '限量': { bg: 'bg-indigo-100', text: 'text-indigo-700' }
+    };
+
+    // 如果找不到對應的分類，使用分類名稱的雜湊值來分配顏色
+    if (colorMap[category]) {
+      return colorMap[category];
+    }
+
+    const colors = [
+      { bg: 'bg-teal-100', text: 'text-teal-700' },
+      { bg: 'bg-cyan-100', text: 'text-cyan-700' },
+      { bg: 'bg-sky-100', text: 'text-sky-700' },
+      { bg: 'bg-violet-100', text: 'text-violet-700' },
+      { bg: 'bg-fuchsia-100', text: 'text-fuchsia-700' },
+      { bg: 'bg-rose-100', text: 'text-rose-700' },
+      { bg: 'bg-amber-100', text: 'text-amber-700' },
+      { bg: 'bg-lime-100', text: 'text-lime-700' }
+    ];
+
+    // 使用分類名稱計算雜湊值來選擇顏色
+    let hash = 0;
+    for (let i = 0; i < category.length; i++) {
+      hash = category.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % colors.length;
+    return colors[index];
+  };
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -217,21 +257,24 @@ export const ProductsPage: React.FC = () => {
 
               {/* 分類篩選 */}
               <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <Button
-                    key={category.id}
-                    variant={selectedCategory === category.name ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handleCategoryChange(category.name)}
-                    className={`${
-                      selectedCategory === category.name 
-                        ? 'bg-vintage-green text-white hover:bg-vintage-green/90' 
-                        : 'border-vintage-green text-vintage-green hover:bg-vintage-green hover:text-white'
-                    }`}
-                  >
-                    {category.name}
-                  </Button>
-                ))}
+                {categories.map((category) => {
+                  const categoryColors = getCategoryColors(category.name);
+                  return (
+                    <Button
+                      key={category.id}
+                      variant={selectedCategory === category.name ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handleCategoryChange(category.name)}
+                      className={`${
+                        selectedCategory === category.name 
+                          ? `${categoryColors.bg} ${categoryColors.text} hover:opacity-80 border-0` 
+                          : `border-2 ${categoryColors.text} hover:${categoryColors.bg} hover:border-transparent`
+                      }`}
+                    >
+                      {category.name}
+                    </Button>
+                  );
+                })}
               </div>
 
               {/* 清除篩選 */}
@@ -251,11 +294,14 @@ export const ProductsPage: React.FC = () => {
             {/* 篩選結果摘要 */}
             <div className="mt-4 flex items-center gap-2 text-sm text-gray-600">
               <span>共找到 {filteredProducts.length} 個商品</span>
-              {selectedCategory && (
-                <Badge variant="secondary" className="bg-vintage-green/10 text-vintage-green">
-                  分類: {selectedCategory}
-                </Badge>
-              )}
+              {selectedCategory && (() => {
+                const categoryColors = getCategoryColors(selectedCategory);
+                return (
+                  <Badge variant="secondary" className={`${categoryColors.bg} ${categoryColors.text} border-0`}>
+                    分類: {selectedCategory}
+                  </Badge>
+                );
+              })()}
               {searchTerm && (
                 <Badge variant="secondary" className="bg-blue-100 text-blue-700">
                   搜索: {searchTerm}
@@ -329,11 +375,17 @@ export const ProductsPage: React.FC = () => {
                       </h3>
                       
                       {/* 商品分類 */}
-                      {product.category && (
-                        <Badge variant="secondary" className="mb-2 bg-vintage-green/10 text-vintage-green">
-                          {product.category}
-                        </Badge>
-                      )}
+                      {product.category && (() => {
+                        const categoryColors = getCategoryColors(product.category);
+                        return (
+                          <Badge 
+                            variant="secondary" 
+                            className={`mb-2 ${categoryColors.bg} ${categoryColors.text} border-0`}
+                          >
+                            {product.category}
+                          </Badge>
+                        );
+                      })()}
 
                       {/* 商品描述 */}
                       {product.description && (
