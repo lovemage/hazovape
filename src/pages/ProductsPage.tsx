@@ -395,64 +395,66 @@ export const ProductsPage: React.FC = () => {
                       )}
 
                       {/* 價格和優惠 */}
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <span className="text-sm sm:text-lg font-bold text-vintage-green whitespace-nowrap">
-                            NT$ {Math.round(product.price).toLocaleString()}
-                          </span>
-                          {discounts && discounts.length > 0 && (
-                            <p className="text-xs text-green-600 mt-1">
-                              {discounts[0].display}
-                            </p>
-                          )}
-                        </div>
-                        <button
-                          className="group flex-shrink-0"
-                          style={{
-                            width: '90px',
-                            height: '36px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'flex-start',
-                            gap: '6px',
-                            backgroundColor: 'rgb(161, 255, 20)',
-                            borderRadius: '30px',
-                            color: 'rgb(19, 19, 19)',
-                            fontWeight: '600',
-                            fontSize: '12px',
-                            border: 'none',
-                            position: 'relative',
-                            cursor: 'pointer',
-                            transitionDuration: '.2s',
-                            boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.116)',
-                            paddingLeft: '6px'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgb(192, 255, 20)';
-                            e.currentTarget.style.transitionDuration = '.5s';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgb(161, 255, 20)';
-                            e.currentTarget.style.transitionDuration = '.5s';
-                          }}
-                          onMouseDown={(e) => {
-                            e.currentTarget.style.transform = 'scale(0.97)';
-                            e.currentTarget.style.transitionDuration = '.2s';
-                          }}
-                          onMouseUp={(e) => {
-                            e.currentTarget.style.transform = 'scale(1)';
-                            e.currentTarget.style.transitionDuration = '.2s';
-                          }}
-                        >
-                          <Rocket 
-                            className="group-hover:rotate-[250deg] transition-transform duration-[1.5s]"
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <span className="text-sm sm:text-lg font-bold text-vintage-green whitespace-nowrap">
+                              NT$ {Math.round(product.price).toLocaleString()}
+                            </span>
+                            {discounts && discounts.length > 0 && (
+                              <p className="text-xs text-green-600 mt-1">
+                                {discounts[0].display}
+                              </p>
+                            )}
+                          </div>
+                          <button
+                            className="group flex-shrink-0"
                             style={{
-                              height: '20px',
-                              fill: 'rgb(19, 19, 19)'
+                              width: '70px',
+                              height: '30px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '4px',
+                              backgroundColor: 'rgb(161, 255, 20)',
+                              borderRadius: '30px',
+                              color: 'rgb(19, 19, 19)',
+                              fontWeight: '600',
+                              fontSize: '11px',
+                              border: 'none',
+                              position: 'relative',
+                              cursor: 'pointer',
+                              transitionDuration: '.2s',
+                              boxShadow: '3px 3px 8px rgba(0, 0, 0, 0.116)',
+                              paddingLeft: '4px'
                             }}
-                          />
-                          選購
-                        </button>
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = 'rgb(192, 255, 20)';
+                              e.currentTarget.style.transitionDuration = '.5s';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'rgb(161, 255, 20)';
+                              e.currentTarget.style.transitionDuration = '.5s';
+                            }}
+                            onMouseDown={(e) => {
+                              e.currentTarget.style.transform = 'scale(0.97)';
+                              e.currentTarget.style.transitionDuration = '.2s';
+                            }}
+                            onMouseUp={(e) => {
+                              e.currentTarget.style.transform = 'scale(1)';
+                              e.currentTarget.style.transitionDuration = '.2s';
+                            }}
+                          >
+                            <Rocket 
+                              className="group-hover:rotate-[250deg] transition-transform duration-[1.5s]"
+                              style={{
+                                height: '16px',
+                                fill: 'rgb(19, 19, 19)'
+                              }}
+                            />
+                            選購
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
