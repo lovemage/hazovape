@@ -345,7 +345,7 @@ export const ProductsPage: React.FC = () => {
                       {/* 價格和優惠 */}
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex-1 min-w-0">
-                          <span className="text-lg sm:text-xl font-bold text-vintage-green">
+                          <span className="text-sm sm:text-lg font-bold text-vintage-green whitespace-nowrap">
                             NT$ {Math.round(product.price).toLocaleString()}
                           </span>
                           {discounts && discounts.length > 0 && (
