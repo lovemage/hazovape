@@ -17,7 +17,8 @@ export const FlavorsPage: React.FC = () => {
   const { addItem, getTotalItems, toggleCart } = useCart();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [flavors, setFlavors] = useState<Flavor[]>([]);
-  const [flavorQuantities, setFlavorQuantities] = useState<Record<number, number>>({});
+  const [selectedFlavor, setSelectedFlavor] = useState<Flavor | null>(null);
+  const [quantity, setQuantity] = useState<number>(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedFlavorForImage, setSelectedFlavorForImage] = useState<Flavor | null>(null);
@@ -126,40 +127,26 @@ export const FlavorsPage: React.FC = () => {
     }
   };
 
-  const handleFlavorQuantityChange = (flavorId: number, delta: number) => {
-    const flavor = flavors.find(f => f.id === flavorId);
+  const handleFlavorSelect = (flavor: Flavor) => {
+    setSelectedFlavor(flavor);
+    setQuantity(1); // 重置數量為1
     
-    setFlavorQuantities(prev => {
-      const currentQuantity = prev[flavorId] || 0;
-      const newQuantity = currentQuantity + delta;
+    // 如果該規格有圖片，則設為當前圖片顯示的規格
+    if (flavor.image) {
+      console.log('🖼️ 切換到規格圖片:', flavor.name, flavor.image);
+      setSelectedFlavorForImage(flavor);
+    } else {
+      setSelectedFlavorForImage(null);
+    }
+  };
 
-      if (newQuantity <= 0) {
-        const { [flavorId]: removed, ...rest } = prev;
-        
-        // 如果移除的是當前選中的規格圖片，則清空選中狀態
-        if (selectedFlavorForImage?.id === flavorId) {
-          setSelectedFlavorForImage(null);
-        }
-        
-        return rest;
-      }
-
-      // 檢查規格庫存
-      if (flavor && newQuantity <= flavor.stock) {
-        // 當選擇規格時，如果該規格有圖片，則設為當前圖片顯示的規格
-        if (flavor.image && (!selectedFlavorForImage || selectedFlavorForImage.id !== flavorId)) {
-          console.log('🖼️ 切換到規格圖片:', flavor.name, flavor.image);
-          setSelectedFlavorForImage(flavor);
-        }
-        
-        return {
-          ...prev,
-          [flavorId]: newQuantity
-        };
-      }
-
-      return prev;
-    });
+  const handleQuantityChange = (delta: number) => {
+    if (!selectedFlavor) return;
+    
+    const newQuantity = quantity + delta;
+    if (newQuantity >= 1 && newQuantity <= selectedFlavor.stock) {
+      setQuantity(newQuantity);
+    }
   };
 
   const getDiscountInfo = () => {
@@ -179,30 +166,14 @@ export const FlavorsPage: React.FC = () => {
   };
 
   const getTotalQuantity = () => {
-    return Object.values(flavorQuantities).reduce((sum, qty) => sum + qty, 0);
+    return selectedFlavor ? quantity : 0;
   };
 
   const getCurrentPrice = () => {
-    if (!selectedProduct) return 0;
+    if (!selectedProduct || !selectedFlavor) return 0;
     
-    // 計算所選規格的總價格（使用每個規格的final_price）
-    let totalPrice = 0;
-    const validFlavors = flavors.filter(flavor => {
-      const qty = flavorQuantities[flavor.id] || 0;
-      return qty > 0;
-    });
-
-    if (validFlavors.length === 0) {
-      return selectedProduct.price;
-    }
-
-    validFlavors.forEach(flavor => {
-      const quantity = flavorQuantities[flavor.id] || 0;
-      const flavorPrice = flavor.final_price || selectedProduct.price; // 使用規格最終價格
-      totalPrice += flavorPrice * quantity;
-    });
-    
-    return totalPrice;
+    const flavorPrice = selectedFlavor.final_price || selectedProduct.price;
+    return flavorPrice * quantity;
   };
 
   const getAppliedDiscount = () => {
@@ -262,45 +233,43 @@ export const FlavorsPage: React.FC = () => {
   };
 
   const handleAddToCart = () => {
-    // 只加入有數量的規格
-    const validFlavors = flavors.filter(flavor => {
-      const qty = flavorQuantities[flavor.id] || 0;
-      return qty > 0;
-    });
-
-    if (validFlavors.length === 0) {
-      toast.error('請選擇規格');
+    if (!selectedFlavor) {
+      toast.error('請選擇口味');
       return;
     }
 
-    const totalQuantity = getTotalQuantity();
-    if (totalQuantity === 0) {
-      toast.error('請選擇規格數量');
+    if (quantity <= 0) {
+      toast.error('請選擇數量');
       return;
     }
 
     const totalPrice = getCurrentPrice();
+    const flavorPrice = selectedFlavor.final_price || selectedProduct.price;
 
-    // 將Flavor[]轉換為ProductVariant[]
-    const productVariants: ProductVariant[] = validFlavors.map(flavor => ({
-      id: flavor.id,
-      name: flavor.name,
-      quantity: flavorQuantities[flavor.id] || 0,
-      price: flavor.final_price || selectedProduct.price // 使用規格最終價格
-    }));
+    const productVariants: ProductVariant[] = [{
+      id: selectedFlavor.id,
+      name: selectedFlavor.name,
+      quantity: quantity,
+      price: flavorPrice
+    }];
 
     const newItem: CartItem = {
-      id: `${selectedProduct.id}-${Date.now()}`,
+      id: `${selectedProduct.id}-${selectedFlavor.id}-${Date.now()}`,
       productId: selectedProduct.id,
       productName: selectedProduct.name,
-      productPrice: totalPrice / totalQuantity, // 平均單價（用於顯示）
-      quantity: totalQuantity,
+      productPrice: flavorPrice,
+      quantity: quantity,
       variants: productVariants,
       subtotal: totalPrice
     };
 
     addItem(newItem);
-    toast.success('已添加到購物車');
+    toast.success(`已添加 ${selectedFlavor.name} x${quantity} 到購物車`);
+    
+    // 重置選擇
+    setSelectedFlavor(null);
+    setQuantity(1);
+    setSelectedFlavorForImage(null);
   };
 
   if (!selectedProduct) {
@@ -535,278 +504,182 @@ export const FlavorsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="pb-40 md:pb-32">
-          {/* 規格選擇 */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">選擇規格和數量</h3>
-
-            {flavors.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500">目前沒有可用的規格</p>
+        {/* 步驟指示 */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between text-sm text-gray-600">
+            <div className={`flex items-center gap-2 ${selectedFlavor ? 'text-green-600' : 'text-blue-600'}`}>
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                selectedFlavor ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+              }`}>
+                1
               </div>
-            ) : (
-              <div className="space-y-4">
-                {flavors.map((flavor) => {
-                  const quantity = flavorQuantities[flavor.id] || 0;
-                  return (
-                    <div
-                      key={flavor.id}
-                      className={`border rounded-lg p-4 transition-all duration-200 ${
-                        quantity > 0
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 flex-1">
-                          {/* 規格小圖 */}
-                          {flavor.image && (
-                            <div 
-                              className={`w-12 h-12 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer transition-all duration-200 ${
-                                selectedFlavorForImage?.id === flavor.id
-                                  ? 'ring-2 ring-blue-500 ring-offset-1'
-                                  : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-1'
-                              }`}
-                              onClick={() => setSelectedFlavorForImage(flavor)}
-                              title="點擊查看大圖"
-                            >
-                              <img
-                                src={flavor.image.startsWith('http') ? flavor.image : getImageUrl(flavor.image)}
-                                alt={`${flavor.name} 圖片`}
-                                className="w-full h-full object-contain bg-white"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none';
-                                }}
-                              />
-                            </div>
-                          )}
-                          
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <h4 className="text-base font-medium text-gray-900">
-                                {flavor.name}
-                              </h4>
-                              {flavor.image && (
-                                <span 
-                                  className={`text-xs px-2 py-1 rounded-full cursor-pointer transition-colors ${
-                                    selectedFlavorForImage?.id === flavor.id
-                                      ? 'bg-blue-100 text-blue-700'
-                                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                  }`}
-                                  onClick={() => setSelectedFlavorForImage(flavor)}
-                                  title="點擊查看大圖"
-                                >
-                                  圖片
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm text-gray-500">
-                              庫存: {flavor.stock} 件
-                            </p>
-                            {quantity > 0 && (
-                              <p className="text-sm text-blue-600 mt-1">
-                                已選擇 {quantity} 件
-                              </p>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleFlavorQuantityChange(flavor.id, -1)}
-                            disabled={quantity <= 0}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Minus className="w-4 h-4" />
-                          </Button>
-
-                          <span className="text-lg font-semibold min-w-[2rem] text-center">
-                            {quantity}
-                          </span>
-
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleFlavorQuantityChange(flavor.id, 1)}
-                            disabled={quantity >= flavor.stock}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Plus className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+              <span>選擇口味</span>
+              {selectedFlavor && <span className="text-green-600">✓</span>}
+            </div>
+            <div className={`flex items-center gap-2 ${selectedFlavor && quantity > 0 ? 'text-green-600' : selectedFlavor ? 'text-blue-600' : 'text-gray-400'}`}>
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                selectedFlavor && quantity > 0 ? 'bg-green-100 text-green-600' : 
+                selectedFlavor ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'
+              }`}>
+                2
               </div>
-            )}
-
-            {totalQuantity > 0 && (
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-medium text-gray-900 mb-2">訂購摘要：</h4>
-                <div className="space-y-1">
-                  {Object.entries(flavorQuantities).map(([flavorId, quantity]) => {
-                    const flavor = flavors.find(f => f.id === parseInt(flavorId));
-                    return flavor && quantity > 0 ? (
-                      <div key={flavorId} className="flex justify-between text-sm">
-                        <span>{flavor.name}</span>
-                        <span className="font-medium">{quantity} 件</span>
-                      </div>
-                    ) : null;
-                  })}
-                  <div className="border-t pt-2 mt-2">
-                    <div className="flex justify-between font-semibold">
-                      <span>總計</span>
-                      <span>{totalQuantity} 件</span>
-                    </div>
-                  </div>
-                </div>
+              <span>選擇數量</span>
+              {selectedFlavor && quantity > 0 && <span className="text-green-600">✓</span>}
+            </div>
+            <div className={`flex items-center gap-2 ${selectedFlavor && quantity > 0 ? 'text-blue-600' : 'text-gray-400'}`}>
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                selectedFlavor && quantity > 0 ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'
+              }`}>
+                3
               </div>
-            )}
+              <span>加入購物車</span>
+            </div>
           </div>
         </div>
-      </main>
 
-      {/* 浮動購物車明細 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50 transition-transform duration-300">
-        <div className="max-w-4xl mx-auto p-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            {/* 左側：總數量和價格 */}
-            <div className="flex-1 text-center sm:text-left">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6">
-                {/* 總數量 */}
-                <div className="flex items-center justify-center sm:justify-start gap-2">
-                  <span className="text-sm text-gray-600">總數量:</span>
-                  <span className="text-lg font-bold text-blue-600">
-                    {totalQuantity} 件
-                  </span>
-                </div>
-
-                {/* 價格 */}
-                <div className="flex items-center justify-center sm:justify-start gap-2">
-                  {appliedDiscount ? (
-                    <>
-                      <span className="text-sm text-gray-500 line-through">
-                        NT$ {Math.round(originalPrice).toLocaleString()}
-                      </span>
-                      <span className={`text-lg font-bold ${appliedDiscount.type === 'item_discount' ? 'text-blue-600' : 'text-green-600'}`}>
-                        NT$ {Math.round(currentPrice).toLocaleString()}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-lg font-bold text-blue-600">
-                      NT$ {Math.round(currentPrice).toLocaleString()}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* 優惠信息 */}
-              {appliedDiscount && (
-                <div className="mt-1">
-                  <span className={`text-xs px-2 py-1 rounded ${appliedDiscount.type === 'item_discount' ? 'text-blue-600 bg-blue-50' : 'text-green-600 bg-green-50'}`}>
-                    {appliedDiscount.display}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* 右側：加入購物車按鈕 */}
-            <div className="flex-shrink-0 w-full sm:w-auto">
-              <Button
-                onClick={handleAddToCart}
-                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
-                size="lg"
-                disabled={totalQuantity === 0}
-              >
-                加入購物車
-                {totalQuantity > 0 && (
-                  <span className="ml-2 px-2 py-1 bg-white/20 rounded-full text-sm">
-                    {totalQuantity}
-                  </span>
-                )}
-              </Button>
-            </div>
-          </div>
-
-                     {/* 訂購明細和多件優惠（折疊顯示） */}
-           {(totalQuantity > 0 || (getDiscountInfo() && Object.keys(getDiscountInfo()!).length > 0)) && (
-             <div className="mt-3 pt-3 border-t border-gray-200 space-y-3">
-               {/* 訂購明細 */}
-               {totalQuantity > 0 && (
-                 <details className="group">
-                   <summary className="cursor-pointer flex items-center justify-between text-sm text-blue-800">
-                     <span className="flex items-center gap-1">
-                       <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                       訂購明細 ({totalQuantity} 件)
-                     </span>
-                     <span className="text-xs text-gray-500 group-open:hidden">展開查看</span>
-                     <span className="text-xs text-gray-500 group-open:block hidden">收起</span>
-                   </summary>
-                   <div className="mt-2 space-y-1">
-                     {Object.entries(flavorQuantities).map(([flavorId, quantity]) => {
-                       const flavor = flavors.find(f => f.id === parseInt(flavorId));
-                       return flavor && quantity > 0 ? (
-                         <div key={flavorId} className="flex justify-between items-center text-xs p-2 bg-blue-50 rounded">
-                           <span className="text-gray-700">{flavor.name}</span>
-                           <span className="font-medium text-blue-600">{quantity} 件</span>
-                         </div>
-                       ) : null;
-                     })}
-                   </div>
-                 </details>
-               )}
-
-               {/* 多件優惠 */}
-               {getDiscountInfo() && Object.keys(getDiscountInfo()!).length > 0 && (
-                 <details className="group">
-                   <summary className="cursor-pointer flex items-center justify-between text-sm text-orange-800">
-                     <span className="flex items-center gap-1">
-                       <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
-                       多件優惠
-                     </span>
-                     <span className="text-xs text-gray-500 group-open:hidden">展開查看</span>
-                     <span className="text-xs text-gray-500 group-open:block hidden">收起</span>
-                   </summary>
-                   <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                     {Object.entries(getDiscountInfo()!).map(([key, value]) => {
-                       const isItemDiscount = key.startsWith('item_');
-                       return (
-                         <div key={key} className={`flex justify-between items-center text-xs p-2 rounded ${isItemDiscount ? 'text-blue-700 bg-blue-50' : 'text-orange-700 bg-orange-50'}`}>
-                           <span>
-                             {isItemDiscount
-                               ? `第${key.replace('item_', '')}件起`
-                               : `${key}件以上`
-                             }
-                           </span>
-                           <span className="font-medium">
-                             {isItemDiscount
-                               ? `每件減${value}元`
-                               : `-${((1 - Number(value)) * 100).toFixed(0)}%`
-                             }
-                           </span>
-                         </div>
-                       );
-                     })}
-                   </div>
-                 </details>
-               )}
-             </div>
-           )}
+        {/* 第一步：選擇口味 */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">第一步：選擇口味</h3>
           
-          {/* 提示文字 */}
-          {totalQuantity === 0 && (
-            <div className="text-center mt-2">
-              <p className="text-xs text-red-500">
-                請至少選擇一種規格和數量
-              </p>
+          {flavors.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">目前沒有可用的口味</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {flavors.map((flavor) => (
+                <button
+                  key={flavor.id}
+                  onClick={() => handleFlavorSelect(flavor)}
+                  disabled={flavor.stock <= 0}
+                  className={`p-4 rounded-lg border transition-all duration-200 text-left ${
+                    selectedFlavor?.id === flavor.id
+                      ? 'border-blue-500 bg-blue-50 shadow-md'
+                      : flavor.stock <= 0
+                      ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
+                      : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                  }`}
+                >
+                  {/* 口味小圖 */}
+                  {flavor.image && (
+                    <div className="w-full h-20 bg-gray-100 rounded-md overflow-hidden mb-3">
+                      <img
+                        src={flavor.image.startsWith('http') ? flavor.image : getImageUrl(flavor.image)}
+                        alt={`${flavor.name} 圖片`}
+                        className="w-full h-full object-contain bg-white"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                  
+                  <h4 className="font-medium text-gray-900 mb-1 text-sm">
+                    {flavor.name}
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    {flavor.stock > 0 ? `庫存 ${flavor.stock} 件` : '缺貨'}
+                  </p>
+                  
+                  {selectedFlavor?.id === flavor.id && (
+                    <div className="mt-2 text-xs text-blue-600 font-medium">
+                      已選擇 ✓
+                    </div>
+                  )}
+                </button>
+              ))}
             </div>
           )}
         </div>
-      </div>
+
+        {/* 第二步：選擇數量 */}
+        {selectedFlavor && (
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">第二步：選擇數量</h3>
+            <div className="bg-blue-50 p-6 rounded-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="font-medium text-gray-900">已選擇：{selectedFlavor.name}</h4>
+                  <p className="text-sm text-gray-600">庫存：{selectedFlavor.stock} 件</p>
+                </div>
+                {selectedFlavor.image && (
+                  <div className="w-16 h-16 bg-white rounded-lg overflow-hidden">
+                    <img
+                      src={selectedFlavor.image.startsWith('http') ? selectedFlavor.image : getImageUrl(selectedFlavor.image)}
+                      alt={`${selectedFlavor.name} 圖片`}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex items-center justify-center gap-4">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => handleQuantityChange(-1)}
+                  disabled={quantity <= 1}
+                  className="h-12 w-12 p-0"
+                >
+                  <Minus className="w-5 h-5" />
+                </Button>
+
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-blue-600">{quantity}</div>
+                  <div className="text-sm text-gray-600">件</div>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => handleQuantityChange(1)}
+                  disabled={quantity >= selectedFlavor.stock}
+                  className="h-12 w-12 p-0"
+                >
+                  <Plus className="w-5 h-5" />
+                </Button>
+              </div>
+              
+              <div className="mt-4 text-center">
+                <p className="text-lg font-semibold text-gray-900">
+                  小計：NT$ {Math.round(getCurrentPrice()).toLocaleString()}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 第三步：加入購物車 */}
+        {selectedFlavor && quantity > 0 && (
+          <div className="mb-20">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">第三步：確認加入購物車</h3>
+            <div className="bg-white border rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="font-medium text-gray-900">{selectedFlavor.name}</h4>
+                  <p className="text-sm text-gray-600">數量：{quantity} 件</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xl font-bold text-blue-600">
+                    NT$ {Math.round(getCurrentPrice()).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              
+              <Button
+                onClick={handleAddToCart}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
+                size="lg"
+              >
+                <ShoppingBag className="w-5 h-5 mr-2" />
+                加入購物車
+              </Button>
+            </div>
+          </div>
+        )}
+      </main>
+
       
       {/* 懸浮聯繫按鈕 */}
       <FloatingContactButtons />

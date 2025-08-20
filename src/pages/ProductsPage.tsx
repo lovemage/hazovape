@@ -343,9 +343,9 @@ export const ProductsPage: React.FC = () => {
                       )}
 
                       {/* 價格和優惠 */}
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-xl font-bold text-vintage-green">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <span className="text-lg sm:text-xl font-bold text-vintage-green">
                             NT$ {Math.round(product.price).toLocaleString()}
                           </span>
                           {discounts && discounts.length > 0 && (
@@ -355,25 +355,25 @@ export const ProductsPage: React.FC = () => {
                           )}
                         </div>
                         <button
-                          className="group"
+                          className="group flex-shrink-0"
                           style={{
-                            width: '110px',
-                            height: '40px',
+                            width: '90px',
+                            height: '36px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'flex-start',
-                            gap: '10px',
+                            gap: '6px',
                             backgroundColor: 'rgb(161, 255, 20)',
                             borderRadius: '30px',
                             color: 'rgb(19, 19, 19)',
                             fontWeight: '600',
-                            fontSize: '14px',
+                            fontSize: '12px',
                             border: 'none',
                             position: 'relative',
                             cursor: 'pointer',
                             transitionDuration: '.2s',
                             boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.116)',
-                            paddingLeft: '8px'
+                            paddingLeft: '6px'
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.backgroundColor = 'rgb(192, 255, 20)';
@@ -395,7 +395,7 @@ export const ProductsPage: React.FC = () => {
                           <Rocket 
                             className="group-hover:rotate-[250deg] transition-transform duration-[1.5s]"
                             style={{
-                              height: '25px',
+                              height: '20px',
                               fill: 'rgb(19, 19, 19)'
                             }}
                           />
