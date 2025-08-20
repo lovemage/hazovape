@@ -297,7 +297,7 @@ export const HomePage: React.FC = () => {
               onClick={toggleCart}
               variant="outline"
               size="sm"
-              className="relative hover:bg-white/20 border-white/50 text-white hover:text-blue-100"
+              className="relative bg-white/95 hover:bg-white border-white text-gray-900 hover:text-gray-900"
             >
               <ShoppingBag className="w-4 h-4 mr-2" />
               購物車
