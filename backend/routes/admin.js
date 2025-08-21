@@ -594,7 +594,7 @@ router.post('/upload-image', authenticateAdmin, upload.single('image'), async (r
   }
 });
 
-// 管理員：刪除廣告彈窗圖片
+// 管理員：刪除圖片（支援 Cloudinary 和本地文件）
 router.delete('/delete-image', authenticateAdmin, async (req, res) => {
   try {
     const { path: imagePath } = req.body;
@@ -608,7 +608,40 @@ router.delete('/delete-image', authenticateAdmin, async (req, res) => {
 
     console.log('🗑️ 準備刪除圖片，原始路徑:', imagePath);
 
-    // 處理不同的圖片路徑格式
+    // 檢查是否為 Cloudinary URL
+    if (imagePath.includes('cloudinary.com') || imagePath.includes('res.cloudinary.com')) {
+      try {
+        console.log('☁️ 刪除 Cloudinary 圖片:', imagePath);
+        
+        // 提取 public_id 並刪除 Cloudinary 圖片
+        const publicId = extractPublicIdFromUrl(imagePath);
+        if (publicId) {
+          const result = await deleteFromCloudinary(publicId);
+          console.log('✅ Cloudinary 圖片刪除成功:', result);
+          
+          res.json({
+            success: true,
+            message: '圖片刪除成功'
+          });
+        } else {
+          console.log('❌ 無法從 URL 提取 public_id:', imagePath);
+          res.status(400).json({
+            success: false,
+            message: '無法識別的 Cloudinary URL 格式'
+          });
+        }
+      } catch (cloudinaryError) {
+        console.error('❌ Cloudinary 圖片刪除失敗:', cloudinaryError);
+        // 即使 Cloudinary 刪除失敗，我們也返回成功，因為前端需要清除引用
+        res.json({
+          success: true,
+          message: '圖片引用已清除（雲端圖片可能已不存在）'
+        });
+      }
+      return;
+    }
+
+    // 處理本地文件路徑
     let fullPath;
     
     if (imagePath.startsWith('/uploads/static/')) {
@@ -646,17 +679,18 @@ router.delete('/delete-image', authenticateAdmin, async (req, res) => {
 
     if (fs.existsSync(fullPath)) {
       fs.unlinkSync(fullPath);
-      console.log('✅ 圖片刪除成功:', fullPath);
+      console.log('✅ 本地圖片刪除成功:', fullPath);
 
       res.json({
         success: true,
         message: '圖片刪除成功'
       });
     } else {
-      console.log('❌ 圖片不存在於路徑:', fullPath);
-      res.status(404).json({
-        success: false,
-        message: '圖片不存在'
+      console.log('❌ 本地圖片不存在於路徑:', fullPath);
+      // 即使本地文件不存在，也返回成功，因為前端需要清除引用
+      res.json({
+        success: true,
+        message: '圖片引用已清除（本地文件可能已不存在）'
       });
     }
 
