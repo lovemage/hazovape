@@ -54,7 +54,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
 
   return (
     <div 
-      className={`relative min-h-[38vh] md:min-h-screen overflow-hidden pt-16 transition-all duration-1000 ease-in-out ${
+      className={`relative min-h-[38vh] md:min-h-screen overflow-hidden pt-20 md:pt-16 transition-all duration-1000 ease-in-out ${
         currentImage ? 'bg-contain bg-center bg-no-repeat' : 'bg-gradient-to-br from-gray-100 to-gray-200'
       }`}
       style={{
@@ -63,7 +63,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
       }}
     >
       {/* 內容覆蓋層 */}
-      <div className="relative z-10 flex items-center justify-center min-h-[calc(38vh-4rem)] md:min-h-[calc(100vh-4rem)]">
+      <div className="relative z-10 flex items-center justify-center min-h-[calc(38vh-5rem)] md:min-h-[calc(100vh-4rem)]">
         <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl">
           {/* Hero 區域標題（僅在啟用且有內容時顯示） */}
           {heroEnabled && (
