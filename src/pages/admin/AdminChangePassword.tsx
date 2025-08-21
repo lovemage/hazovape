@@ -108,7 +108,7 @@ export const AdminChangePassword: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 頭部導航 */}
-      <nav className="bg-white shadow-sm border-b">
+      <nav className="shadow-sm border-b animated-nav">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -116,12 +116,12 @@ export const AdminChangePassword: React.FC = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/admin')}
-                className="mr-4"
+                className="mr-4 text-white hover:text-blue-100 hover:bg-white/20"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 返回後台
               </Button>
-              <h1 className="text-lg font-semibold text-gray-900">修改密碼</h1>
+              <h1 className="text-lg font-semibold text-white">修改密碼</h1>
             </div>
           </div>
         </div>

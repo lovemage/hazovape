@@ -307,7 +307,7 @@ export const FlavorsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 頭部導航 */}
-      <nav className="bg-white shadow-sm border-b sticky top-0 z-40">
+      <nav className="shadow-sm border-b sticky top-0 z-40 animated-nav">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -315,19 +315,19 @@ export const FlavorsPage: React.FC = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/products')}
-                className="mr-4"
+                className="mr-4 text-white hover:text-blue-100 hover:bg-white/20"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 返回商品
               </Button>
-              <h1 className="text-lg font-semibold text-gray-900">選擇規格</h1>
+              <h1 className="text-lg font-semibold text-white">選擇規格</h1>
             </div>
 
             <Button
               onClick={toggleCart}
               variant="outline"
               size="sm"
-              className="relative"
+              className="relative bg-white/95 hover:bg-white border-white text-gray-900 hover:text-gray-900"
             >
               <ShoppingBag className="w-4 h-4 mr-2" />
               購物車

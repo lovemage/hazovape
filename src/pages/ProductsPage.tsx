@@ -202,13 +202,13 @@ export const ProductsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 頭部導航 */}
-      <nav className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm shadow-sm border-b z-50">
+      <nav className="fixed top-0 left-0 right-0 shadow-sm border-b z-50 animated-nav">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Button
               variant="ghost"
               onClick={() => navigate('/')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 text-white hover:text-blue-100 hover:bg-white/20"
             >
               <ArrowLeft className="w-4 h-4" />
               返回首頁
@@ -218,7 +218,7 @@ export const ProductsPage: React.FC = () => {
               onClick={toggleCart}
               variant="outline"
               size="sm"
-              className="relative"
+              className="relative bg-white/95 hover:bg-white border-white text-gray-900 hover:text-gray-900"
             >
               <ShoppingBag className="w-4 h-4 mr-2" />
               購物車
