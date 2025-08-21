@@ -65,16 +65,35 @@ if (storeName && storeId) {
         };
         localStorage.setItem('ecpay_store_selection', JSON.stringify(selectionData));
         
+        // 移動端專用: 設置一個標記讓主頁面輪詢檢查
+        localStorage.setItem('ecpay_mobile_callback_flag', Date.now().toString());
+        
         // 觸發 storage 事件 (在同一視窗中手動觸發)
-        window.dispatchEvent(new StorageEvent('storage', {
-            key: 'ecpay_store_selection',
-            newValue: JSON.stringify(selectionData),
-            oldValue: null
-        }));
+        try {
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: 'ecpay_store_selection',
+                newValue: JSON.stringify(selectionData),
+                oldValue: null
+            }));
+        } catch (storageEventError) {
+            console.log('⚠️ StorageEvent 觸發失敗，這在某些移動瀏覽器中是正常的');
+        }
         
         callbackSuccess = true;
     } catch (error) {
         console.error('❌ 方案3失敗:', error);
+    }
+
+    // 方案4: 移動端專用 - 嘗試通過 URL hash 傳遞 (最後備選)
+    if (window.opener) {
+        try {
+            console.log('✅ 方案4: 使用 URL hash 通知');
+            const hashData = encodeURIComponent(JSON.stringify(storeData));
+            window.opener.location.hash = `store_selected_${Date.now()}_${hashData}`;
+            callbackSuccess = true;
+        } catch (error) {
+            console.error('❌ 方案4失敗:', error);
+        }
     }
 
     // 更新顯示

@@ -89,21 +89,21 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
       {/* 輪播控制（只在有多張圖片時顯示） */}
       {validImages.length > 1 && (
         <>
-          {/* 左右箭頭 */}
+          {/* 左右箭頭 - 隱藏圖示但保留點擊區域 */}
           <button
             onClick={goToPrevious}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-transparent hover:bg-white/20 p-4 rounded-full transition-all duration-200"
             aria-label="Previous image"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <span className="sr-only">上一張</span>
           </button>
           
           <button
             onClick={goToNext}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-transparent hover:bg-white/20 p-4 rounded-full transition-all duration-200"
             aria-label="Next image"
           >
-            <ChevronRight className="w-6 h-6" />
+            <span className="sr-only">下一張</span>
           </button>
 
           {/* 指示器 */}

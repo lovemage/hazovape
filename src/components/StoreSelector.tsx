@@ -122,30 +122,83 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
 
     // 移動端專用：定期檢查 localStorage (因為某些移動瀏覽器的 storage 事件可能不可靠)
     const pollForStorageChanges = () => {
+      let lastCheckFlag = '';
+      
       const checkStorage = () => {
         try {
-          const existingData = localStorage.getItem('ecpay_store_selection');
-          if (existingData) {
-            console.log('🔄 移動端檢查發現 localStorage 數據');
-            handleStorageChange({
-              key: 'ecpay_store_selection',
-              newValue: existingData,
-              oldValue: null
-            } as StorageEvent);
+          // 檢查移動端標記
+          const mobileFlag = localStorage.getItem('ecpay_mobile_callback_flag');
+          if (mobileFlag && mobileFlag !== lastCheckFlag) {
+            console.log('🔄 檢測到移動端回調標記變化:', mobileFlag);
+            lastCheckFlag = mobileFlag;
+            
+            // 檢查實際數據
+            const existingData = localStorage.getItem('ecpay_store_selection');
+            if (existingData) {
+              console.log('🔄 移動端檢查發現 localStorage 數據');
+              handleStorageChange({
+                key: 'ecpay_store_selection',
+                newValue: existingData,
+                oldValue: null
+              } as StorageEvent);
+              
+              // 清理標記
+              localStorage.removeItem('ecpay_mobile_callback_flag');
+            }
           }
         } catch (error) {
           console.error('❌ 移動端 localStorage 檢查失敗:', error);
         }
       };
 
-      // 每秒檢查一次，持續30秒
-      const pollInterval = setInterval(checkStorage, 1000);
+      // 每0.5秒檢查一次，持續60秒 (移動端需要更頻繁的檢查)
+      const pollInterval = setInterval(checkStorage, 500);
       setTimeout(() => {
         clearInterval(pollInterval);
         console.log('🔄 移動端 localStorage 輪詢結束');
-      }, 30000);
+      }, 60000);
 
       return pollInterval;
+    };
+
+    // URL hash 監聽器 (移動端備選方案)
+    const handleHashChange = () => {
+      try {
+        const hash = window.location.hash;
+        if (hash.startsWith('#store_selected_')) {
+          console.log('🔗 檢測到 URL hash 門市選擇:', hash);
+          
+          const parts = hash.substring(15).split('_'); // 移除 "#store_selected_"
+          if (parts.length >= 2) {
+            const timestamp = parseInt(parts[0]);
+            const encodedData = parts.slice(1).join('_');
+            
+            // 檢查時間戳，只處理最近 30 秒內的數據
+            const timeDiff = Date.now() - timestamp;
+            if (timeDiff < 30000) {
+              try {
+                const storeData = JSON.parse(decodeURIComponent(encodedData));
+                console.log('🔗 從 URL hash 解析門市數據:', storeData);
+                
+                if (typeof (window as any).handleStoreSelection === 'function') {
+                  (window as any).handleStoreSelection(storeData);
+                  console.log('✅ URL hash handleStoreSelection 調用完成');
+                }
+                
+                // 清理 hash
+                window.location.hash = '';
+              } catch (parseError) {
+                console.error('❌ 解析 URL hash 數據失敗:', parseError);
+              }
+            } else {
+              console.log('⚠️ URL hash 數據過期，忽略');
+              window.location.hash = '';
+            }
+          }
+        }
+      } catch (error) {
+        console.error('❌ 處理 URL hash 失敗:', error);
+      }
     };
 
     // 檢查是否有遺留的 localStorage 數據 (頁面刷新場景)
@@ -205,9 +258,11 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
 
     window.addEventListener('message', handleMessage);
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('hashchange', handleHashChange);
     
     // 初始檢查
     checkExistingStorageData();
+    handleHashChange(); // 檢查當前是否已有hash
 
     // 啟動移動端輪詢檢查
     const pollInterval = pollForStorageChanges();
@@ -217,6 +272,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
       delete (window as any).handleStoreSelection;
       window.removeEventListener('message', handleMessage);
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('hashchange', handleHashChange);
       if (pollInterval) {
         clearInterval(pollInterval);
       }
