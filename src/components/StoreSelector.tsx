@@ -120,6 +120,34 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
       }
     };
 
+    // 移動端專用：定期檢查 localStorage (因為某些移動瀏覽器的 storage 事件可能不可靠)
+    const pollForStorageChanges = () => {
+      const checkStorage = () => {
+        try {
+          const existingData = localStorage.getItem('ecpay_store_selection');
+          if (existingData) {
+            console.log('🔄 移動端檢查發現 localStorage 數據');
+            handleStorageChange({
+              key: 'ecpay_store_selection',
+              newValue: existingData,
+              oldValue: null
+            } as StorageEvent);
+          }
+        } catch (error) {
+          console.error('❌ 移動端 localStorage 檢查失敗:', error);
+        }
+      };
+
+      // 每秒檢查一次，持續30秒
+      const pollInterval = setInterval(checkStorage, 1000);
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        console.log('🔄 移動端 localStorage 輪詢結束');
+      }, 30000);
+
+      return pollInterval;
+    };
+
     // 檢查是否有遺留的 localStorage 數據 (頁面刷新場景)
     const checkExistingStorageData = () => {
       try {
@@ -181,11 +209,17 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
     // 初始檢查
     checkExistingStorageData();
 
+    // 啟動移動端輪詢檢查
+    const pollInterval = pollForStorageChanges();
+
     // 清理函數
     return () => {
       delete (window as any).handleStoreSelection;
       window.removeEventListener('message', handleMessage);
       window.removeEventListener('storage', handleStorageChange);
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
     };
   }, [onStoreSelect]);
 
