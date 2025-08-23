@@ -214,9 +214,9 @@ async function migrateAddUpsellFeatures() {
       // 插入基本設置
       const settings = [
         ['homepage_subtitle', '精選優質茶葉、咖啡豆與手工餅乾，為您帶來最美好的味覺體驗', '首頁副標題'],
-        ['contact_telegram', 't.me/whalesale', 'Telegram 客服連結'],
+        ['contact_telegram', 't.me/edward0521', 'Telegram 客服連結'],
         ['free_shipping_threshold', '3000', '免運費門檻'],
-        ['store_notice', '本賣場3000免運優惠中 當天出貨 訂購成功逾30分無法修改及取消訂單。 超商貨到付款機制配送時效1-3日。 請勿棄單或惡作劇下單(避免浪費彼此時間)。 配送狀態可以後台自行查詢配送狀態。 有相關問題請加飛機telegram( @whalesale ) 如遇口味缺貨，已有選擇的口味遞補！ 無售後無保固下單即同意', '商店公告']
+        ['store_notice', '本賣場3000免運優惠中 當天出貨 訂購成功逾30分無法修改及取消訂單。 超商貨到付款機制配送時效1-3日。 請勿棄單或惡作劇下單(避免浪費彼此時間)。 配送狀態可以後台自行查詢配送狀態。 有相關問題請加飛機telegram( @edward0521 ) 如遇口味缺貨，已有選擇的口味遞補！ 無售後無保固下單即同意', '商店公告']
       ];
       
       for (const [key, value, description] of settings) {

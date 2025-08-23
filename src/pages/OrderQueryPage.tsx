@@ -48,7 +48,7 @@ const OrderQueryPage: React.FC = () => {
   const [verificationCode, setVerificationCode] = useState('');
   const [orderData, setOrderData] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(false);
-  const [telegramUrl, setTelegramUrl] = useState<string>('https://t.me/whalesale');
+  const [telegramUrl, setTelegramUrl] = useState<string>('t.me/edward0521');
 
   useEffect(() => {
     loadSettings();

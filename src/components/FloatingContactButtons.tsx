@@ -8,8 +8,8 @@ interface FloatingContactButtonsProps {
 export const FloatingContactButtons: React.FC<FloatingContactButtonsProps> = ({ className = '' }) => {
   const location = useLocation();
   const [enabled, setEnabled] = useState<boolean>(true);
-  const [lineUrl, setLineUrl] = useState<string>('https://line.me/ti/p/@590shgcm');
-  const [telegramUrl, setTelegramUrl] = useState<string>('https://t.me/whalesale');
+  const [lineUrl, setLineUrl] = useState<string>('https://line.me/ti/p/euNh8K-s3e');
+  const [telegramUrl, setTelegramUrl] = useState<string>('t.me/edward0521');
 
   // 檢查是否有底部導航（與 MobileNavigation 組件邏輯一致）
   const hasBottomNavigation = !location.pathname.includes('/admin') && 

@@ -35,8 +35,8 @@ export const HomePage: React.FC = () => {
   const [showAdPopup, setShowAdPopup] = useState(false);
   const [popupImage, setPopupImage] = useState<string>('/uploads/static/unlock-popup.png');
   const [popupEnabled, setPopupEnabled] = useState<boolean>(true);
-  const [lineUrl, setLineUrl] = useState<string>('https://line.me/ti/p/@590shgcm');
-  const [telegramUrl, setTelegramUrl] = useState<string>('https://t.me/whalesale');
+  const [lineUrl, setLineUrl] = useState<string>('https://line.me/ti/p/euNh8K-s3e');
+  const [telegramUrl, setTelegramUrl] = useState<string>('t.me/edward0521');
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [heroBackgroundImage, setHeroBackgroundImage] = useState<string>('');

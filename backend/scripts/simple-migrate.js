@@ -128,7 +128,7 @@ async function simpleMigrate() {
                 // 插入基本設置
                 const settings = [
                   ['homepage_subtitle', '精選優質茶葉、咖啡豆與手工餅乾，為您帶來最美好的味覺體驗', '首頁副標題'],
-                  ['contact_telegram', 't.me/whalesale', 'Telegram 客服連結'],
+                  ['contact_telegram', 't.me/edward0521', 'Telegram 客服連結'],
                   ['free_shipping_threshold', '3000', '免運費門檻'],
                   ['store_notice', '本賣場3000免運優惠中 當天出貨', '商店公告']
                 ];
