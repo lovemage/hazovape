@@ -36,6 +36,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     description: '',
     category: '其他',
     is_active: true,
+    disable_coupon: false,
     multi_discount: {} as Record<number, number>
   });
   const [images, setImages] = useState<File[]>([]);
@@ -78,6 +79,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         description: product.description || '',
         category: product.category || '其他',
         is_active: product.is_active ?? true,
+        disable_coupon: product.disable_coupon ?? false,
         multi_discount: typeof product.multi_discount === 'string' 
           ? JSON.parse(product.multi_discount || '{}')
           : product.multi_discount || {}
@@ -97,6 +99,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         description: '',
         category: '其他',
         is_active: true,
+        disable_coupon: false,
         multi_discount: {}
       });
       setExistingImages([]);
@@ -238,6 +241,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       submitData.append('description', formData.description);
       submitData.append('category', formData.category);
       submitData.append('is_active', formData.is_active?.toString() || 'true');
+      submitData.append('disable_coupon', formData.disable_coupon?.toString() || 'false');
       submitData.append('multi_discount', JSON.stringify(formData.multi_discount));
       
       console.log('🖼️  現有圖片:', existingImages);
@@ -390,6 +394,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   onCheckedChange={(checked) => handleInputChange('is_active', checked)}
                 />
                 <Label htmlFor="is_active">啟用商品</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="disable_coupon"
+                  checked={formData.disable_coupon}
+                  onCheckedChange={(checked) => handleInputChange('disable_coupon', checked)}
+                />
+                <Label htmlFor="disable_coupon">禁止使用優惠券</Label>
               </div>
             </CardContent>
           </Card>

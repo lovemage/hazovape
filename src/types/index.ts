@@ -17,6 +17,7 @@ export interface Product {
   images?: string | string[];
   image?: string;
   is_active?: boolean;
+  disable_coupon?: boolean;
   variants?: ProductVariant[];
   sort_order?: number;
   created_at?: string;

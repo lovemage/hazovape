@@ -7,7 +7,7 @@ const router = express.Router();
 // 前端API：驗證優惠券
 router.post('/validate', async (req, res) => {
   try {
-    const { code, customerPhone, subtotal } = req.body;
+    const { code, customerPhone, subtotal, cartItems } = req.body;
 
     if (!code || !code.trim()) {
       return res.status(400).json({
@@ -23,7 +23,7 @@ router.post('/validate', async (req, res) => {
       });
     }
 
-    console.log('🎫 驗證優惠券:', { code, customerPhone, subtotal });
+    console.log('🎫 驗證優惠券:', { code, customerPhone, subtotal, cartItemsCount: cartItems?.length || 0 });
 
     // 查找優惠券
     const coupon = await Database.get(`
@@ -48,6 +48,30 @@ router.post('/validate', async (req, res) => {
         success: false,
         message: '優惠券已過期'
       });
+    }
+
+    // 檢查購物車中是否有禁止使用優惠券的產品
+    if (cartItems && Array.isArray(cartItems)) {
+      console.log('🛒 檢查購物車商品優惠券限制...');
+      
+      for (const item of cartItems) {
+        const productId = item.productId || item.id;
+        if (productId) {
+          const product = await Database.get(
+            'SELECT id, name, disable_coupon FROM products WHERE id = ?',
+            [productId]
+          );
+          
+          if (product && product.disable_coupon) {
+            console.log('❌ 發現禁止使用優惠券的產品:', product.name);
+            return res.json({
+              success: false,
+              message: `商品「${product.name}」不可使用優惠券`
+            });
+          }
+        }
+      }
+      console.log('✅ 購物車商品優惠券檢查通過');
     }
 
     // 檢查最低訂單金額

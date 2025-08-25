@@ -64,13 +64,13 @@ router.get('/', async (req, res) => {
     let products;
     try {
       products = await Database.all(
-        'SELECT id, name, description, price, category, multi_discount, images, is_active, sort_order FROM products WHERE is_active = true ORDER BY sort_order ASC, id ASC'
+        'SELECT id, name, description, price, category, multi_discount, images, is_active, disable_coupon, sort_order FROM products WHERE is_active = true ORDER BY sort_order ASC, id ASC'
       );
     } catch (error) {
       if (error.message.includes('no such column: sort_order')) {
         console.log('⚠️  sort_order 字段不存在，使用默認排序');
         products = await Database.all(
-          'SELECT id, name, description, price, category, multi_discount, images, is_active FROM products WHERE is_active = true ORDER BY id ASC'
+          'SELECT id, name, description, price, category, multi_discount, images, is_active, disable_coupon FROM products WHERE is_active = true ORDER BY id ASC'
         );
         // 為每個產品添加默認 sort_order
         products = products.map((product, index) => ({
@@ -123,7 +123,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
     
     const product = await Database.get(
-      'SELECT id, name, description, price, multi_discount, images, is_active, created_at FROM products WHERE id = ? AND is_active = true',
+      'SELECT id, name, description, price, multi_discount, images, is_active, disable_coupon, created_at FROM products WHERE id = ? AND is_active = true',
       [id]
     );
 
@@ -172,13 +172,13 @@ router.get('/admin/all', authenticateAdmin, async (req, res) => {
     let products;
     try {
       products = await Database.all(
-        'SELECT id, name, description, price, category, multi_discount, images, is_active, created_at, sort_order FROM products ORDER BY sort_order ASC, created_at DESC'
+        'SELECT id, name, description, price, category, multi_discount, images, is_active, disable_coupon, created_at, sort_order FROM products ORDER BY sort_order ASC, created_at DESC'
       );
     } catch (error) {
       if (error.message.includes('no such column: sort_order')) {
         console.log('⚠️  sort_order 字段不存在，使用默認排序');
         products = await Database.all(
-          'SELECT id, name, description, price, category, multi_discount, images, is_active, created_at FROM products ORDER BY created_at DESC'
+          'SELECT id, name, description, price, category, multi_discount, images, is_active, disable_coupon, created_at FROM products ORDER BY created_at DESC'
         );
         // 為每個產品添加默認 sort_order
         products = products.map((product, index) => ({
@@ -213,7 +213,7 @@ router.get('/admin/all', authenticateAdmin, async (req, res) => {
 // 管理員：創建產品
 router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, res) => {
   try {
-    const { name, description, price, category, multi_discount, existing_images } = req.body;
+    const { name, description, price, category, multi_discount, existing_images, disable_coupon } = req.body;
 
     console.log('🆕 創建產品請求');
     console.log('📝 請求數據:', { name, price, category, existing_images });
@@ -296,7 +296,7 @@ router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, 
 
     // 插入產品數據
     const result = await Database.run(
-      'INSERT INTO products (name, description, price, category, multi_discount, images, is_active, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id',
+      'INSERT INTO products (name, description, price, category, multi_discount, images, is_active, disable_coupon, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id',
       [
         name,
         description || '',
@@ -305,6 +305,7 @@ router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, 
         JSON.stringify(parsedMultiDiscount),
         JSON.stringify(allImages),
         true,
+        disable_coupon === 'true' || disable_coupon === true ? 1 : 0,
         nextSortOrder
       ]
     );
@@ -381,7 +382,7 @@ router.put('/admin/update-sort-order', authenticateAdmin, async (req, res) => {
 router.put('/admin/:id', authenticateAdmin, upload.array('images', 5), async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, price, category, multi_discount, existing_images } = req.body;
+    const { name, description, price, category, multi_discount, existing_images, disable_coupon } = req.body;
 
     console.log('🔄 更新產品請求, ID:', id);
     console.log('📝 請求數據:', { name, price, category, existing_images });
@@ -459,7 +460,7 @@ router.put('/admin/:id', authenticateAdmin, upload.array('images', 5), async (re
 
     const result = await Database.run(
       `UPDATE products 
-       SET name = ?, description = ?, price = ?, category = ?, multi_discount = ?, images = ?
+       SET name = ?, description = ?, price = ?, category = ?, multi_discount = ?, images = ?, disable_coupon = ?
        WHERE id = ?`,
       [
         name,
@@ -468,6 +469,7 @@ router.put('/admin/:id', authenticateAdmin, upload.array('images', 5), async (re
         category || '其他',
         JSON.stringify(parsedMultiDiscount),
         JSON.stringify(currentImages),
+        disable_coupon === 'true' || disable_coupon === true ? 1 : 0,
         id
       ]
     );
@@ -903,7 +905,7 @@ router.get('/category/:category', async (req, res) => {
     console.log('🏷️ 根據分類獲取產品:', category);
     
     const products = await Database.all(
-      'SELECT id, name, description, price, category, multi_discount, images, is_active FROM products WHERE is_active = true AND category = ? ORDER BY id',
+      'SELECT id, name, description, price, category, multi_discount, images, is_active, disable_coupon FROM products WHERE is_active = true AND category = ? ORDER BY id',
       [category]
     );
 
