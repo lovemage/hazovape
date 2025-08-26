@@ -410,17 +410,17 @@ export const HomePage: React.FC = () => {
 
       {/* 公告區塊 */}
       {announcements.length > 0 && (
-        <section className="bg-gray-50 py-8">
+        <section 
+          className="py-8"
+          style={{
+            backgroundImage: 'url(/images_title/background.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        >
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div 
-              className="rounded-2xl border border-gray-200 p-6 shadow-lg"
-              style={{
-                backgroundImage: 'url(/images_title/background.png)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-              }}
-            >
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-lg">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-center gap-2">
                 <div className="w-3 h-3 bg-gradient-to-r from-vape-cyan to-vape-purple rounded-full animate-pulse"></div>
                 最新公告
