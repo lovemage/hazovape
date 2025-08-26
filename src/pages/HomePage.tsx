@@ -430,8 +430,18 @@ export const HomePage: React.FC = () => {
         {/* 精選商品 */}
         <div id="products" className="mb-12">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">精選商品</h2>
-            <p className="text-gray-600">為您推薦的優質商品</p>
+            <img 
+              src="/images_title/2.png" 
+              alt="精選商品" 
+              className="mx-auto max-w-[650px] w-full md:w-[650px] w-[550px]"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const fallback = document.createElement('div');
+                fallback.innerHTML = '<h2 class="text-3xl font-bold text-gray-900 mb-2">精選商品</h2><p class="text-gray-600">為您推薦的優質商品</p>';
+                target.parentNode?.appendChild(fallback);
+              }}
+            />
           </div>
           
           {loading ? (

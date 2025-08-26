@@ -235,9 +235,19 @@ export const ProductsPage: React.FC = () => {
       {/* 主要內容 */}
       <main className="pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">商品選購</h1>
-            <p className="text-gray-600">選擇您喜愛的商品，點擊進入口味選擇</p>
+          <div className="mb-8 text-center">
+            <img 
+              src="/images_title/3.png" 
+              alt="商品選購" 
+              className="mx-auto max-w-[650px] w-full md:w-[650px] w-[550px]"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const fallback = document.createElement('div');
+                fallback.innerHTML = '<h1 class="text-3xl font-bold text-gray-900 mb-2">商品選購</h1><p class="text-gray-600">選擇您喜愛的商品，點擊進入口味選擇</p>';
+                target.parentNode?.appendChild(fallback);
+              }}
+            />
           </div>
 
           {/* 篩選區域 */}
