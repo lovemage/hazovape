@@ -408,31 +408,31 @@ export const HomePage: React.FC = () => {
         </section>
       )}
 
-      {/* 公告區塊 */}
-      {announcements.length > 0 && (
-        <section 
-          className="py-8"
-          style={{
-            backgroundImage: 'url(/images_title/background.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-        >
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-lg">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-center gap-2">
-                <div className="w-3 h-3 bg-gradient-to-r from-vape-cyan to-vape-purple rounded-full animate-pulse"></div>
-                最新公告
-              </h3>
-              <AnnouncementCarousel 
-                announcements={announcements.map(a => ({ title: a.title, content: a.content }))}
-                className="text-gray-700 text-base leading-relaxed"
-              />
-            </div>
+      {/* 最新公告圖片 */}
+      <section 
+        className="py-8"
+        style={{
+          backgroundImage: 'url(/images_title/background.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <img 
+              src="/images_title/an.png" 
+              alt="最新公告" 
+              className="mx-auto max-w-[550px] w-full md:w-[550px] sm:w-[480px]"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                console.log('公告圖片載入失敗');
+              }}
+            />
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* 管理員提示 */}
       {showAdminHint && (

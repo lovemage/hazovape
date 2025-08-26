@@ -85,7 +85,7 @@ export const MobileNavigation: React.FC = () => {
       )}
 
       {/* 底部導航欄 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-30 md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 animated-nav border-t border-white/20 shadow-lg z-30 md:hidden">
         <div className="flex items-center justify-around py-2">
           {/* 首頁按鈕 */}
           <Button
@@ -94,8 +94,8 @@ export const MobileNavigation: React.FC = () => {
             size="sm"
             className={`flex flex-col items-center gap-1 px-4 py-2 ${
               location.pathname === '/' 
-                ? 'text-vintage-green bg-vintage-pink/20' 
-                : 'text-gray-600 hover:text-vintage-green'
+                ? 'text-white bg-white/20' 
+                : 'text-white/80 hover:text-white'
             }`}
           >
             <Home className="w-5 h-5" />
@@ -109,8 +109,8 @@ export const MobileNavigation: React.FC = () => {
             size="sm"
             className={`flex flex-col items-center gap-1 px-4 py-2 ${
               showCategoryMenu
-                ? 'text-vintage-green bg-vintage-pink/20'
-                : 'text-gray-600 hover:text-vintage-green'
+                ? 'text-white bg-white/20'
+                : 'text-white/80 hover:text-white'
             }`}
           >
             <div className="relative">
@@ -129,7 +129,7 @@ export const MobileNavigation: React.FC = () => {
             onClick={toggleCart}
             variant="ghost"
             size="sm"
-            className="flex flex-col items-center gap-1 px-4 py-2 text-gray-600 hover:text-vintage-green relative"
+            className="flex flex-col items-center gap-1 px-4 py-2 text-white/80 hover:text-white relative"
           >
             <div className="relative">
               <ShoppingBag className="w-5 h-5" />
