@@ -408,31 +408,41 @@ export const HomePage: React.FC = () => {
         </section>
       )}
 
-      {/* 最新公告圖片 */}
-      <section 
-        className="py-8"
-        style={{
-          backgroundImage: 'url(/images_title/background.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <img 
-              src="/images_title/an.png" 
-              alt="最新公告" 
-              className="mx-auto max-w-[550px] w-full md:w-[550px] sm:w-[480px]"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                console.log('公告圖片載入失敗');
-              }}
-            />
+      {/* 公告區塊 */}
+      {announcements.length > 0 && (
+        <section 
+          className="py-8"
+          style={{
+            backgroundImage: 'url(/images_title/background.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        >
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-lg">
+              {/* 標題圖片裝飾 */}
+              <div className="text-center mb-4">
+                <img 
+                  src="/images_title/an.png" 
+                  alt="最新公告" 
+                  className="mx-auto max-w-[550px] w-full md:w-[550px] sm:w-[480px]"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    console.log('公告圖片載入失敗');
+                  }}
+                />
+              </div>
+              {/* 公告內容 */}
+              <AnnouncementCarousel 
+                announcements={announcements.map(a => ({ title: a.title, content: a.content }))}
+                className="text-gray-700 text-base leading-relaxed"
+              />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 管理員提示 */}
       {showAdminHint && (
