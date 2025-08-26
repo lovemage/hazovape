@@ -23,6 +23,8 @@ if (process.env.DATABASE_URL) {
         // 修復 PostgreSQL 布林值比較問題
         convertedSql = convertedSql.replace(/is_active\s*=\s*1/gi, 'is_active = true');
         convertedSql = convertedSql.replace(/is_active\s*=\s*0/gi, 'is_active = false');
+        convertedSql = convertedSql.replace(/disable_coupon\s*=\s*1/gi, 'disable_coupon = true');
+        convertedSql = convertedSql.replace(/disable_coupon\s*=\s*0/gi, 'disable_coupon = false');
         
         const result = await pool.query(convertedSql, params);
         
@@ -47,6 +49,8 @@ if (process.env.DATABASE_URL) {
         // 修復 PostgreSQL 布林值比較問題
         convertedSql = convertedSql.replace(/is_active\s*=\s*1/gi, 'is_active = true');
         convertedSql = convertedSql.replace(/is_active\s*=\s*0/gi, 'is_active = false');
+        convertedSql = convertedSql.replace(/disable_coupon\s*=\s*1/gi, 'disable_coupon = true');
+        convertedSql = convertedSql.replace(/disable_coupon\s*=\s*0/gi, 'disable_coupon = false');
         
         const result = await pool.query(convertedSql, params);
         return result.rows[0] || null;
@@ -67,6 +71,8 @@ if (process.env.DATABASE_URL) {
         // 修復 PostgreSQL 布林值比較問題
         convertedSql = convertedSql.replace(/is_active\s*=\s*1/gi, 'is_active = true');
         convertedSql = convertedSql.replace(/is_active\s*=\s*0/gi, 'is_active = false');
+        convertedSql = convertedSql.replace(/disable_coupon\s*=\s*1/gi, 'disable_coupon = true');
+        convertedSql = convertedSql.replace(/disable_coupon\s*=\s*0/gi, 'disable_coupon = false');
         
         const result = await pool.query(convertedSql, params);
         return result.rows;

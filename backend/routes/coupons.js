@@ -246,23 +246,44 @@ router.post('/admin', authenticateAdmin, async (req, res) => {
       });
     }
 
-    const result = await Database.run(`
-      INSERT INTO coupons (
-        code, name, description, discount_type, discount_value, min_order_amount,
-        max_discount_amount, usage_limit, start_date, end_date
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      RETURNING id
-    `, [
-      code.toUpperCase(), name, description || '', type, value, min_order_amount || 0,
-      max_discount, usage_limit, valid_from, valid_until
-    ]);
+    // 根據數據庫類型使用不同的 SQL
+    const isPostgreSQL = !!process.env.DATABASE_URL;
+    let result;
+    let couponId;
 
-    console.log('✅ 優惠券創建成功:', code);
+    if (isPostgreSQL) {
+      // PostgreSQL 使用 RETURNING 子句
+      result = await Database.get(`
+        INSERT INTO coupons (
+          code, name, description, type, value, min_order_amount,
+          max_discount, usage_limit, valid_from, valid_until
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        RETURNING id
+      `, [
+        code.toUpperCase(), name, description || '', type, value, min_order_amount || 0,
+        max_discount, usage_limit, valid_from, valid_until
+      ]);
+      couponId = result.id;
+    } else {
+      // SQLite 使用 Database.run 返回的 id (實際上是 lastID)
+      result = await Database.run(`
+        INSERT INTO coupons (
+          code, name, description, type, value, min_order_amount,
+          max_discount, usage_limit, valid_from, valid_until
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `, [
+        code.toUpperCase(), name, description || '', type, value, min_order_amount || 0,
+        max_discount, usage_limit, valid_from, valid_until
+      ]);
+      couponId = result.id;  // SQLite Database.run 返回 { id: this.lastID, changes: this.changes }
+    }
+
+    console.log('✅ 優惠券創建成功:', code, 'ID:', couponId);
 
     res.json({
       success: true,
       message: '優惠券創建成功',
-      data: { id: result.id }
+      data: { id: couponId }
     });
 
   } catch (error) {

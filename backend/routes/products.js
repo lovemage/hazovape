@@ -9,6 +9,20 @@ const { uploadBufferToCloudinary, deleteFromCloudinary, extractPublicIdFromUrl }
 
 const router = express.Router();
 
+// Helper function to convert boolean values based on database type
+function convertBooleanForDB(value) {
+  const isPostgreSQL = !!process.env.DATABASE_URL;
+  const boolValue = value === 'true' || value === true;
+  
+  if (isPostgreSQL) {
+    // PostgreSQL: use actual boolean values
+    return boolValue;
+  } else {
+    // SQLite: use integer values (1 for true, 0 for false)
+    return boolValue ? 1 : 0;
+  }
+}
+
 // 配置 multer 使用內存存儲（用於 Cloudinary 上傳）
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -305,7 +319,7 @@ router.post('/admin', authenticateAdmin, upload.array('images', 5), async (req, 
         JSON.stringify(parsedMultiDiscount),
         JSON.stringify(allImages),
         true,
-        disable_coupon === 'true' || disable_coupon === true ? 1 : 0,
+        convertBooleanForDB(disable_coupon),
         nextSortOrder
       ]
     );
@@ -469,7 +483,7 @@ router.put('/admin/:id', authenticateAdmin, upload.array('images', 5), async (re
         category || '其他',
         JSON.stringify(parsedMultiDiscount),
         JSON.stringify(currentImages),
-        disable_coupon === 'true' || disable_coupon === true ? 1 : 0,
+        convertBooleanForDB(disable_coupon),
         id
       ]
     );
