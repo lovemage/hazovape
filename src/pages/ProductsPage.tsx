@@ -200,7 +200,16 @@ export const ProductsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div 
+      className="min-h-screen bg-gray-50"
+      style={{
+        backgroundImage: 'url(/images_title/background.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       {/* 頭部導航 */}
       <nav className="fixed top-0 left-0 right-0 shadow-sm border-b z-50 animated-nav">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
