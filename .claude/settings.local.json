@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker run:*)",
+      "Bash(node server.js)",
+      "Bash(taskkill:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(PORT=3005 node server.js)",
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)",
+      "Bash(docker exec:*)",
+      "Bash(heroku:*)",
+      "Bash(docker cp:*)",
+      "Bash(pg_restore:*)",
+      "Bash(node:*)",
+      "Bash(DATABASE_URL=postgresql://postgres:postgres123@localhost:5432/hazo_dev node import-production-data.js)",
+      "Bash(docker start:*)",
+      "Bash(n)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

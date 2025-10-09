@@ -257,24 +257,24 @@ async function initializePostgreSQL() {
 
     // 插入一些基本設置
     const defaultSettings = [
-      ['site_title', 'MeelFull', 'text', '網站標題', 'general'],
-      ['site_description', 'MeelFull - 優質產品專賣店，為您提供最佳的購物體驗', 'text', '網站描述', 'general'],
-      ['homepage_subtitle', '精選優質產品，為您帶來最美好的體驗', 'text', '首頁副標題', 'homepage'],
+      ['site_title', 'MeelFull', 'string', '網站標題', 'general'],
+      ['site_description', 'MeelFull - 優質產品專賣店，為您提供最佳的購物體驗', 'string', '網站描述', 'general'],
+      ['homepage_subtitle', '精選優質產品，為您帶來最美好的體驗', 'string', '首頁副標題', 'homepage'],
       ['free_shipping_threshold', '3000', 'number', '免運門檻', 'shipping'],
       ['shipping_fee', '60', 'number', '運費金額', 'shipping'],
-      ['contact_phone', '', 'text', '聯絡電話', 'contact'],
-      ['contact_email', '', 'text', '聯絡信箱', 'contact'],
-      ['contact_line', 'https://line.me/ti/p/euNh8K-s3e', 'text', 'LINE 官方帳號', 'contact'],
-      ['contact_telegram', 't.me/edward0521', 'text', 'Telegram 聯絡方式', 'contact'],
+      ['contact_phone', '', 'string', '聯絡電話', 'contact'],
+      ['contact_email', '', 'string', '聯絡信箱', 'contact'],
+      ['contact_line', 'https://line.me/ti/p/euNh8K-s3e', 'string', 'LINE 官方帳號', 'contact'],
+      ['contact_telegram', 't.me/edward0521', 'string', 'Telegram 聯絡方式', 'contact'],
       ['homepage_hero_enabled', 'true', 'boolean', '啟用 Hero 區域標題', 'homepage'],
-      ['homepage_title', 'MeelFull', 'text', 'Hero 區域主標題', 'homepage'],
+      ['homepage_title', 'MeelFull', 'string', 'Hero 區域主標題', 'homepage'],
       ['popup_enabled', 'false', 'boolean', '啟用首頁彈窗', 'popup'],
       ['order_complete_popup_enabled', 'true', 'boolean', '啟用訂單完成彈窗', 'popup']
     ];
 
     for (const [key, value, type, description, category] of defaultSettings) {
       await pool.query(`
-        INSERT INTO site_settings (setting_key, setting_value, setting_type, description, category, is_active)
+        INSERT INTO site_settings (setting_key, setting_value, data_type, description, category, is_active)
         VALUES ($1, $2, $3, $4, $5, $6)
         ON CONFLICT (setting_key) DO NOTHING
       `, [key, value, type, description, category, true]);

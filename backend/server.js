@@ -3,7 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // v1.0.1 - 強制部署解決緩存問題
 
@@ -51,6 +51,7 @@ app.use(helmet({
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
       "img-src": ["'self'", "data:", "blob:", "https:"],
       "form-action": ["'self'", "https://logistics.ecpay.com.tw", "https://logistics-stage.ecpay.com.tw"],
+      "connect-src": ["'self'", "http://localhost:3005", "http://localhost:5174", "ws://localhost:5174"],
     },
   },
 }));
@@ -59,11 +60,11 @@ const corsOptions = {
   credentials: true
 };
 
-// 生產環境允許同源請求，開發環境允許 localhost:5173
+// 生產環境允許同源請求，開發環境允許 localhost 的多個端口
 if (process.env.NODE_ENV === 'production') {
   corsOptions.origin = true; // 允許同源請求
 } else {
-  corsOptions.origin = 'http://localhost:5173';
+  corsOptions.origin = ['http://localhost:5173', 'http://localhost:5174'];
 }
 
 app.use(cors(corsOptions));

@@ -11,8 +11,8 @@ const isLocalDev = currentDomain.includes('localhost') || currentDomain.includes
 let API_BASE_URL: string;
 
 if (isLocalDev) {
-  // 本地開發環境，使用本地後端
-  API_BASE_URL = 'http://localhost:3001/api';
+  // 本地開發環境，使用 Vite 代理
+  API_BASE_URL = '/api';
 } else {
   // 生產環境，使用相對路徑
   API_BASE_URL = '/api';

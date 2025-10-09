@@ -42,16 +42,61 @@ async function getTelegramConfig() {
   }
 }
 
-// 生成訂單號 ORD{年}{日}{月}{時}{分}
-function generateOrderNumber() {
+// 生成唯一訂單號 ORD{年}{日}{月}{時}{分}{秒}{毫秒}
+async function generateUniqueOrderNumber() {
+  let attempts = 0;
+  const maxAttempts = 10;
+
+  while (attempts < maxAttempts) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hour = String(now.getHours()).padStart(2, '0');
+    const minute = String(now.getMinutes()).padStart(2, '0');
+    const second = String(now.getSeconds()).padStart(2, '0');
+    const millisecond = String(now.getMilliseconds()).padStart(3, '0');
+
+    // 生成訂單號：ORD + 年 + 日 + 月 + 時 + 分 + 秒 + 毫秒前2位
+    const orderNumber = `ORD${year}${day}${month}${hour}${minute}${second}${millisecond.substring(0, 2)}`;
+
+    try {
+      // 檢查訂單號是否已存在
+      const existingOrder = await Database.get(
+        'SELECT id FROM orders WHERE order_number = ?',
+        [orderNumber]
+      );
+
+      if (!existingOrder) {
+        console.log(`✅ 生成唯一訂單號: ${orderNumber} (嘗試次數: ${attempts + 1})`);
+        return orderNumber;
+      }
+
+      console.log(`⚠️ 訂單號 ${orderNumber} 已存在，重新生成...`);
+      attempts++;
+
+      // 短暫延遲避免時間戳重複
+      await new Promise(resolve => setTimeout(resolve, Math.random() * 10 + 1));
+
+    } catch (error) {
+      console.error('檢查訂單號唯一性時出錯:', error);
+      attempts++;
+    }
+  }
+
+  // 如果多次嘗試都失敗，添加隨機後綴
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
   const hour = String(now.getHours()).padStart(2, '0');
   const minute = String(now.getMinutes()).padStart(2, '0');
-  
-  return `ORD${year}${day}${month}${hour}${minute}`;
+  const second = String(now.getSeconds()).padStart(2, '0');
+  const randomSuffix = Math.random().toString(36).substring(2, 5).toUpperCase();
+
+  const fallbackOrderNumber = `ORD${year}${day}${month}${hour}${minute}${second}${randomSuffix}`;
+  console.log(`⚠️ 使用備用訂單號: ${fallbackOrderNumber}`);
+  return fallbackOrderNumber;
 }
 
 // 生成驗證碼
@@ -404,8 +449,8 @@ router.post('/', async (req, res) => {
         });
       }
 
-      // 生成訂單號和驗證碼
-      const orderNumber = generateOrderNumber();
+      // 生成唯一訂單號和驗證碼
+      const orderNumber = await generateUniqueOrderNumber();
       const verificationCode = generateVerificationCode();
 
       // 使用前端傳來的 total_amount（包含運費）
