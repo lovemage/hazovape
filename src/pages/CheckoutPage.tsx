@@ -10,7 +10,7 @@ import { CustomerInfo, CouponValidationResult } from '../types';
 import { toast } from 'sonner';
 import { UpsellSection } from '../components/UpsellSection';
 import { FloatingContactButtons } from '../components/FloatingContactButtons';
-import { StoreSelector } from '../components/StoreSelector';
+import { StoreSearchSelector } from '../components/StoreSearchSelector';
 import { OrderItem } from '../types';
 
 export const CheckoutPage: React.FC = () => {
@@ -350,74 +350,7 @@ export const CheckoutPage: React.FC = () => {
     }
   };
 
-  // 7-11門市選擇功能
-  const openStoreSelector = () => {
-    const { name, phone } = customerInfo;
 
-    // 準備傳遞給7-11的資料
-    const data = [
-      name || '',
-      phone || '',
-      '', // lineId
-      '', // memo
-      '13663', // id
-      '', // accessToken
-      '', // bonusCode
-      '', // source
-      '' // lineSource
-    ].join('|');
-
-    // 根據設備類型選擇URL
-    const isMobile = window.innerWidth < 768;
-    const baseUrl = isMobile
-      ? "https://emap.presco.com.tw/c2cemapm-u.ashx"
-      : "https://emap.presco.com.tw/c2cemap.ashx";
-
-    // 直接回調到結帳頁面
-    const callbackUrl = encodeURIComponent(window.location.origin + '/checkout');
-    const url = `${baseUrl}?eshopid=870&servicetype=1&tempvar=${data}&url=${callbackUrl}`;
-
-    console.log('🗺️ 開啟 7-11 門市選擇器:', {
-      baseUrl,
-      callbackUrl: window.location.origin + '/checkout',
-      fullUrl: url,
-      isMobile
-    });
-
-    // 開啟7-11門市查詢頁面（使用與成功版本相同的方式）
-    window.open(url, '_blank', 'width=800,height=600');
-
-    toast.info('已開啟 7-11 門市選擇器', {
-      description: '請在地圖上選擇您要取貨的門市，選擇完成後會自動返回此頁面',
-      duration: 5000
-    });
-  };
-
-  const handleStoreSearch = () => {
-    // 開啟 7-11 店號查詢視窗（備用方案）
-    const searchUrl = 'https://www.ibon.com.tw/mobile/retail_inquiry.aspx#gsc.tab=0';
-    const windowFeatures = 'width=1200,height=800,scrollbars=yes,resizable=yes,toolbar=no,menubar=no,location=no,status=no';
-
-    console.log('🔍 開啟 7-11 店號查詢視窗');
-
-    const searchWindow = window.open(searchUrl, '7-11店號查詢', windowFeatures);
-
-    if (searchWindow) {
-      searchWindow.focus();
-      toast.info('已開啟 7-11 門市查詢視窗', {
-        duration: 8000,
-        description: '1. 在 ibon 門市查詢系統中搜尋門市\n2. 記下門市的6位數店號\n3. 關閉查詢視窗後，將店號輸入到下方欄位中',
-      });
-    } else {
-      toast.error('無法開啟查詢視窗', {
-        description: '您的瀏覽器可能阻擋了彈出視窗，請允許彈出視窗或點擊下方按鈕直接前往',
-        action: {
-          label: '直接前往',
-          onClick: () => window.open(searchUrl, '_blank')
-        }
-      });
-    }
-  };
 
   const discountInfo: Array<{
     productName: string;
@@ -624,8 +557,8 @@ export const CheckoutPage: React.FC = () => {
                     7-11取貨門市 *
                   </Label>
 
-                  {/* 本地門市選擇器 */}
-                  <StoreSelector
+                  {/* 本地門市搜尋選擇器 */}
+                  <StoreSearchSelector
                     onStoreSelect={handleStoreSelect}
                     selectedStore={customerInfo.storeNumber ? {
                       id: customerInfo.storeNumber,
