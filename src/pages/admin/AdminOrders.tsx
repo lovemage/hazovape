@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Search, Filter, Download, MessageSquare, Trash2, Eye, Truck, Edit2, Save, X } from 'lucide-react';
+import { ShoppingCart, Search, Filter, Download, MessageSquare, Trash2, Eye, Truck, Edit2, Save, X, Package, User, Phone, MapPin, Calendar, DollarSign } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
@@ -26,6 +26,20 @@ interface Order {
   items?: any[];
 }
 
+interface OrderItem {
+  id: number;
+  product_name: string;
+  product_price: number;
+  quantity: number;
+  flavors: string[];
+  subtotal: number;
+  is_upsell: boolean;
+}
+
+interface OrderDetail extends Order {
+  items: OrderItem[];
+}
+
 export const AdminOrders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,6 +54,11 @@ export const AdminOrders: React.FC = () => {
   const [editingTracking, setEditingTracking] = useState<{ [key: number]: boolean }>({});
   const [trackingInputs, setTrackingInputs] = useState<{ [key: number]: string }>({});
   const [savingTracking, setSavingTracking] = useState<{ [key: number]: boolean }>({});
+
+  // 訂單詳情模態框狀態
+  const [showOrderDetail, setShowOrderDetail] = useState(false);
+  const [selectedOrderDetail, setSelectedOrderDetail] = useState<OrderDetail | null>(null);
+  const [loadingOrderDetail, setLoadingOrderDetail] = useState(false);
 
   useEffect(() => {
     loadOrders();
@@ -255,6 +274,36 @@ export const AdminOrders: React.FC = () => {
       default:
         return status;
     }
+  };
+
+  // 查看訂單詳情
+  const handleViewOrderDetail = async (orderId: number) => {
+    setLoadingOrderDetail(true);
+    try {
+      const response = await orderAPI.getById(orderId);
+      if (response.data.success) {
+        setSelectedOrderDetail(response.data.data);
+        setShowOrderDetail(true);
+      } else {
+        toast.error('載入訂單詳情失敗');
+      }
+    } catch (error) {
+      console.error('載入訂單詳情失敗:', error);
+      toast.error('載入訂單詳情失敗');
+    } finally {
+      setLoadingOrderDetail(false);
+    }
+  };
+
+  // 格式化日期
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('zh-TW', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   if (loading) {
@@ -568,7 +617,12 @@ export const AdminOrders: React.FC = () => {
                           <Trash2 className="h-4 w-4" />
                         </Button>
 
-                        <Button variant="outline" size="sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewOrderDetail(order.id)}
+                          disabled={loadingOrderDetail}
+                        >
                           <Eye className="h-4 w-4 mr-1" />
                           查看詳情
                         </Button>
@@ -580,6 +634,132 @@ export const AdminOrders: React.FC = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* 訂單詳情模態框 */}
+        {showOrderDetail && selectedOrderDetail && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <Package className="h-6 w-6" />
+                    訂單詳情
+                  </h2>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowOrderDetail(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* 訂單基本信息 */}
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <User className="w-5 h-5" />
+                        基本信息
+                      </span>
+                      <Badge className={getStatusBadgeColor(selectedOrderDetail.status)}>
+                        {getStatusText(selectedOrderDetail.status)}
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-600">訂單號</p>
+                        <p className="font-medium">{selectedOrderDetail.order_number}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">下單時間</p>
+                        <p className="font-medium">{formatDate(selectedOrderDetail.created_at)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">客戶姓名</p>
+                        <p className="font-medium">{selectedOrderDetail.customer_name}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">聯絡電話</p>
+                        <p className="font-medium flex items-center gap-1">
+                          <Phone className="w-4 h-4" />
+                          {selectedOrderDetail.customer_phone}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">取貨門市</p>
+                        <p className="font-medium flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          {selectedOrderDetail.store_number}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">訂單總額</p>
+                        <p className="font-medium text-lg flex items-center gap-1">
+                          <DollarSign className="w-4 h-4" />
+                          NT$ {selectedOrderDetail.total_amount.toLocaleString()}
+                        </p>
+                      </div>
+                      {selectedOrderDetail.tracking_number && (
+                        <div className="md:col-span-2">
+                          <p className="text-sm text-gray-600">運輸單號</p>
+                          <p className="font-medium flex items-center gap-1">
+                            <Truck className="w-4 h-4" />
+                            {selectedOrderDetail.tracking_number}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* 訂單商品 */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <ShoppingCart className="w-5 h-5" />
+                      訂單商品
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {selectedOrderDetail.items?.map((item, index) => (
+                        <div key={index} className="border rounded-lg p-4">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <h4 className="font-medium text-gray-900">{item.product_name}</h4>
+                              {item.flavors && item.flavors.length > 0 && (
+                                <p className="text-sm text-gray-600 mt-1">
+                                  規格: {item.flavors.join(', ')}
+                                </p>
+                              )}
+                              <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                <span>單價: NT$ {item.product_price}</span>
+                                <span>數量: {item.quantity}</span>
+                                {item.is_upsell && (
+                                  <Badge variant="outline" className="text-xs">
+                                    加購商品
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-medium text-lg">
+                                NT$ {item.subtotal.toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );

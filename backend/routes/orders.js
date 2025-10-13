@@ -841,6 +841,51 @@ router.put('/admin/:id/tracking', authenticateAdmin, async (req, res) => {
   }
 });
 
+// 管理員：獲取單個訂單詳情
+router.get('/admin/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log('🔍 獲取訂單詳情，ID:', id);
+
+    // 獲取訂單基本信息
+    const order = await Database.get(
+      'SELECT * FROM orders WHERE id = ?',
+      [id]
+    );
+
+    if (!order) {
+      console.log('❌ 訂單不存在，ID:', id);
+      return res.status(404).json({
+        success: false,
+        message: '訂單不存在'
+      });
+    }
+
+    // 獲取訂單項目
+    const orderItems = await Database.all(
+      'SELECT * FROM order_items WHERE order_id = ?',
+      [id]
+    );
+
+    console.log('✅ 訂單詳情獲取成功:', order.order_number);
+
+    res.json({
+      success: true,
+      data: {
+        ...order,
+        items: orderItems
+      }
+    });
+
+  } catch (error) {
+    console.error('獲取訂單詳情錯誤:', error);
+    res.status(500).json({
+      success: false,
+      message: '獲取訂單詳情失敗'
+    });
+  }
+});
+
 // 管理員：獲取運輸單號
 router.get('/admin/:id/tracking', authenticateAdmin, async (req, res) => {
   try {

@@ -877,6 +877,28 @@ export const CheckoutPage: React.FC = () => {
                   商品將在3-5個工作天內送達指定門市
                 </p>
               </div>
+
+              {/* 電腦端提交按鈕 */}
+              <div className="hidden lg:block mt-6">
+                <Button
+                  onClick={handleSubmit}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  size="lg"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      處理中...
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="w-4 h-4" />
+                      提交訂單
+                    </div>
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
