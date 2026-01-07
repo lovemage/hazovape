@@ -40,10 +40,10 @@ const OrderQueryPage: React.FC = () => {
   const location = useLocation();
   const { state } = useCart();
   const items = state.items;
-  
+
   // 檢查是否有預填的訂單號
   const prefilledOrderNumber = location.state?.prefilledOrderNumber;
-  
+
   const [orderNumber, setOrderNumber] = useState(prefilledOrderNumber || '');
   const [verificationCode, setVerificationCode] = useState('');
   const [orderData, setOrderData] = useState<OrderData | null>(null);
@@ -87,7 +87,7 @@ const OrderQueryPage: React.FC = () => {
     setLoading(true);
     try {
       const response = await orderAPI.query(orderNumber.trim(), verificationCode.trim());
-      
+
       if (response.data.success) {
         setOrderData(response.data.data);
         toast.success('查詢成功');
@@ -164,9 +164,9 @@ const OrderQueryPage: React.FC = () => {
               className="flex items-center cursor-pointer group"
               onClick={() => navigate('/')}
             >
-              <img 
-                src="/hazo-png.png" 
-                alt="Hazo Logo" 
+              <img
+                src="/hazo-png.png"
+                alt="Hazo Logo"
                 className="w-10 h-10 mr-3 group-hover:scale-105 transition-transform rounded-md object-cover"
               />
               <h1 className="text-xl font-bold bg-gradient-to-r from-meelful-primary to-meelful-secondary bg-clip-text text-transparent">
@@ -221,244 +221,244 @@ const OrderQueryPage: React.FC = () => {
       {/* 主要內容 */}
       <div className="py-8">
         <div className="max-w-4xl mx-auto px-4">
-        {/* 頁面標題 */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">訂單查詢</h1>
-          <p className="text-gray-600">請輸入您的訂單號和驗證碼查詢訂單狀態</p>
-        </div>
+          {/* 頁面標題 */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">訂單查詢</h1>
+            <p className="text-gray-600">請輸入您的訂單號和驗證碼查詢訂單狀態</p>
+          </div>
 
-        {/* 免責聲明 */}
-        <Card className="mb-6 border-amber-200 bg-amber-50">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-amber-800">
-                <p className="font-medium mb-2">重要提醒</p>
-                <p className="leading-relaxed">
-                  此查詢頁面並非絕對貨態查詢，因商品寄出和系統非同步進行，您訂購的商品可能已經安排出貨，但是系統尚未更新狀態。此頁面僅供參考，如要正確貨態查詢可以與客服人員聯繫。
-                </p>
-                <div className="mt-3">
+          {/* 免責聲明 */}
+          <Card className="mb-6 border-amber-200 bg-amber-50">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-amber-800">
+                  <p className="font-medium mb-2">重要提醒</p>
+                  <p className="leading-relaxed">
+                    此查詢頁面並非絕對貨態查詢，因商品寄出和系統非同步進行，您訂購的商品可能已經安排出貨，但是系統尚未更新狀態。此頁面僅供參考，如要正確貨態查詢可以與客服人員聯繫。
+                  </p>
+                  <div className="mt-3">
+                    <Button
+                      onClick={() => window.open(telegramUrl, '_blank')}
+                      className="bg-gradient-to-r from-vape-purple to-vape-cyan hover:from-purple-700 hover:to-cyan-600 text-white"
+                      size="sm"
+                    >
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      聯繫 Telegram 客服
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 查詢表單 */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Search className="w-5 h-5" />
+                查詢訂單
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="orderNumber">訂單號</Label>
+                  <Input
+                    id="orderNumber"
+                    type="text"
+                    placeholder="請輸入訂單號"
+                    value={orderNumber}
+                    onChange={(e) => setOrderNumber(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="verificationCode">驗證碼</Label>
+                  <Input
+                    id="verificationCode"
+                    type="text"
+                    placeholder="請輸入驗證碼"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+              <Button
+                onClick={handleQuery}
+                disabled={loading}
+                className="w-full"
+              >
+                {loading ? '查詢中...' : '查詢訂單'}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* 訂單詳情 */}
+          {orderData && (
+            <div className="space-y-6">
+              {/* 訂單基本信息 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <Package className="w-5 h-5" />
+                      訂單詳情
+                    </span>
+                    <Badge className={`${getStatusColor(orderData.status)} border`}>
+                      <span className="flex items-center gap-1">
+                        {getStatusIcon(orderData.status)}
+                        {orderData.status_text}
+                      </span>
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-600">訂單號</p>
+                      <p className="font-medium">{orderData.order_number}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">下單時間</p>
+                      <p className="font-medium">{formatDate(orderData.created_at)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">客戶姓名</p>
+                      <p className="font-medium">{orderData.customer_name}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">聯絡電話</p>
+                      <p className="font-medium">{orderData.customer_phone}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">取貨門市</p>
+                      <p className="font-medium">{orderData.store_number}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">訂單總額</p>
+                      <p className="font-medium text-lg text-vape-purple">
+                        NT$ {orderData.total_amount.toLocaleString()}
+                      </p>
+                    </div>
+
+                    {/* 運輸單號顯示 */}
+                    {(orderData.status === 'shipped' || orderData.status === 'delivered') && (
+                      <div className="col-span-2">
+                        <p className="text-sm text-gray-600">運輸單號</p>
+                        {orderData.tracking_number ? (
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono bg-vape-purple/10 px-3 py-1 rounded border border-vape-purple/20 text-vape-purple">
+                                {orderData.tracking_number}
+                              </span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleCopyTracking(orderData.tracking_number!)}
+                                className="text-vape-cyan hover:text-vape-purple"
+                              >
+                                <Copy className="w-3 h-3 mr-1" />
+                                複製
+                              </Button>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                onClick={() => window.open('https://eservice.7-11.com.tw/e-tracking/search.aspx', '_blank')}
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                              >
+                                <ExternalLink className="w-3 h-3 mr-1" />
+                                立刻查詢
+                              </Button>
+                              <span className="text-xs text-gray-500">前往7-11電子取貨查詢系統</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-500 mt-1">尚未提供運輸單號</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {orderData.is_verified && (
+                    <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center gap-2 text-green-700">
+                        <CheckCircle className="w-4 h-4" />
+                        <span className="text-sm font-medium">此訂單已驗證</span>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* 商品清單 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>商品清單</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {orderData.items.map((item, index) => (
+                      <div key={item.id} className="flex justify-between items-start p-4 border rounded-lg">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className="font-medium">{item.product_name}</h4>
+                            {item.is_upsell && (
+                              <Badge variant="secondary" className="text-xs">
+                                加購商品
+                              </Badge>
+                            )}
+                          </div>
+                          {Array.isArray(item.flavors) && item.flavors.length > 0 && (
+                            <p className="text-sm text-gray-600 mb-1">
+                              規格: {item.flavors.join(', ')}
+                            </p>
+                          )}
+                          <p className="text-sm text-gray-600">
+                            單價: NT$ {item.product_price.toLocaleString()} × {item.quantity}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium">
+                            NT$ {item.subtotal.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Telegram 客服聯繫 */}
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MessageCircle className="w-5 h-5 text-vape-cyan" />
+                    <p className="font-medium text-vape-dark">需要協助？</p>
+                  </div>
+                  <p className="text-sm text-vape-dark/80 mb-3">
+                    如有任何問題或需要最新的貨態查詢，請聯繫我們的 Telegram 客服
+                  </p>
                   <Button
                     onClick={() => window.open(telegramUrl, '_blank')}
-                    className="bg-gradient-to-r from-vape-purple to-vape-cyan hover:from-purple-700 hover:to-cyan-600 text-white"
+                    className="w-full bg-gradient-to-r from-vape-purple to-vape-cyan hover:from-purple-700 hover:to-cyan-600 text-white"
                     size="sm"
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />
                     聯繫 Telegram 客服
                   </Button>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* 查詢表單 */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="w-5 h-5" />
-              查詢訂單
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="orderNumber">訂單號</Label>
-                <Input
-                  id="orderNumber"
-                  type="text"
-                  placeholder="請輸入訂單號"
-                  value={orderNumber}
-                  onChange={(e) => setOrderNumber(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="verificationCode">驗證碼</Label>
-                <Input
-                  id="verificationCode"
-                  type="text"
-                  placeholder="請輸入驗證碼"
-                  value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-            </div>
-            <Button 
-              onClick={handleQuery} 
-              disabled={loading}
-              className="w-full"
-            >
-              {loading ? '查詢中...' : '查詢訂單'}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* 訂單詳情 */}
-        {orderData && (
-          <div className="space-y-6">
-            {/* 訂單基本信息 */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span className="flex items-center gap-2">
-                    <Package className="w-5 h-5" />
-                    訂單詳情
-                  </span>
-                  <Badge className={`${getStatusColor(orderData.status)} border`}>
-                    <span className="flex items-center gap-1">
-                      {getStatusIcon(orderData.status)}
-                      {orderData.status_text}
-                    </span>
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">訂單號</p>
-                    <p className="font-medium">{orderData.order_number}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">下單時間</p>
-                    <p className="font-medium">{formatDate(orderData.created_at)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">客戶姓名</p>
-                    <p className="font-medium">{orderData.customer_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">聯絡電話</p>
-                    <p className="font-medium">{orderData.customer_phone}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">取貨門市</p>
-                    <p className="font-medium">{orderData.store_number}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">訂單總額</p>
-                    <p className="font-medium text-lg text-vape-purple">
-                      NT$ {orderData.total_amount.toLocaleString()}
-                    </p>
-                  </div>
-                  
-                  {/* 運輸單號顯示 */}
-                  {(orderData.status === 'shipped' || orderData.status === 'delivered') && (
-                    <div className="col-span-2">
-                      <p className="text-sm text-gray-600">運輸單號</p>
-                                             {orderData.tracking_number ? (
-                         <div className="space-y-2">
-                           <div className="flex items-center gap-2">
-                             <span className="font-mono bg-vape-purple/10 px-3 py-1 rounded border border-vape-purple/20 text-vape-purple">
-                               {orderData.tracking_number}
-                             </span>
-                             <Button
-                               size="sm"
-                               variant="outline"
-                               onClick={() => handleCopyTracking(orderData.tracking_number!)}
-                               className="text-vape-cyan hover:text-vape-purple"
-                             >
-                               <Copy className="w-3 h-3 mr-1" />
-                               複製
-                             </Button>
-                           </div>
-                           <div className="flex items-center gap-2">
-                             <Button
-                               size="sm"
-                               onClick={() => window.open('https://eservice.7-11.com.tw/e-tracking/search.aspx', '_blank')}
-                               className="bg-green-600 hover:bg-green-700 text-white"
-                             >
-                               <ExternalLink className="w-3 h-3 mr-1" />
-                               立刻查詢
-                             </Button>
-                             <span className="text-xs text-gray-500">前往7-11電子取貨查詢系統</span>
-                           </div>
-                         </div>
-                       ) : (
-                         <p className="text-sm text-gray-500 mt-1">尚未提供運輸單號</p>
-                       )}
-                    </div>
-                  )}
-                </div>
-                
-                {orderData.is_verified && (
-                  <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-center gap-2 text-green-700">
-                      <CheckCircle className="w-4 h-4" />
-                      <span className="text-sm font-medium">此訂單已驗證</span>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* 商品清單 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>商品清單</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {orderData.items.map((item, index) => (
-                    <div key={item.id} className="flex justify-between items-start p-4 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-medium">{item.product_name}</h4>
-                          {item.is_upsell && (
-                            <Badge variant="secondary" className="text-xs">
-                              加購商品
-                            </Badge>
-                          )}
-                        </div>
-                        {item.flavors.length > 0 && (
-                          <p className="text-sm text-gray-600 mb-1">
-                            規格: {item.flavors.join(', ')}
-                          </p>
-                        )}
-                        <p className="text-sm text-gray-600">
-                          單價: NT$ {item.product_price.toLocaleString()} × {item.quantity}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium">
-                          NT$ {item.subtotal.toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Telegram 客服聯繫 */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <MessageCircle className="w-5 h-5 text-vape-cyan" />
-                  <p className="font-medium text-vape-dark">需要協助？</p>
-                </div>
-                <p className="text-sm text-vape-dark/80 mb-3">
-                  如有任何問題或需要最新的貨態查詢，請聯繫我們的 Telegram 客服
-                </p>
-                <Button
-                  onClick={() => window.open(telegramUrl, '_blank')}
-                  className="w-full bg-gradient-to-r from-vape-purple to-vape-cyan hover:from-purple-700 hover:to-cyan-600 text-white"
-                  size="sm"
-                >
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  聯繫 Telegram 客服
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+          )}
         </div>
       </div>
-      
+
       {/* 懸浮聯繫按鈕 */}
       <FloatingContactButtons />
-      
+
       {/* 移動端底部導航的佔位空間 */}
       <div className="h-16 md:hidden" />
     </div>

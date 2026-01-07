@@ -73,7 +73,7 @@ export const AdminOrders: React.FC = () => {
         status: statusFilter !== 'all' ? statusFilter : undefined,
         search: searchTerm || undefined
       };
-      
+
       const response = await orderAPI.getAllAdmin(params);
       if (response.data.success) {
         setOrders(response.data.data.orders || []);
@@ -209,7 +209,7 @@ export const AdminOrders: React.FC = () => {
 
   const handleSaveTracking = async (orderId: number) => {
     const trackingNumber = trackingInputs[orderId]?.trim();
-    
+
     if (!trackingNumber) {
       toast.error('請輸入運輸單號');
       return;
@@ -310,7 +310,7 @@ export const AdminOrders: React.FC = () => {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center h-64">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-vape-purple"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-vape-purple"></div>
         </div>
       </AdminLayout>
     );
@@ -370,7 +370,7 @@ export const AdminOrders: React.FC = () => {
               <div className="text-2xl font-bold">{orders.length}</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">待處理</CardTitle>
@@ -382,7 +382,7 @@ export const AdminOrders: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">已完成</CardTitle>
@@ -394,7 +394,7 @@ export const AdminOrders: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">總金額</CardTitle>
@@ -500,7 +500,7 @@ export const AdminOrders: React.FC = () => {
                           </Badge>
                         )}
                       </div>
-                      
+
                       <div className="text-right">
                         <p className="font-medium text-gray-900">NT$ {order.total_amount.toLocaleString()}</p>
                         <p className="text-sm text-gray-500">
@@ -508,7 +508,7 @@ export const AdminOrders: React.FC = () => {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-3">
                       <div>
                         <span className="font-medium">客戶:</span> {order.customer_name}
@@ -520,78 +520,78 @@ export const AdminOrders: React.FC = () => {
                         <span className="font-medium">店號:</span> {order.store_number}
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
-                                          <div className="text-sm text-gray-500">
-                      驗證碼: {order.verification_code} | 
-                      已驗證: {order.is_verified ? '是' : '否'}
-                    </div>
-                    
-                    {/* 運輸單號區域 */}
-                    {canShowTracking(order.status) && (
-                      <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Truck className="h-4 w-4 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-900">運輸單號</span>
-                        </div>
-                        
-                        {editingTracking[order.id] ? (
-                          <div className="flex gap-2">
-                            <Input
-                              type="text"
-                              placeholder="請輸入運輸單號"
-                              value={trackingInputs[order.id] || ''}
-                              onChange={(e) => handleTrackingInputChange(order.id, e.target.value)}
-                              className="flex-1"
-                              onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                  handleSaveTracking(order.id);
-                                }
-                              }}
-                            />
-                            <Button
-                              size="sm"
-                              onClick={() => handleSaveTracking(order.id)}
-                              disabled={savingTracking[order.id]}
-                              className="bg-green-600 hover:bg-green-700"
-                            >
-                              {savingTracking[order.id] ? (
-                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
-                              ) : (
-                                <Save className="h-3 w-3" />
-                              )}
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleCancelEditTracking(order.id)}
-                              disabled={savingTracking[order.id]}
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-mono bg-white px-2 py-1 rounded border">
-                              {order.tracking_number || '尚未提供'}
-                            </span>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleEditTracking(order.id, order.tracking_number)}
-                              className="ml-2"
-                            >
-                              <Edit2 className="h-3 w-3 mr-1" />
-                              {order.tracking_number ? '修改' : '添加'}
-                            </Button>
-                          </div>
-                        )}
+                      <div className="text-sm text-gray-500">
+                        驗證碼: {order.verification_code} |
+                        已驗證: {order.is_verified ? '是' : '否'}
                       </div>
-                    )}
-                      
+
+                      {/* 運輸單號區域 */}
+                      {canShowTracking(order.status) && (
+                        <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Truck className="h-4 w-4 text-blue-600" />
+                            <span className="text-sm font-medium text-blue-900">運輸單號</span>
+                          </div>
+
+                          {editingTracking[order.id] ? (
+                            <div className="flex gap-2">
+                              <Input
+                                type="text"
+                                placeholder="請輸入運輸單號"
+                                value={trackingInputs[order.id] || ''}
+                                onChange={(e) => handleTrackingInputChange(order.id, e.target.value)}
+                                className="flex-1"
+                                onKeyPress={(e) => {
+                                  if (e.key === 'Enter') {
+                                    handleSaveTracking(order.id);
+                                  }
+                                }}
+                              />
+                              <Button
+                                size="sm"
+                                onClick={() => handleSaveTracking(order.id)}
+                                disabled={savingTracking[order.id]}
+                                className="bg-green-600 hover:bg-green-700"
+                              >
+                                {savingTracking[order.id] ? (
+                                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                                ) : (
+                                  <Save className="h-3 w-3" />
+                                )}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleCancelEditTracking(order.id)}
+                                disabled={savingTracking[order.id]}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-mono bg-white px-2 py-1 rounded border">
+                                {order.tracking_number || '尚未提供'}
+                              </span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleEditTracking(order.id, order.tracking_number)}
+                                className="ml-2"
+                              >
+                                <Edit2 className="h-3 w-3 mr-1" />
+                                {order.tracking_number ? '修改' : '添加'}
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       <div className="flex gap-2">
-                        <Select 
-                          value={order.status} 
+                        <Select
+                          value={order.status}
                           onValueChange={(value) => handleStatusChange(order.id, value)}
                         >
                           <SelectTrigger className="w-32">
@@ -606,7 +606,7 @@ export const AdminOrders: React.FC = () => {
                             <SelectItem value="cancelled">已取消</SelectItem>
                           </SelectContent>
                         </Select>
-                        
+
                         <Button
                           variant="outline"
                           size="sm"
@@ -730,7 +730,7 @@ export const AdminOrders: React.FC = () => {
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
                               <h4 className="font-medium text-gray-900">{item.product_name}</h4>
-                              {item.flavors && item.flavors.length > 0 && (
+                              {Array.isArray(item.flavors) && item.flavors.length > 0 && (
                                 <p className="text-sm text-gray-600 mt-1">
                                   規格: {item.flavors.join(', ')}
                                 </p>
