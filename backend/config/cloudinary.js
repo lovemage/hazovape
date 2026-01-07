@@ -1,12 +1,18 @@
 const cloudinary = require('cloudinary').v2;
 
 // 配置 Cloudinary
-cloudinary.config({
-  cloud_name: 'dnps7z7p8',
-  api_key: '135283526689588',
-  api_secret: 'kz8Sq6DqXecKWId8uc3vO24VQ4M',
-  secure: true
-});
+if (process.env.CLOUDINARY_URL) {
+  // 如果設置了 CLOUDINARY_URL環境變數，SDK 會自動解析，無需手動配置
+  console.log('✅ 檢測到 CLOUDINARY_URL 環境變數，使用自動配置');
+} else {
+  // 否則使用手動配置
+  cloudinary.config({
+    cloud_name: 'dnps7z7p8',
+    api_key: '135283526689588',
+    api_secret: 'kz8Sq6DqXecKWId8uc3vO24VQ4M',
+    secure: true
+  });
+}
 
 // 測試連接
 async function testCloudinaryConnection() {
@@ -28,9 +34,13 @@ async function uploadToCloudinary(filePath, options = {}) {
       use_filename: true,
       unique_filename: true,
       overwrite: false,
+      format: 'webp', // 強制轉換為 WebP
+      transformation: [
+        { quality: 'auto', fetch_format: 'webp' } // 自動優化和 WebP 格式
+      ],
       ...options
     });
-    
+
     console.log('✅ Cloudinary 上傳成功:', result.secure_url);
     return result;
   } catch (error) {
@@ -46,6 +56,10 @@ async function uploadBufferToCloudinary(buffer, options = {}) {
       {
         folder: options.folder || 'hazo',
         resource_type: 'auto',
+        format: 'webp', // 強制轉換為 WebP
+        transformation: [
+          { quality: 'auto', fetch_format: 'webp' } // 自動優化和 WebP 格式
+        ],
         ...options
       },
       (error, result) => {
