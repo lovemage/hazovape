@@ -201,9 +201,9 @@ ${itemsText}
 router.post('/', async (req, res) => {
   try {
     console.log('🛒 收到訂單創建請求:', req.body);
-    const { 
-      customer_name, customer_phone, store_number, items, total_amount, 
-      subtotal, shipping_fee, coupon_code, coupon_id, discount_amount 
+    const {
+      customer_name, customer_phone, store_number, items, total_amount,
+      subtotal, shipping_fee, coupon_code, coupon_id, discount_amount
     } = req.body;
 
     // 驗證必填字段
@@ -234,7 +234,7 @@ router.post('/', async (req, res) => {
     // 驗證商品庫存和計算總金額
     let totalAmount = 0;
     const validatedItems = [];
-    
+
     // 檢查數據庫類型並正確處理事務
     const isPostgreSQL = !!process.env.DATABASE_URL;
     let client = null;
@@ -348,26 +348,26 @@ router.post('/', async (req, res) => {
         if (!is_upsell && processedFlavors.length > 0) {
           // 一般商品：每個規格單獨計價（現在前端已拆分為單個規格）
           console.log(`💰 規格計價: 商品 ${product.name}, 規格: ${processedFlavors[0]}, 數量: ${quantity}`);
-          
+
           const flavorName = processedFlavors[0]; // 現在每個訂單項目只有一個規格
-          
+
           // 獲取規格資訊，檢查是否有獨立價格
           const flavor = await Database.get(
             'SELECT price FROM flavors WHERE name = ? AND product_id = ? AND is_active = true',
             [flavorName, product_id]
           );
-          
+
           // 使用規格價格（如果有），否則使用產品價格
           const flavorPrice = flavor?.price || product.price;
           subtotal = Math.round(flavorPrice * quantity);
           unitPrice = flavorPrice;
-          
+
           console.log(`💰 規格 "${flavorName}": 價格=${flavorPrice}, 數量=${quantity}, 小計=${subtotal}`);
         } else {
           // 加購商品或無規格商品：使用原有邏輯
           subtotal = Math.round(product.price * quantity);
           unitPrice = product.price;
-          
+
           console.log(`💰 商品計價: 單價=${unitPrice}, 數量=${quantity}, 小計=${subtotal}`);
         }
 
@@ -481,7 +481,7 @@ router.post('/', async (req, res) => {
       // 如果使用了優惠券，記錄使用情況
       if (coupon_id && discount_amount > 0) {
         console.log('🎫 記錄優惠券使用:', { coupon_id, discount_amount, customer_phone });
-        
+
         await Database.run(
           `INSERT INTO coupon_usages (coupon_id, order_id, customer_phone, discount_amount)
            VALUES (?, ?, ?, ?)`,
@@ -663,15 +663,24 @@ router.post('/query', async (req, res) => {
     console.log(`⏱️  訂單項目查詢耗時: ${Date.now() - itemsStart}ms`);
 
     // 格式化訂單項目數據
-    const formattedItems = orderItems.map(item => ({
-      id: item.id,
-      product_name: item.product_name,
-      product_price: item.product_price,
-      quantity: item.quantity,
-      flavors: item.flavors ? JSON.parse(item.flavors) : [],
-      subtotal: item.subtotal,
-      is_upsell: item.is_upsell === true
-    }));
+    const formattedItems = orderItems.map(item => {
+      let flavors = [];
+      try {
+        const parsed = item.flavors ? JSON.parse(item.flavors) : [];
+        flavors = Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        flavors = [];
+      }
+      return {
+        id: item.id,
+        product_name: item.product_name,
+        product_price: item.product_price,
+        quantity: item.quantity,
+        flavors: flavors,
+        subtotal: item.subtotal,
+        is_upsell: item.is_upsell === true
+      };
+    });
 
     // 格式化訂單狀態
     const getStatusText = (status) => {
@@ -756,10 +765,20 @@ router.get('/admin/all', authenticateAdmin, async (req, res) => {
         'SELECT * FROM order_items WHERE order_id = ?',
         [order.id]
       );
-      order.items = items.map(item => ({
-        ...item,
-        flavors: item.flavors ? JSON.parse(item.flavors) : []
-      }));
+      order.items = items.map(item => {
+        let flavors = [];
+        try {
+          const parsed = item.flavors ? JSON.parse(item.flavors) : [];
+          flavors = Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          // console.warn(`Error parsing flavors for item ${item.id}:`, e);
+          flavors = [];
+        }
+        return {
+          ...item,
+          flavors
+        };
+      });
     }
 
     res.json({
@@ -1185,9 +1204,9 @@ router.post('/admin/:id/resend-telegram', authenticateAdmin, async (req, res) =>
     }
 
     const orderItems = await Database.all('SELECT * FROM order_items WHERE order_id = ?', [id]);
-    
+
     const telegramSent = await sendTelegramNotification(order, orderItems);
-    
+
     if (telegramSent) {
       await Database.run('UPDATE orders SET telegram_sent = true WHERE id = ?', [id]);
       res.json({
@@ -1263,13 +1282,13 @@ router.delete('/admin/batch', authenticateAdmin, async (req, res) => {
       });
     } catch (error) {
       console.error('❌ 事務執行失敗:', error);
-      
+
       if (isPostgreSQL && client) {
         await Database.rollback(client);
       } else if (!isPostgreSQL) {
         await Database.rollback();
       }
-      
+
       throw error;
     }
   } catch (error) {
@@ -1331,13 +1350,13 @@ router.delete('/admin/:id', authenticateAdmin, async (req, res) => {
       });
     } catch (error) {
       console.error('❌ 事務執行失敗:', error);
-      
+
       if (isPostgreSQL && client) {
         await Database.rollback(client);
       } else if (!isPostgreSQL) {
         await Database.rollback();
       }
-      
+
       throw error;
     }
   } catch (error) {
